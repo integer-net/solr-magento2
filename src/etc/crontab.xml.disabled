@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+  <group id="default">
+    <job name="integernet_solr_rebuild_config" instance="IntegerNet\Solr\Model\Observer" method="storeSolrConfig">
+      <schedule>0 3 * * *</schedule>
+    </job>
+    <job name="integernet_solr_check_server_connection" instance="IntegerNet\Solr\Model\Observer" method="checkSolrServerConnection">
+      <schedule>*/5 * * * *</schedule>
+    </job>
+  </group>
+</config>

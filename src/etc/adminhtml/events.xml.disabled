@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+  <event name="adminhtml_catalog_product_attribute_edit_prepare_form">
+    <observer name="integernet_solr" instance="IntegerNet\Solr\Observer\AdminhtmlCatalogProductAttributeEditPrepareForm"/>
+  </event>
+  <event name="admin_system_config_changed_section_integernet_solr">
+    <observer name="integernet_solr" instance="IntegerNet\Solr\Observer\AdminSystemConfigChangedSectionIntegernetSolr"/>
+  </event>
+  <event name="admin_session_user_login_success">
+    <observer name="integernet_solr" instance="IntegerNet\Solr\Observer\AdminSessionUserLoginSuccess"/>
+  </event>
+</config>

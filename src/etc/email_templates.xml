@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+  <template id="integernet_solr_connection_check_email_template" label="Solr Connection Check Notification" file="integernet_solr/connection_check.txt" type="text" area="frontend" module="IntegerNet_Solr"/>
+</config>

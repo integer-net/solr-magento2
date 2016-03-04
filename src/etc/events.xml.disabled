@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+  <event name="catalog_block_product_list_collection">
+    <observer name="review" instance="Magento\Review\Observer\CatalogBlockProductCollectionBeforeToHtml"/>
+  </event>
+  <event name="catalog_product_delete_after">
+    <observer name="integernet_solr" instance="IntegerNet\Solr\Observer\CatalogProductDeleteAfter"/>
+  </event>
+  <event name="application_clean_cache">
+    <observer name="integernet_solr" instance="IntegerNet\Solr\Observer\ApplicationCleanCache"/>
+  </event>
+  <event name="controller_front_init_before">
+    <observer name="integernet_solr" instance="\CreateAndRegister"/>
+  </event>
+  <event name="core_block_abstract_to_html_before">
+    <observer name="integernet_solr" instance="IntegerNet\Solr\Observer\CoreBlockAbstractToHtmlBefore"/>
+  </event>
+  <event name="cms_page_save_commit_after">
+    <observer name="integernet_solr" instance="IntegerNet\Solr\Model\Cmsindexer\CmsPageSaveAfter"/>
+  </event>
+</config>
