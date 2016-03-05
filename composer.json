@@ -14,13 +14,13 @@
             "registration.php"
         ],
         "psr-4": {
-            "IntegerNet\\Solr\\": ""
+            "IntegerNet\\Solr\\": "src"
         }
     },
     "extra": {
         "map": [
             [
-                "*",
+                "src/*",
                 "IntegerNet\/Solr"
             ]
         ]
