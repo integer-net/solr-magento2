@@ -5,7 +5,7 @@
       <label>IntegerNet_Solr</label>
       <class>integernet-solr-tab</class>
       <tab>service</tab>
-      <resource>IntegerNet_Solr::system_config</resource>
+      <resource>IntegerNet_Solr::config_integernet_solr</resource>
       <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>General</label>
         <field id="description" translate="label" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -46,7 +46,7 @@
         <field id="http_method" translate="label,comment" sortOrder="50" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>HTTP Transport Method</label>
           <comment>Please change if you are getting communication errors</comment>
-          <source_model>IntegerNet\Solr\Model\Source\Httptransportmethod</source_model>
+          <source_model>IntegerNet\Solr\Model\Source\HttpTransportMethod</source_model>
         </field>
         <field id="use_https" translate="label,comment" sortOrder="60" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Use HTTPS</label>
@@ -147,11 +147,11 @@
         </field>
         <field id="search_operator" translate="label" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Search Operator</label>
-          <source_model>IntegerNet\Solr\Model\Source\Searchoperator</source_model>
+          <source_model>IntegerNet\Solr\Model\Source\SearchOperator</source_model>
         </field>
         <field id="filter_position" translate="label" sortOrder="23" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Position of Filters</label>
-          <source_model>IntegerNet\Solr\Model\Source\Filterposition</source_model>
+          <source_model>IntegerNet\Solr\Model\Source\FilterPosition</source_model>
         </field>
         <field id="priority_categories" translate="label,comment" sortOrder="25" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Solr Priority of Category Names</label>
@@ -180,12 +180,12 @@
         <field id="product_attributes_redirect" translate="label,comment" sortOrder="70" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Redirect to product page on direct match in one of these attributes</label>
           <comment>If the exact name / sku / ... is entered in the search field, the customer will be redirected to the product view page.</comment>
-          <source_model>IntegerNet\Solr\Model\Source\Varcharproductattribute</source_model>
+          <source_model>IntegerNet\Solr\Model\Source\VarcharProductAttribute</source_model>
         </field>
         <field id="category_attributes_redirect" translate="label,comment" sortOrder="80" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Redirect to category page on direct match in one of these attributes</label>
           <comment>If the exact name / ... is entered in the search field, the customer will be redirected to the category view page.</comment>
-          <source_model>IntegerNet\Solr\Model\Source\Varcharcategoryattribute</source_model>
+          <source_model>IntegerNet\Solr\Model\Source\VarcharCategoryAttribute</source_model>
         </field>
       </group>
       <group id="category" translate="label" sortOrder="60" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -196,7 +196,7 @@
         </field>
         <field id="filter_position" translate="label" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Position of Filters</label>
-          <source_model>IntegerNet\Solr\Model\Source\Filterposition</source_model>
+          <source_model>IntegerNet\Solr\Model\Source\FilterPosition</source_model>
         </field>
       </group>
       <group id="autosuggest" translate="label" sortOrder="80" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -208,7 +208,7 @@
         <field id="use_php_file_in_home_dir" translate="label,comment" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Method to retrieve autosuggest information</label>
           <comment>Please see manual for information about the different methods.</comment>
-          <source_model>IntegerNet\Solr\Model\Source\Autosuggestmethod</source_model>
+          <source_model>IntegerNet\Solr\Model\Source\AutosuggestMethod</source_model>
         </field>
         <field id="max_number_searchword_suggestions" translate="label" sortOrder="30" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Maximum number of searchword suggestions</label>
@@ -230,12 +230,12 @@
         </field>
         <field id="category_link_type" translate="label" sortOrder="70" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Type of Category Links</label>
-          <source_model>IntegerNet\Solr\Model\Source\Categorylinktype</source_model>
+          <source_model>IntegerNet\Solr\Model\Source\CategoryLinkType</source_model>
         </field>
         <field id="attribute_filter_suggestions" translate="label" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Attribute Filter Suggestions</label>
           <comment>0 = show all</comment>
-          <frontend_model>IntegerNet\Solr\Block\Config\Attributefiltersuggestions</frontend_model>
+          <frontend_model>IntegerNet\Solr\Block\Config\AttributeFilterSuggestions</frontend_model>
           <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
         </field>
       </group>
@@ -244,7 +244,7 @@
         <field id="hide_from_robots" sortOrder="10" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Hide the following pages from robots:</label>
           <comment>This will set NOINDEX,NOFOLLOW</comment>
-          <source_model>IntegerNet\Solr\Model\Source\Robotoptions</source_model>
+          <source_model>IntegerNet\Solr\Model\Source\RobotOptions</source_model>
         </field>
       </group>
       <group id="dev" translate="label,comment" sortOrder="110" showInDefault="1">
