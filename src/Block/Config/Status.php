@@ -9,7 +9,7 @@
  */
 namespace IntegerNet\Solr\Block\Config;
 
-use Magento\Framework\App\RequestInterface;
+use IntegerNet\Solr\Model\StatusMessages;
 use Magento\Framework\View\Element\Template;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -17,17 +17,9 @@ class Status extends Template
 {
     protected $_messages = null;
     /**
-     * @var RequestInterface
+     * @var StatusMessages
      */
-    protected $_appRequestInterface;
-    /**
-     * @var StoreManagerInterface
-     */
-    protected $_modelStoreManagerInterface;
-    /**
-     * @var Configuration
-     */
-    protected $_solrConfiguration;
+    protected $statusMessages;
 
     /**
      * @return string[]
@@ -36,6 +28,20 @@ class Status extends Template
     {
         return $this->_getMessages('success');
     }
+
+    /**
+     * Constructor
+     *
+     * @param StatusMessages $statusMessages
+     * @param Template\Context $context
+     * @param array $data
+     */
+    public function __construct(StatusMessages $statusMessages, Template\Context $context, array $data = [])
+    {
+        $this->statusMessages = $statusMessages;
+        parent::__construct($context, $data);
+    }
+
 
     /**
      * @return string[]
@@ -79,15 +85,14 @@ class Status extends Template
 
     protected function _createMessages()
     {
-        return; //TODO implement
         $storeId = null;
-        if ($storeCode = $this->_appRequestInterface->getParam('store')) {
-            $storeId = $this->_modelStoreManagerInterface->getStore($storeCode)->getId();
+        if ($storeCode = $this->getRequest()->getParam('store')) {
+            $storeId = $this->_storeManager->getStore($storeCode)->getId();
         } else {
-            if ($websiteCode = $this->_appRequestInterface->getParam('website')) {
-                $storeId = $this->_modelStoreManagerInterface->getWebsite($websiteCode)->getDefaultStore()->getId();
+            if ($websiteCode = $this->getRequest()->getParam('website')) {
+                $storeId = $this->_storeManager->getWebsite($websiteCode)->getDefaultStore()->getId();
             }
         }
-        $this->_messages = $this->_solrConfiguration->getMessages($storeId);
+        $this->_messages = $this->statusMessages->getMessages($storeId);
     }
 }

@@ -10,6 +10,8 @@
 
 namespace IntegerNet\Solr;
 
+use IntegerNet\Solr\Model\SolrStatusMessages;
+use IntegerNet\Solr\Model\StatusMessages;
 use Magento\Framework\App\DeploymentConfig;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Component\ComponentRegistrar;
@@ -38,7 +40,7 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
     /**
      * @return ModuleList
      */
-    private function getReasModuleList()
+    private function getRealModuleList()
     {
         $directoryList = $this->objectManager->create(DirectoryList::class, ['root' => BP]);
         $configReader = $this->objectManager->create(DeploymentConfig\Reader::class, ['dirList' => $directoryList]);
@@ -70,9 +72,13 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
 
     public function testTheModuleIsKnownAndEnabledInTheRealEnvironment()
     {
-        $moduleList = $this->getReasModuleList();
+        $moduleList = $this->getRealModuleList();
         $this->assertTrue($moduleList->has(self::MODULE_NAME), 'Module should be enabled in real environment');
 
+    }
+    public function testDependencyInjection()
+    {
+        $this->assertInstanceOf(SolrStatusMessages::class, $this->objectManager->create(StatusMessages::class));
     }
 
 }

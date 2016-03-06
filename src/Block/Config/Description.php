@@ -36,7 +36,7 @@ class Description extends Field
     {
         return $this->_viewLayout
             ->createBlock(Status::class, 'integernet_solr_config_status')
-            ->setTemplate('IntegerNet_Solr::integernet/solr/config/status.phtml')
+            ->setTemplate('IntegerNet_Solr::config/status.phtml')
             ->toHtml();
     }
 
