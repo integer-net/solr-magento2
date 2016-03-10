@@ -10,7 +10,9 @@
 
 namespace IntegerNet\Solr\Model\Source;
 
-class CategoryLinkType
+use Magento\Framework\Data\OptionSourceInterface;
+
+class CategoryLinkType implements OptionSourceInterface
 {
     const CATEGORY_LINK_TYPE_FILTER = 'filter';
     const CATEGORY_LINK_TYPE_DIRECT = 'direct';

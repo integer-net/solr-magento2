@@ -10,7 +10,9 @@
 
 namespace IntegerNet\Solr\Model\Source;
 
-class AutosuggestMethod
+use Magento\Framework\Data\OptionSourceInterface;
+
+class AutosuggestMethod implements OptionSourceInterface
 {
     const AUTOSUGGEST_METHOD_MAGENTO_CONTROLLER = 0;
     const AUTOSUGGEST_METHOD_PHP = 1;

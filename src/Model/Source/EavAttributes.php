@@ -3,8 +3,9 @@ namespace IntegerNet\Solr\Model\Source;
 
 use Magento\Framework\Api\Search\SearchCriteria;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
+use Magento\Framework\Data\OptionSourceInterface;
 
-abstract class EavAttributes
+abstract class EavAttributes implements OptionSourceInterface
 {
     /**
      * @var SearchCriteria

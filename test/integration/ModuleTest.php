@@ -10,6 +10,7 @@
 
 namespace IntegerNet\Solr;
 
+use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Model\SolrStatusMessages;
 use IntegerNet\Solr\Model\StatusMessages;
 use Magento\Framework\App\DeploymentConfig;
@@ -79,6 +80,7 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
     public function testDependencyInjection()
     {
         $this->assertInstanceOf(SolrStatusMessages::class, $this->objectManager->create(StatusMessages::class));
+        $this->assertInstanceof(\IntegerNet\Solr\Model\Bridge\AttributeRepository::class, $this->objectManager->create(AttributeRepository::class));
     }
 
 }

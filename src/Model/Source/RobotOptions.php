@@ -10,7 +10,9 @@
 
 namespace IntegerNet\Solr\Model\Source;
 
-class RobotOptions
+use Magento\Framework\Data\OptionSourceInterface;
+
+class RobotOptions implements OptionSourceInterface
 {
     const ROBOT_OPTION_SEARCH_RESULTS_ALL = 'search_results_all';
     const ROBOT_OPTION_SEARCH_RESULTS_FILTERED = 'search_results_filtered';

@@ -9,6 +9,9 @@ use Magento\Framework\Api\Search\SearchCriteria;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchResultsInterface;
 
+/**
+ * @covers \IntegerNet\Solr\Model\Source\VarcharCategoryAttribute
+ */
 class VarcharCategoryAttributeTest extends \PHPUnit_Framework_TestCase
 {
     /**

@@ -10,7 +10,9 @@
 
 namespace IntegerNet\Solr\Model\Source;
 
-class FilterPosition
+use Magento\Framework\Data\OptionSourceInterface;
+
+class FilterPosition implements OptionSourceInterface
 {
     const FILTER_POSITION_DEFAULT = 0;
     const FILTER_POSITION_LEFT = 1;

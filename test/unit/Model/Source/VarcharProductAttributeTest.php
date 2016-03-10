@@ -3,14 +3,15 @@ namespace IntegerNet\Solr\Model\Source;
 
 use Magento\Catalog\Api\Data\EavAttributeInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
-use Magento\Catalog\Api\Data\ProductAttributeInterface;
-use Magento\Catalog\Api\Data\ProductAttributeSearchResultsInterface;
 use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\Search\SearchCriteria;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchResultsInterface;
 
+/**
+ * @covers \IntegerNet\Solr\Model\Source\VarcharProductAttribute
+ */
 class VarcharProductAttributeTest extends \PHPUnit_Framework_TestCase
 {
     /**

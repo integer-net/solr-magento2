@@ -9,7 +9,9 @@
  */
 namespace IntegerNet\Solr\Model\Source;
 
-class HttpTransportMethod
+use Magento\Framework\Data\OptionSourceInterface;
+
+class HttpTransportMethod implements OptionSourceInterface
 {
     const HTTP_TRANSPORT_METHOD_FILEGETCONTENTS = 'filegetcontents';
     const HTTP_TRANSPORT_METHOD_CURL = 'curl';

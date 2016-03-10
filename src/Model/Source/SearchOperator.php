@@ -10,7 +10,9 @@
 
 namespace IntegerNet\Solr\Model\Source;
 
-class SearchOperator
+use Magento\Framework\Data\OptionSourceInterface;
+
+class SearchOperator implements OptionSourceInterface
 {
     const SEARCH_OPERATOR_AND = 'AND';
     const SEARCH_OPERATOR_OR = 'OR';

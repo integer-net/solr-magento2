@@ -1,28 +1,40 @@
 {
-    "name": "IntegerNet\/Solr",
-    "description": "",
-    "require": {
-        "php": "~5.5.0|~5.6.0"
-    },
-    "type": "magento2-module",
-    "version": "0.1.0",
-    "license": [
-        "Proprietary"
+  "name": "integer-net/solr-magento2",
+  "description": "",
+  "require": {
+    "php": "~5.5.0|~5.6.0",
+    "integer-net/solr-base": "dev-master",
+    "integer-net/solr-pro": "dev-master"
+  },
+  "type": "magento2-module",
+  "version": "0.1.0",
+  "license": [
+    "Proprietary"
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
     ],
-    "autoload": {
-        "files": [
-            "registration.php"
-        ],
-        "psr-4": {
-            "IntegerNet\\Solr\\": "src"
-        }
-    },
-    "extra": {
-        "map": [
-            [
-                "src/*",
-                "IntegerNet\/Solr"
-            ]
-        ]
+    "psr-4": {
+      "IntegerNet\\Solr\\": "src"
     }
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:integer-net/solr-base.git"
+    },
+    {
+      "type": "vcs",
+      "url": "git@github.com:integer-net/solr-pro.git"
+    }
+  ],
+  "extra": {
+    "map": [
+      [
+        "src/*",
+        "IntegerNet\/Solr"
+      ]
+    ]
+  }
 }

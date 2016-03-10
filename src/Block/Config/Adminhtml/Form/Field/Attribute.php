@@ -9,18 +9,48 @@
  */
 namespace IntegerNet\Solr\Block\Config\Adminhtml\Form\Field;
 
+use IntegerNet\Solr\Implementor\AttributeRepository;
+use Magento\Framework\View\Element\Context as ViewElementContext;
 use Magento\Framework\View\Element\Html\Select;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Attribute extends Select {
+    /**
+     * Store manager
+     *
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
+     * @var AttributeRepository
+     */
+    protected $attributeRepository;
+
+    /**
+     * Constructor
+     *
+     * @param AttributeRepository $attributeRepository
+     * @param StoreManagerInterface $storeManager
+     * @param ViewElementContext $context
+     * @param array $data
+     */
+    public function __construct(AttributeRepository $attributeRepository, StoreManagerInterface $storeManager,
+                                ViewElementContext $context, array $data = [])
+    {
+        $this->attributeRepository = $attributeRepository;
+        $this->storeManager = $storeManager;
+        parent::__construct($context, $data);
+    }
+
 
     public function _toHtml()
     {
-        return parent::_toHtml(); //TODO implement
-        $attributes = $this->_bridgeAttributerepository
-            ->getFilterableInSearchAttributes($this->_modelStoreManagerInterface->getStore()->getId());
+        $attributes = $this->attributeRepository
+            ->getFilterableInSearchAttributes($this->storeManager->getStore()->getId());
 
         foreach($attributes as $attribute) {
-            $this->addOption($attribute->getAttributeCode(), $attribute->getFrontendLabel() . ' [' . $attribute->getAttributeCode() . ']');
+            $this->addOption($attribute->getAttributeCode(), $attribute->getStoreLabel() . ' [' . $attribute->getAttributeCode() . ']');
         }
 
         return parent::_toHtml();
@@ -28,7 +58,7 @@ class Attribute extends Select {
 
     /**
      * @param string $value
-     * @return Integer\Net\Solr\Block\Config\Adminhtml\Form\Field\Attribute
+     * @return $this
      */
     public function setInputName($value)
     {
