@@ -20,6 +20,7 @@ class SolrStatusMessages implements StatusMessages
      */
     public function getMessages($storeId = null)
     {
+        return []; //TODO implement
         $this->_checkConfiguration($storeId);
         return $this->_messages;
     }
