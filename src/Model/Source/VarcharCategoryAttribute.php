@@ -10,41 +10,50 @@
  */
 namespace IntegerNet\Solr\Model\Source;
 
-class VarcharCategoryAttribute
+use IntegerNet\Solr\Model\SearchCriteria\VarcharAttributes;
+use Magento\Catalog\Api\CategoryAttributeRepositoryInterface;
+use Magento\Framework\Api\Search\SearchCriteria;
+use Magento\Framework\Api\Search\SearchCriteriaBuilder;
+
+class VarcharCategoryAttribute extends EavAttributes
 {
     /**
-     * Options getter
-     *
-     * @return array
+     * @var CategoryAttributeRepositoryInterface
      */
-    public function toOptionArray()
-    {
-        $options = [[
-            'value' => '',
-            'label' => '',
-        ]];
-        return $options; //TODO implement
+    protected $attributeRepository;
 
-        /** @var $attributes \Magento\Catalog\Model\ResourceModel\Category\Attribute\Collection */
-        $attributes = $this->_attributeCollection
-            ->addFieldToFilter('backend_type', ['in' => ['static', 'varchar']])
-            ->addFieldToFilter('frontend_input', 'text')
-            ->addFieldToFilter('attribute_code', ['nin' => [
+    /**
+     * @param CategoryAttributeRepositoryInterface $attributeRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     */
+    public function __construct(CategoryAttributeRepositoryInterface $attributeRepository,
+                                SearchCriteriaBuilder $searchCriteriaBuilder)
+    {
+        $this->attributeRepository = $attributeRepository;
+        parent::__construct($searchCriteriaBuilder);
+    }
+
+    /**
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     */
+    protected function buildSearchCriteria(SearchCriteriaBuilder $searchCriteriaBuilder)
+    {
+        $this->searchCriteria = (new VarcharAttributes($searchCriteriaBuilder))->except([
                 'url_path',
                 'children_count',
                 'level',
                 'path',
                 'position',
-            ]])
-            ->setOrder('frontend_label', \Magento\Eav\Model\Entity\Collection\AbstractCollection::SORT_ORDER_ASC);
-        
-        foreach ($attributes as $attribute) {
-            /** @var \Magento\Catalog\Model\Entity\Attribute $attribute */
-            $options[] = [
-                'value' => $attribute->getAttributeCode(),
-                'label' => sprintf('%s [%s]', $attribute->getFrontendLabel(), $attribute->getAttributeCode()),
-            ];
-        }
-        return $options;
+            ]
+        )->create();
+    }
+
+    /**
+     * @return \Magento\Catalog\Api\Data\CategoryAttributeInterface[]
+     */
+    protected function loadAttributes()
+    {
+        $attributes = $this->attributeRepository->getList($this->searchCriteria)->getItems();
+        return $attributes;
     }
 }

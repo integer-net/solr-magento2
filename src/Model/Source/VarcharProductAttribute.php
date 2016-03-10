@@ -10,29 +10,55 @@
 
 namespace IntegerNet\Solr\Model\Source;
 
-class VarcharProductAttribute
+use IntegerNet\Solr\Model\SearchCriteria\VarcharAttributes;
+use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
+use Magento\Framework\Api\Search\SearchCriteria;
+use Magento\Framework\Api\Search\SearchCriteriaBuilder;
+
+class VarcharProductAttribute extends EavAttributes
 {
     /**
-     * Options getter
-     *
-     * @return array
+     * @var ProductAttributeRepositoryInterface
      */
-    public function toOptionArray()
+    protected $attributeRepository;
+
+    /**
+     * @param ProductAttributeRepositoryInterface $attributeRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     */
+    public function __construct(ProductAttributeRepositoryInterface $attributeRepository,
+                                SearchCriteriaBuilder $searchCriteriaBuilder)
     {
-        $options = [[
-            'value' => '',
-            'label' => '',
-        ]];
-        return $options; //TODO implement
+        $this->attributeRepository = $attributeRepository;
+        parent::__construct($searchCriteriaBuilder);
+    }
 
-        $attributes = $this->_bridgeAttributerepository->getVarcharProductAttributes();
+    /**
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @return SearchCriteria|void
+     */
+    protected function buildSearchCriteria(SearchCriteriaBuilder $searchCriteriaBuilder)
+    {
+        $this->searchCriteria = (new VarcharAttributes($searchCriteriaBuilder))->except([
+                'url_path',
+                'image_label',
+                'small_image_label',
+                'thumbnail_label',
+                'category_ids',
+                'required_options',
+                'has_options',
+                'created_at',
+                'updated_at',
+            ]
+        )->create();
+    }
 
-        foreach($attributes as $attribute) { /** @var \Magento\Catalog\Model\Entity\Attribute $attribute */
-            $options[] = [
-                'value' => $attribute->getAttributeCode(),
-                'label' => sprintf('%s [%s]', $attribute->getFrontendLabel(), $attribute->getAttributeCode()),
-            ];
-        }
-        return $options;
+    /**
+     * @return \Magento\Catalog\Api\Data\ProductAttributeInterface[]
+     */
+    protected function loadAttributes()
+    {
+        $attributes = $this->attributeRepository->getList($this->searchCriteria)->getItems();
+        return $attributes;
     }
 }

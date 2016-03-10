@@ -10,6 +10,8 @@
 
 namespace IntegerNet\Solr;
 
+use DOMDocument;
+use DOMXPath;
 use IntegerNet\Solr\Model\SolrStatusMessages;
 use IntegerNet\Solr\Model\StatusMessages;
 use Magento\TestFramework\ObjectManager;
@@ -42,17 +44,55 @@ class ConfigTest extends  AbstractBackendController
 
     /**
      * @param Response $response
-     * @return \DOMDocument
+     * @return DOMDocument
      */
     private function getResponseDom(Response $response)
     {
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         \libxml_use_internal_errors(true);
         $dom->loadHTML($response->getBody());
         \libxml_clear_errors();
         return $dom;
     }
 
+
+    /**
+     * @param DOMDocument $dom
+     */
+    private function assertStatusMessages(DOMDocument $dom)
+    {
+        $descriptionHtml = $dom->saveXml($dom->getElementById('row_integernet_solr_general_description'));
+        $expectedDescriptionFragments = [
+            'Status messages container' => '<ul class="messages integernet_solr_messages">',
+            'Error messages' => '<li class="error-msg">',
+            'Success messages' => '<li class="success-msg">',
+            'Warning messages' => '<li class="warning-msg">',
+            'Notice messages' => '<li class="notice-msg">',
+            'First success message' => '<li><span>Success 1</span></li>',
+            'Second success message' => '<li><span>Success 2</span></li>',
+            'Error message' => '<li><span>Error 1</span></li>',
+            'Warning message' => '<li><span>Warning 1</span></li>',
+            'Notice message' => '<li><span>Notice 1</span></li>',
+        ];
+        foreach ($expectedDescriptionFragments as $assertMessage => $expectedHtml) {
+            $this->assertContains($expectedHtml, $descriptionHtml, $assertMessage);
+        }
+    }
+
+    /**
+     * @param DOMDocument $dom
+     */
+    private function assertDropdowns(DOMDocument $dom)
+    {
+        $xpath = new DOMXPath($dom);
+        $categoryRedirectDropdown = $xpath->query('//select[@id="integernet_solr_results_category_attributes_redirect"]');
+        $this->assertEquals(1, $categoryRedirectDropdown->length, 'Category redirect');
+        $this->assertContains('Name [name]', $dom->saveXML($categoryRedirectDropdown->item(0)));
+
+        $productRedirectDropdown = $xpath->query('//select[@id="integernet_solr_results_product_attributes_redirect"]');
+        $this->assertEquals(1, $productRedirectDropdown->length, 'Category redirect');
+        $this->assertContains('Name [name]', $dom->saveXML($productRedirectDropdown->item(0)));
+    }
 
     protected function setUp()
     {
@@ -95,22 +135,8 @@ class ConfigTest extends  AbstractBackendController
     {
         $this->assertEquals(200, $response->getStatusCode(), 'HTTP Status Code');
         $dom = $this->getResponseDom($response);
-        $descriptionHtml = $dom->saveXml($dom->getElementById('row_integernet_solr_general_description'));
-        $expectedFragments = [
-            'Status messages container' => '<ul class="messages integernet_solr_messages">',
-            'Error messages' => '<li class="error-msg">',
-            'Success messages' => '<li class="success-msg">',
-            'Warning messages' => '<li class="warning-msg">',
-            'Notice messages' => '<li class="notice-msg">',
-            'First success message' => '<li><span>Success 1</span></li>',
-            'Second success message' => '<li><span>Success 2</span></li>',
-            'Error message' => '<li><span>Error 1</span></li>',
-            'Warning message' => '<li><span>Warning 1</span></li>',
-            'Notice message' => '<li><span>Notice 1</span></li>',
-        ];
-        foreach($expectedFragments as $assertMessage => $expectedHtml) {
-            $this->assertContains($expectedHtml, $descriptionHtml, $assertMessage);
-        }
+        $this->assertStatusMessages($dom);
+        $this->assertDropdowns($dom);
     }
 
 }
