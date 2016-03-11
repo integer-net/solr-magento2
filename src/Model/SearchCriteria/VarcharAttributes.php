@@ -1,6 +1,7 @@
 <?php
 namespace IntegerNet\Solr\Model\SearchCriteria;
 
+use Magento\Catalog\Api\Data\EavAttributeInterface;
 use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
@@ -20,14 +21,14 @@ class VarcharAttributes implements SimpleBuilderInterface
     public function __construct(SearchCriteriaBuilder $searchCriteriaBuilder)
     {
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $searchCriteriaBuilder->addSortOrder('frontend_label', AbstractCollection::SORT_ORDER_ASC);
+        $searchCriteriaBuilder->addSortOrder(EavAttributeInterface::FRONTEND_LABEL, AbstractCollection::SORT_ORDER_ASC);
         $searchCriteriaBuilder->addFilter(new Filter([
-            Filter::KEY_FIELD => 'backend_type',
+            Filter::KEY_FIELD => EavAttributeInterface::BACKEND_TYPE,
             Filter::KEY_CONDITION_TYPE => 'in',
             Filter::KEY_VALUE => ['static', 'varchar']
         ]));
         $searchCriteriaBuilder->addFilter(new Filter([
-            Filter::KEY_FIELD => 'frontend_input',
+            Filter::KEY_FIELD => EavAttributeInterface::FRONTEND_INPUT,
             Filter::KEY_VALUE => 'text'
         ]));
     }
@@ -42,7 +43,7 @@ class VarcharAttributes implements SimpleBuilderInterface
     {
         $searchCriteriaBuilder = $this->searchCriteriaBuilder;
         $searchCriteriaBuilder->addFilter(new Filter([
-            Filter::KEY_FIELD => 'attribute_code',
+            Filter::KEY_FIELD => EavAttributeInterface::ATTRIBUTE_CODE,
             Filter::KEY_CONDITION_TYPE => 'nin',
             Filter::KEY_VALUE => $attributeCodes
         ]));

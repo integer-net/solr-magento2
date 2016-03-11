@@ -31,7 +31,6 @@ abstract class EavAttributes implements OptionSourceInterface
      * Configure search criteria builder and build $searchCriteria
      *
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @return mixed
      */
     abstract protected function buildSearchCriteria(SearchCriteriaBuilder $searchCriteriaBuilder);
 

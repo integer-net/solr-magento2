@@ -35,7 +35,6 @@ class VarcharProductAttribute extends EavAttributes
 
     /**
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @return SearchCriteria|void
      */
     protected function buildSearchCriteria(SearchCriteriaBuilder $searchCriteriaBuilder)
     {

@@ -2,11 +2,35 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Exception;
-use IntegerNet\Solr\Implementor\Attribute;
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
+use Magento\Catalog\Api\Data\EavAttributeInterface;
+use Magento\Catalog\Api\Data\ProductAttributeInterface;
+use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
+use Magento\Cms\Model\ResourceModel\AbstractCollection;
+use Magento\Framework\Api\Filter;
+use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 
 class AttributeRepository implements AttributeRepositoryInterface
 {
+    /**
+     * @var ProductAttributeRepositoryInterface
+     */
+    protected $attributeRepository;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    protected $searchCriteriaBuilder;
+    /**
+     * AttributeRepository constructor.
+     * @param ProductAttributeRepositoryInterface $attributeRepository
+     */
+    public function __construct(ProductAttributeRepositoryInterface $attributeRepository, SearchCriteriaBuilder $searchCriteriaBuilder)
+    {
+        $this->attributeRepository = $attributeRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+    }
+
     /**
      * @param int $storeId
      * @return Attribute[]
@@ -33,8 +57,20 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        // TODO: Implement getFilterableInSearchAttributes() method.
-        return array();
+        $this->searchCriteriaBuilder->addSortOrder(EavAttributeInterface::FRONTEND_LABEL, AbstractCollection::SORT_ORDER_ASC);
+        $this->searchCriteriaBuilder->addFilter(new Filter([
+            Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE_IN_SEARCH,
+            Filter::KEY_VALUE => '1'
+        ]));
+        $this->searchCriteriaBuilder->addFilter(new Filter([
+            Filter::KEY_FIELD => EavAttributeInterface::ATTRIBUTE_CODE,
+            Filter::KEY_CONDITION_TYPE => 'neq',
+            Filter::KEY_VALUE => 'status'
+        ]));
+        $result = $this->attributeRepository->getList($this->searchCriteriaBuilder->create());
+        return \array_map(function(ProductAttributeInterface $magentoAttribute) {
+            return new Attribute($magentoAttribute);
+        }, $result->getItems());
     }
 
     /**

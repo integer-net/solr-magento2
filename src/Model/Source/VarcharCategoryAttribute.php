@@ -12,7 +12,6 @@ namespace IntegerNet\Solr\Model\Source;
 
 use IntegerNet\Solr\Model\SearchCriteria\VarcharAttributes;
 use Magento\Catalog\Api\CategoryAttributeRepositoryInterface;
-use Magento\Framework\Api\Search\SearchCriteria;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 
 class VarcharCategoryAttribute extends EavAttributes

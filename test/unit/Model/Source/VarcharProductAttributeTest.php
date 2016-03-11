@@ -1,20 +1,34 @@
 <?php
 namespace IntegerNet\Solr\Model\Source;
 
+use IntegerNet\Solr\TestUtil\Traits\AttributeRepositoryMock;
 use Magento\Catalog\Api\Data\EavAttributeInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\Search\SearchCriteria;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
-use Magento\Framework\Api\SearchResultsInterface;
 
 /**
  * @covers \IntegerNet\Solr\Model\Source\VarcharProductAttribute
  */
 class VarcharProductAttributeTest extends \PHPUnit_Framework_TestCase
 {
+    use AttributeRepositoryMock;
+
     /**
+     * @param array $dataAttributes
+     * @param SearchCriteria $expectedSearchCriteria
+     * @return ProductAttributeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function mockProductAttributeRepository(array $dataAttributes, SearchCriteria $expectedSearchCriteria)
+    {
+        return $this->mockAttributeRepository($dataAttributes, $expectedSearchCriteria,
+            ProductAttributeRepositoryInterface::class,
+            EavAttributeInterface::class);
+    }
+
+        /**
      * @dataProvider dataAttributes
      * @param array $dataAttributes
      */
@@ -24,7 +38,7 @@ class VarcharProductAttributeTest extends \PHPUnit_Framework_TestCase
         $searchCriteriaDummy = new SearchCriteria();
         $searchCriteriaBuilderMock->method('create')
             ->willReturn($searchCriteriaDummy);
-        $attributeRepositoryMock = $this->mockAttributeRepository($dataAttributes, $searchCriteriaDummy);
+        $attributeRepositoryMock = $this->mockProductAttributeRepository($dataAttributes, $searchCriteriaDummy);
 
         $sourceModel = new VarcharProductAttribute($attributeRepositoryMock, $searchCriteriaBuilderMock);
         $actualOptions = $sourceModel->toOptionArray();
@@ -44,16 +58,16 @@ class VarcharProductAttributeTest extends \PHPUnit_Framework_TestCase
     {
         $attributesData = [
             [
-                'attribute_code' => 'attribute_1',
-                'frontend_label' => 'Attribute 1',
+                EavAttributeInterface::ATTRIBUTE_CODE => 'attribute_1',
+                EavAttributeInterface::FRONTEND_LABEL => 'Attribute 1',
             ],
             [
-                'attribute_code' => 'attribute_2',
-                'frontend_label' => 'Attribute 2',
+                EavAttributeInterface::ATTRIBUTE_CODE => 'attribute_2',
+                EavAttributeInterface::FRONTEND_LABEL => 'Attribute 2',
             ],
             [
-                'attribute_code' => 'attribute_3',
-                'frontend_label' => 'Attribute 3',
+                EavAttributeInterface::ATTRIBUTE_CODE => 'attribute_3',
+                EavAttributeInterface::FRONTEND_LABEL => 'Attribute 3',
             ],
         ];
         $expectedOptions = [
@@ -75,63 +89,36 @@ class VarcharProductAttributeTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @param array $dataAttributes
-     * @param SearchCriteria $expectedSearchCriteria
-     * @return \PHPUnit_Framework_MockObject_MockObject|ProductAttributeRepositoryInterface
-     */
-    protected function mockAttributeRepository(array $dataAttributes, SearchCriteria $expectedSearchCriteria)
-    {
-        $attributeRepositoryStub = $this->getMockForAbstractClass(ProductAttributeRepositoryInterface::class);
-        $attributeStubs = [];
-        foreach ($dataAttributes as $dataAttribute) {
-            $attributeStub = $this->getMockForAbstractClass(EavAttributeInterface::class);
-            $attributeStub->method('getDefaultFrontendLabel')
-                ->willReturn($dataAttribute['frontend_label']);
-            $attributeStub->method('getAttributeCode')
-                ->willReturn($dataAttribute['attribute_code']);
-            $attributeStubs[] = $attributeStub;
-        }
-        $attributeSearchResultStub = $this->getMockForAbstractClass(SearchResultsInterface::class);
-        $attributeSearchResultStub->method('getItems')
-            ->willReturn($attributeStubs);
-        $attributeRepositoryStub->method('getList')
-            ->with($this->identicalTo($expectedSearchCriteria))
-            ->willReturn($attributeSearchResultStub);
-        return $attributeRepositoryStub;
-    }
+
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|SearchCriteriaBuilder
      */
     protected function mockSearchCriteriaBuilder()
     {
-        $searchCriteriaBuilderMock = $this->getMockBuilder(SearchCriteriaBuilder::class)
-            ->setMethods(['addFilter', 'addSortOrder', 'create'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $searchCriteriaBuilderMock = $this->getSearchCriteriaBuilderMock();
         $searchCriteriaBuilderMock->expects($this->once())
             ->method('addSortOrder')
-            ->with('frontend_label', AbstractCollection::SORT_ORDER_ASC);
+            ->with(EavAttributeInterface::FRONTEND_LABEL, AbstractCollection::SORT_ORDER_ASC);
         $searchCriteriaBuilderMock->expects($this->exactly(3))
             ->method('addFilter')
             ->withConsecutive(
                 [
                     new Filter([
-                        Filter::KEY_FIELD => 'backend_type',
+                        Filter::KEY_FIELD => EavAttributeInterface::BACKEND_TYPE,
                         Filter::KEY_CONDITION_TYPE => 'in',
                         Filter::KEY_VALUE => ['static', 'varchar']
                     ])
                 ],
                 [
                     new Filter([
-                        Filter::KEY_FIELD => 'frontend_input',
+                        Filter::KEY_FIELD => EavAttributeInterface::FRONTEND_INPUT,
                         Filter::KEY_VALUE => 'text'
                     ])
                 ],
                 [
                     new Filter([
-                        Filter::KEY_FIELD => 'attribute_code',
+                        Filter::KEY_FIELD => EavAttributeInterface::ATTRIBUTE_CODE,
                         Filter::KEY_CONDITION_TYPE => 'nin',
                         Filter::KEY_VALUE => [
                             'url_path',
