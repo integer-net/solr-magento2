@@ -68,8 +68,8 @@ class AttributeRepository implements AttributeRepositoryInterface
             Filter::KEY_VALUE => 'status'
         ]));
         $result = $this->attributeRepository->getList($this->searchCriteriaBuilder->create());
-        return \array_map(function(ProductAttributeInterface $magentoAttribute) {
-            return new Attribute($magentoAttribute);
+        return \array_map(function(ProductAttributeInterface $magentoAttribute) use ($storeId) {
+            return new Attribute($magentoAttribute, $storeId);
         }, $result->getItems());
     }
 

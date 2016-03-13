@@ -59,20 +59,22 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testItReturnsFilterableInSearchAttributes(array $dataAttributes)
     {
         $storeId = 0;
-        $searchCriteriaDummy = new SearchCriteria();
-        $searchCriteriaBuilderMock = $this->mockSearchCriteriaBuilder();
-        $searchCriteriaBuilderMock->method('create')
-            ->willReturn($searchCriteriaDummy);
-        $productAttributeRepositoryMock = $this->mockProductAttributeRepository($dataAttributes, $searchCriteriaDummy);
-        $attributeRepository = new AttributeRepository($productAttributeRepositoryMock, $searchCriteriaBuilderMock);
-        //TODO test store id if necessary
+        $attributeRepository = $this->getAttributeRepository($dataAttributes);
         $attributes = $attributeRepository->getFilterableInSearchAttributes($storeId);
-        $this->assertCount(count($dataAttributes), $attributes);
-        foreach ($attributes as $actualAttribute) {
-            $this->assertInstanceOf(Attribute::class, $actualAttribute);
-            $expectedAttributeCode = \array_shift($dataAttributes)[EavAttributeInterface::ATTRIBUTE_CODE];
-            $this->assertEquals($expectedAttributeCode, $actualAttribute->getAttributeCode());
-        }
+        $this->assertAttributeCodes($dataAttributes, $attributes);
+    }
+    /**
+     * @dataProvider dataAttributes
+     * @param array $dataAttributes
+     */
+    public function testItUsesStoreId(array $dataAttributes)
+    {
+        $storeId = 1;
+        $attributeRepository = $this->getAttributeRepository($dataAttributes);
+        $attributes = $attributeRepository->getFilterableInSearchAttributes($storeId);
+        $this->assertAttributeCodes($dataAttributes, $attributes);
+        $this->setExpectedException(\InvalidArgumentException::class, 'Invalid store id 1');
+        $attributes[0]->getStoreLabel();
     }
 
     public static function dataAttributes()
@@ -94,6 +96,35 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
         return [
             [$attributesData]
         ];
+    }
+
+    /**
+     * @param array $dataAttributes
+     * @return AttributeRepository
+     */
+    protected function getAttributeRepository(array $dataAttributes)
+    {
+        $searchCriteriaDummy = new SearchCriteria();
+        $searchCriteriaBuilderMock = $this->mockSearchCriteriaBuilder();
+        $searchCriteriaBuilderMock->method('create')
+            ->willReturn($searchCriteriaDummy);
+        $productAttributeRepositoryMock = $this->mockProductAttributeRepository($dataAttributes, $searchCriteriaDummy);
+        $attributeRepository = new AttributeRepository($productAttributeRepositoryMock, $searchCriteriaBuilderMock);
+        return $attributeRepository;
+    }
+
+    /**
+     * @param array $dataAttributes
+     * @param $attributes
+     */
+    protected function assertAttributeCodes(array $dataAttributes, $attributes)
+    {
+        $this->assertCount(count($dataAttributes), $attributes);
+        foreach ($attributes as $actualAttribute) {
+            $this->assertInstanceOf(Attribute::class, $actualAttribute);
+            $expectedAttributeCode = \array_shift($dataAttributes)[EavAttributeInterface::ATTRIBUTE_CODE];
+            $this->assertEquals($expectedAttributeCode, $actualAttribute->getAttributeCode());
+        }
     }
 
 }

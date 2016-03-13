@@ -2,6 +2,7 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
+use Magento\Eav\Api\Data\AttributeFrontendLabelInterface;
 use Magento\Eav\Model\Entity\Attribute\Source\Boolean;
 use Magento\Eav\Model\ResourceModel\Entity\AttributeFactory;
 
@@ -24,35 +25,142 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    public function testGetterDelegation()
+    /**
+     * @dataProvider dataAttribute
+     * @param $attributeCode
+     * @param $backendType
+     * @param $frontendInput
+     * @param $isSearchable
+     * @param $solrBoost
+     * @param $storeLabel
+     * @param $usedForSortBy
+     */
+    public function testStoreScope($attributeCode, $backendType, $frontendInput, $isSearchable, $solrBoost, $storeLabel, $usedForSortBy)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeFactory $attributeFactoryStub */
-        $attributeFactoryStub = $this->getMockBuilder(AttributeFactory::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['create'])
-            ->getMock();
+        $storeLabelStub = $this->getMockForAbstractClass(AttributeFrontendLabelInterface::class);
+        $storeLabelStub->method('getLabel')->willReturn($storeLabel . '-1');
+        $storeId = 1;
+        $storeLabels = [
+            $storeId => $storeLabelStub
+        ];
+        $this->prepareMagentoAttributeStub($attributeCode, $backendType, $frontendInput, $isSearchable, $storeLabel, $usedForSortBy, $solrBoost, new Boolean($this->getAttributeFactoryStub()), $storeLabels);
 
-        $attributeCode = 'attribute_1';
-        $backendType = 'int';
-        $frontendInput = 'select';
-        $isSearchable = true;
-        $solrBoost = 1.0;
-        $storeLabel = 'Attribute 1';
-        $usedForSortBy = true;
-        $sourceModel = new Boolean($attributeFactoryStub);
+        $attributeBridge = new Attribute($this->magentoAttributeStub, $storeId);
 
+        $this->assertAttributeData($attributeCode, $backendType, $frontendInput, $isSearchable, $solrBoost, $storeLabel . '-1', $usedForSortBy, $attributeBridge);
+
+    }
+
+    /**
+     * @dataProvider dataAttribute
+     * @param $attributeCode
+     * @param $backendType
+     * @param $frontendInput
+     * @param $isSearchable
+     * @param $solrBoost
+     * @param $storeLabel
+     * @param $usedForSortBy
+     */
+    public function testInvalidStoreScopeThrowsException($attributeCode, $backendType, $frontendInput, $isSearchable, $solrBoost, $storeLabel, $usedForSortBy)
+    {
+        $storeLabelStub = $this->getMockForAbstractClass(AttributeFrontendLabelInterface::class);
+        $storeLabelStub->method('getLabel')->willReturn($storeLabel . '-1');
+        $storeId = 1;
+        $storeLabels = [
+            $storeId => $storeLabelStub
+        ];
+        $this->prepareMagentoAttributeStub($attributeCode, $backendType, $frontendInput, $isSearchable, $storeLabel, $usedForSortBy, $solrBoost, new Boolean($this->getAttributeFactoryStub()), $storeLabels);
+
+        $invalidStoreId = 999;
+        $attributeBridge = new Attribute($this->magentoAttributeStub, $invalidStoreId);
+
+        $this->setExpectedException(\InvalidArgumentException::class);
+        $attributeBridge->getStoreLabel();
+    }
+
+    /**
+     * @dataProvider dataAttribute
+     * @param $attributeCode
+     * @param $backendType
+     * @param $frontendInput
+     * @param $isSearchable
+     * @param $solrBoost
+     * @param $storeLabel
+     * @param $usedForSortBy
+     */
+    public function testGetterDelegation($attributeCode, $backendType, $frontendInput, $isSearchable, $solrBoost, $storeLabel, $usedForSortBy)
+    {
+        $this->prepareMagentoAttributeStub($attributeCode, $backendType, $frontendInput, $isSearchable, $storeLabel, $usedForSortBy, $solrBoost, new Boolean($this->getAttributeFactoryStub()), []);
+
+        $attributeBridge = new Attribute($this->magentoAttributeStub);
+
+        $this->assertAttributeData($attributeCode, $backendType, $frontendInput, $isSearchable, $solrBoost, $storeLabel, $usedForSortBy, $attributeBridge);
+    }
+
+    public static function dataAttribute()
+    {
+        return [
+            [
+                'attribute_1',
+                'int',
+                'select',
+                true,
+                1.0,
+                'Attribute 1',
+                true
+            ]
+        ];
+    }
+
+    /**
+     * @param $attributeCode
+     * @param $backendType
+     * @param $frontendInput
+     * @param $isSearchable
+     * @param $defaultStoreLabel
+     * @param $usedForSortBy
+     * @param $solrBoost
+     * @param $sourceModel
+     * @param $storeLabels
+     */
+    protected function prepareMagentoAttributeStub($attributeCode, $backendType, $frontendInput, $isSearchable, $defaultStoreLabel, $usedForSortBy, $solrBoost, $sourceModel, $storeLabels)
+    {
         $this->magentoAttributeStub
             ->setAttributeCode($attributeCode)
             ->setBackendType($backendType)
             ->setFrontendInput($frontendInput)
             ->setIsSearchable($isSearchable)
-            ->setDefaultFrontendLabel($storeLabel)
+            ->setDefaultFrontendLabel($defaultStoreLabel)
+            ->setFrontendLabels($storeLabels)
             ->setUsedForSortBy($usedForSortBy)
             ->setData('solr_boost', $solrBoost);
         $this->magentoAttributeStub->method('getSource')->willReturn($sourceModel);
+    }
 
-        $attributeBridge = new Attribute($this->magentoAttributeStub);
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|AttributeFactory
+     */
+    protected function getAttributeFactoryStub()
+    {
+        $attributeFactoryStub = $this->getMockBuilder(AttributeFactory::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['create'])
+            ->getMock();
+        return $attributeFactoryStub;
+    }
 
+    /**
+     * @param $attributeCode
+     * @param $backendType
+     * @param $frontendInput
+     * @param $isSearchable
+     * @param $solrBoost
+     * @param $storeLabel
+     * @param $usedForSortBy
+     * @param $attributeBridge
+     */
+    protected function assertAttributeData($attributeCode, $backendType, $frontendInput, $isSearchable, $solrBoost, $storeLabel, $usedForSortBy, $attributeBridge)
+    {
         $this->assertEquals($attributeCode, $attributeBridge->getAttributeCode(), 'attribute code');
         $this->assertEquals($backendType, $attributeBridge->getBackendType(), 'backend type');
         $this->assertEquals($frontendInput, $attributeBridge->getFacetType(), 'facet type');

@@ -11,13 +11,19 @@ class Attribute implements AttributeInterface
      * @var EavAttributeInterface
      */
     protected $magentoAttribute;
+    /**
+     * @var int|null
+     */
+    private $storeId;
 
     /**
      * @param AttributeResource $magentoAttribute
+     * @param int|null $storeId store id for store label (null for default)
      */
-    public function __construct(AttributeResource $magentoAttribute)
+    public function __construct(AttributeResource $magentoAttribute, $storeId = null)
     {
         $this->magentoAttribute = $magentoAttribute;
+        $this->storeId = $storeId;
     }
 
     /**
@@ -33,7 +39,14 @@ class Attribute implements AttributeInterface
      */
     public function getStoreLabel()
     {
-        return $this->magentoAttribute->getDefaultFrontendLabel();
+        if ($this->storeId === null) {
+            return $this->magentoAttribute->getDefaultFrontendLabel();
+        }
+        $labels = $this->magentoAttribute->getFrontendLabels();
+        if (! isset($labels[$this->storeId])) {
+            throw new \InvalidArgumentException('Invalid store id ' . $this->storeId);
+        }
+        return $labels[$this->storeId]->getLabel();
     }
 
     /**
