@@ -2,7 +2,6 @@
 namespace IntegerNet\Solr\Model\Source;
 
 use Magento\Framework\Api\Search\SearchCriteria;
-use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 use Magento\Framework\Data\OptionSourceInterface;
 
 abstract class EavAttributes implements OptionSourceInterface
@@ -13,26 +12,11 @@ abstract class EavAttributes implements OptionSourceInterface
     protected $searchCriteria;
 
     /**
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     */
-    public function __construct(SearchCriteriaBuilder $searchCriteriaBuilder)
-    {
-        $this->buildSearchCriteria($searchCriteriaBuilder);
-    }
-
-    /**
      * Load attributes based on $searchCriteria
      *
      * @return \Magento\Catalog\Api\Data\EavAttributeInterface[]
      */
     abstract protected function loadAttributes();
-
-    /**
-     * Configure search criteria builder and build $searchCriteria
-     *
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     */
-    abstract protected function buildSearchCriteria(SearchCriteriaBuilder $searchCriteriaBuilder);
 
     /**
      * Options getter

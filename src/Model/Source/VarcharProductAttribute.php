@@ -10,7 +10,7 @@
 
 namespace IntegerNet\Solr\Model\Source;
 
-use IntegerNet\Solr\Model\SearchCriteria\VarcharAttributes;
+use IntegerNet\Solr\Model\SearchCriteria\AttributeSearchCriteriaBuilder;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Framework\Api\Search\SearchCriteria;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
@@ -21,24 +21,28 @@ class VarcharProductAttribute extends EavAttributes
      * @var ProductAttributeRepositoryInterface
      */
     protected $attributeRepository;
+    /**
+     * @var AttributeSearchCriteriaBuilder
+     */
+    private $varcharAttributesSearchCriteriaBuilder;
 
     /**
      * @param ProductAttributeRepositoryInterface $attributeRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param AttributeSearchCriteriaBuilder $varcharAttributesSearchCriteriaBuilder
      */
-    public function __construct(ProductAttributeRepositoryInterface $attributeRepository,
-                                SearchCriteriaBuilder $searchCriteriaBuilder)
+     public function __construct(ProductAttributeRepositoryInterface $attributeRepository,
+                                AttributeSearchCriteriaBuilder $varcharAttributesSearchCriteriaBuilder)
     {
         $this->attributeRepository = $attributeRepository;
-        parent::__construct($searchCriteriaBuilder);
+        $this->varcharAttributesSearchCriteriaBuilder = $varcharAttributesSearchCriteriaBuilder;
     }
 
     /**
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @return \Magento\Catalog\Api\Data\ProductAttributeInterface[]
      */
-    protected function buildSearchCriteria(SearchCriteriaBuilder $searchCriteriaBuilder)
+    protected function loadAttributes()
     {
-        $this->searchCriteria = (new VarcharAttributes($searchCriteriaBuilder))->except([
+        $searchCriteria = $this->varcharAttributesSearchCriteriaBuilder->varchar()->sortedByLabel()->except([
                 'url_path',
                 'image_label',
                 'small_image_label',
@@ -50,14 +54,7 @@ class VarcharProductAttribute extends EavAttributes
                 'updated_at',
             ]
         )->create();
-    }
-
-    /**
-     * @return \Magento\Catalog\Api\Data\ProductAttributeInterface[]
-     */
-    protected function loadAttributes()
-    {
-        $attributes = $this->attributeRepository->getList($this->searchCriteria)->getItems();
+        $attributes = $this->attributeRepository->getList($searchCriteria)->getItems();
         return $attributes;
     }
 }

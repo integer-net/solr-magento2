@@ -1,6 +1,7 @@
 <?php
 namespace IntegerNet\Solr\Model\Source;
 
+use IntegerNet\Solr\Model\SearchCriteria\AttributeSearchCriteriaBuilder;
 use IntegerNet\Solr\TestUtil\Traits\AttributeRepositoryMock;
 use Magento\Catalog\Api\CategoryAttributeRepositoryInterface;
 use Magento\Catalog\Api\Data\EavAttributeInterface;
@@ -8,7 +9,7 @@ use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\Search\SearchCriteria;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
-use Magento\Framework\Api\SearchResultsInterface;
+use Magento\Framework\Api\Search\SearchCriteriaBuilderFactory;
 
 /**
  * @covers \IntegerNet\Solr\Model\Source\VarcharCategoryAttribute
@@ -28,9 +29,16 @@ class VarcharCategoryAttributeTest extends \PHPUnit_Framework_TestCase
         $searchCriteriaDummy = new SearchCriteria();
         $searchCriteriaBuilderMock->method('create')
             ->willReturn($searchCriteriaDummy);
+        $searchCriteriaBuilderFactoryMock = $this->getMockBuilder(SearchCriteriaBuilderFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $searchCriteriaBuilderFactoryMock->method('create')->willReturn($searchCriteriaBuilderMock);
         $attributeRepositoryMock = $this->mockCategoryAttributeRepository($dataAttributes, $searchCriteriaDummy);
 
-        $sourceModel = new VarcharCategoryAttribute($attributeRepositoryMock, $searchCriteriaBuilderMock);
+        $sourceModel = new VarcharCategoryAttribute(
+            $attributeRepositoryMock,
+            new AttributeSearchCriteriaBuilder($searchCriteriaBuilderFactoryMock));
         $actualOptions = $sourceModel->toOptionArray();
         $this->assertInternalType('array', $actualOptions);
         $this->assertNotEmpty($actualOptions);

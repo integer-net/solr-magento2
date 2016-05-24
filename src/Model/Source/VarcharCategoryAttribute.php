@@ -10,9 +10,8 @@
  */
 namespace IntegerNet\Solr\Model\Source;
 
-use IntegerNet\Solr\Model\SearchCriteria\VarcharAttributes;
+use IntegerNet\Solr\Model\SearchCriteria\AttributeSearchCriteriaBuilder;
 use Magento\Catalog\Api\CategoryAttributeRepositoryInterface;
-use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 
 class VarcharCategoryAttribute extends EavAttributes
 {
@@ -20,31 +19,20 @@ class VarcharCategoryAttribute extends EavAttributes
      * @var CategoryAttributeRepositoryInterface
      */
     protected $attributeRepository;
+    /**
+     * @var AttributeSearchCriteriaBuilder
+     */
+    private $varcharAttributesSearchCriteriaBuilder;
 
     /**
      * @param CategoryAttributeRepositoryInterface $attributeRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param AttributeSearchCriteriaBuilder $varcharAttributesSearchCriteriaBuilder
      */
     public function __construct(CategoryAttributeRepositoryInterface $attributeRepository,
-                                SearchCriteriaBuilder $searchCriteriaBuilder)
+                                AttributeSearchCriteriaBuilder $varcharAttributesSearchCriteriaBuilder)
     {
         $this->attributeRepository = $attributeRepository;
-        parent::__construct($searchCriteriaBuilder);
-    }
-
-    /**
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     */
-    protected function buildSearchCriteria(SearchCriteriaBuilder $searchCriteriaBuilder)
-    {
-        $this->searchCriteria = (new VarcharAttributes($searchCriteriaBuilder))->except([
-                'url_path',
-                'children_count',
-                'level',
-                'path',
-                'position',
-            ]
-        )->create();
+        $this->varcharAttributesSearchCriteriaBuilder = $varcharAttributesSearchCriteriaBuilder;
     }
 
     /**
@@ -52,7 +40,15 @@ class VarcharCategoryAttribute extends EavAttributes
      */
     protected function loadAttributes()
     {
-        $attributes = $this->attributeRepository->getList($this->searchCriteria)->getItems();
+        $searchCriteria = $this->varcharAttributesSearchCriteriaBuilder->varchar()->sortedByLabel()->except([
+                'url_path',
+                'children_count',
+                'level',
+                'path',
+                'position',
+            ]
+        )->create();
+        $attributes = $this->attributeRepository->getList($searchCriteria)->getItems();
         return $attributes;
     }
 }
