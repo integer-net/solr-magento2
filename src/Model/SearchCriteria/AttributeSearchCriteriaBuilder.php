@@ -48,6 +48,29 @@ class AttributeSearchCriteriaBuilder implements SimpleBuilderInterface
         return $new;
     }
 
+    public function searchable()
+    {
+        $new = clone $this;
+        $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
+            $builder->addFilter(new Filter([
+                Filter::KEY_FIELD => EavAttributeInterface::IS_SEARCHABLE,
+                Filter::KEY_VALUE => '1'
+            ]));
+        };
+        return $new;
+    }
+    public function filterableInSearch()
+    {
+        $new = clone $this;
+        $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
+            $builder->addFilter(new Filter([
+                Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE_IN_SEARCH,
+                Filter::KEY_VALUE => '1'
+            ]));
+        };
+        return $new;
+    }
+
     public function sortedByLabel()
     {
         $new = clone $this;
@@ -68,8 +91,8 @@ class AttributeSearchCriteriaBuilder implements SimpleBuilderInterface
         $new->buildCallbacks[] = function(SearchCriteriaBuilder $searchCriteriaBuilder) use ($attributeCodes) {
             $searchCriteriaBuilder->addFilter(new Filter([
                 Filter::KEY_FIELD => EavAttributeInterface::ATTRIBUTE_CODE,
-                Filter::KEY_CONDITION_TYPE => 'nin',
-                Filter::KEY_VALUE => $attributeCodes
+                Filter::KEY_CONDITION_TYPE => count($attributeCodes) > 1 ? 'nin' : 'neq',
+                Filter::KEY_VALUE => count($attributeCodes) > 1 ? $attributeCodes : reset($attributeCodes)
             ]));
         };
         return $new;

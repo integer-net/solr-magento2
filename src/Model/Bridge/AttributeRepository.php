@@ -3,12 +3,14 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
+use IntegerNet\Solr\Model\SearchCriteria\AttributeSearchCriteriaBuilder;
 use Magento\Catalog\Api\Data\EavAttributeInterface;
 use Magento\Catalog\Api\Data\ProductAttributeInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Cms\Model\ResourceModel\AbstractCollection;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
+use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
 
 class AttributeRepository implements AttributeRepositoryInterface
 {
@@ -18,17 +20,20 @@ class AttributeRepository implements AttributeRepositoryInterface
     protected $attributeRepository;
 
     /**
-     * @var SearchCriteriaBuilder
+     * @var AttributeSearchCriteriaBuilder
      */
     protected $searchCriteriaBuilder;
+
     /**
      * AttributeRepository constructor.
      * @param ProductAttributeRepositoryInterface $attributeRepository
+     * @param AttributeSearchCriteriaBuilder $searchCriteriaBuilder
      */
-    public function __construct(ProductAttributeRepositoryInterface $attributeRepository, SearchCriteriaBuilder $searchCriteriaBuilder)
+    public function __construct(ProductAttributeRepositoryInterface $attributeRepository,
+                                AttributeSearchCriteriaBuilder $searchCriteriaBuilder)
     {
         $this->attributeRepository = $attributeRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder->sortedByLabel()->except(['status']);
     }
 
     /**
@@ -37,7 +42,7 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getSearchableAttributes($storeId)
     {
-        // TODO: Implement getSearchableAttributes() method.
+        return $this->loadAttributes($storeId, $this->searchCriteriaBuilder->searchable());
     }
 
     /**
@@ -57,20 +62,7 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        $this->searchCriteriaBuilder->addSortOrder(EavAttributeInterface::FRONTEND_LABEL, AbstractCollection::SORT_ORDER_ASC);
-        $this->searchCriteriaBuilder->addFilter(new Filter([
-            Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE_IN_SEARCH,
-            Filter::KEY_VALUE => '1'
-        ]));
-        $this->searchCriteriaBuilder->addFilter(new Filter([
-            Filter::KEY_FIELD => EavAttributeInterface::ATTRIBUTE_CODE,
-            Filter::KEY_CONDITION_TYPE => 'neq',
-            Filter::KEY_VALUE => 'status'
-        ]));
-        $result = $this->attributeRepository->getList($this->searchCriteriaBuilder->create());
-        return \array_map(function(ProductAttributeInterface $magentoAttribute) use ($storeId) {
-            return new Attribute($magentoAttribute, $storeId);
-        }, $result->getItems());
+        return $this->loadAttributes($storeId, $this->searchCriteriaBuilder->filterableInSearch());
     }
 
     /**
@@ -110,6 +102,19 @@ class AttributeRepository implements AttributeRepositoryInterface
     public function getAttributeByCode($storeId, $attributeCode)
     {
         // TODO: Implement getAttributeByCode() method.
+    }
+
+    /**
+     * @param $storeId
+     * @param AttributeSearchCriteriaBuilder $criteriaBuilder
+     * @return array
+     */
+    private function loadAttributes($storeId, AttributeSearchCriteriaBuilder $criteriaBuilder)
+    {
+        $result = $this->attributeRepository->getList($criteriaBuilder->create());
+        return \array_map(function (AttributeResource $magentoAttribute) use ($storeId) {
+            return new Attribute($magentoAttribute, $storeId);
+        }, $result->getItems());
     }
 
 }

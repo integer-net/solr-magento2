@@ -2,13 +2,12 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
-use Magento\Catalog\Api\Data\EavAttributeInterface;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
 
 class Attribute implements AttributeInterface
 {
     /**
-     * @var EavAttributeInterface
+     * @var AttributeResource
      */
     protected $magentoAttribute;
     /**
@@ -17,6 +16,9 @@ class Attribute implements AttributeInterface
     private $storeId;
 
     /**
+     * Note: needs concrete Attribute class for getSource() and getData(), which the EavAttributeInterface
+     * does not provide (Magento 2.0).
+     *
      * @param AttributeResource $magentoAttribute
      * @param int|null $storeId store id for store label (null for default)
      */
