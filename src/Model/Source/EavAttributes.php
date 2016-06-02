@@ -1,7 +1,7 @@
 <?php
 namespace IntegerNet\Solr\Model\Source;
 
-use Magento\Framework\Api\Search\SearchCriteria;
+use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Data\OptionSourceInterface;
 
 abstract class EavAttributes implements OptionSourceInterface

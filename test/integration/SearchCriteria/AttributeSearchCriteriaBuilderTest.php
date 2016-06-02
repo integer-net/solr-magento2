@@ -11,13 +11,10 @@
 namespace IntegerNet\Solr\Model\SearchCriteria;
 
 
-use Magento\Framework\Api\Search\SearchCriteriaBuilderFactory;
+use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 
 /**
- * Note: This should be a unit test but I could not figure out how to instantiata a generated factory in a
- * unit test.
- *
- * @see http://magento.stackexchange.com/questions/116687/generate-factory-or-proxy-in-unit-tests-reflectionexception-class-factory
+ * Note: This is an integration test because behavior of generated factory and side effects of builder operations are being tested
  *
  * @package IntegerNet\Solr\Model\SearchCriteria
  */

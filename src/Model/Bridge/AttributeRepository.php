@@ -4,12 +4,7 @@ namespace IntegerNet\Solr\Model\Bridge;
 use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
 use IntegerNet\Solr\Model\SearchCriteria\AttributeSearchCriteriaBuilder;
-use Magento\Catalog\Api\Data\EavAttributeInterface;
-use Magento\Catalog\Api\Data\ProductAttributeInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
-use Magento\Cms\Model\ResourceModel\AbstractCollection;
-use Magento\Framework\Api\Filter;
-use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
 
 class AttributeRepository implements AttributeRepositoryInterface
@@ -33,7 +28,7 @@ class AttributeRepository implements AttributeRepositoryInterface
                                 AttributeSearchCriteriaBuilder $searchCriteriaBuilder)
     {
         $this->attributeRepository = $attributeRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder->sortedByLabel()->except(['status']);
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder->except(['status']);
     }
 
     /**
@@ -46,13 +41,17 @@ class AttributeRepository implements AttributeRepositoryInterface
     }
 
     /**
+     * Return filterable attributes in current context (catalog or search)
+     *
+     * @deprecated use getFilterableInSearchAttributes() or getFilterableInCatalogAttributes() directly!
      * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]
      */
     public function getFilterableAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        // TODO: Implement getFilterableAttributes() method.
+        //TODO deprecate method in interface and eliminate usage. We don't know the context here!
+        return $this->getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch);
     }
 
     /**
@@ -62,7 +61,11 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        return $this->loadAttributes($storeId, $this->searchCriteriaBuilder->filterableInSearch());
+        $attributeSearchCriteriaBuilder = $this->searchCriteriaBuilder->filterableInSearch();
+        if ($useAlphabeticalSearch) {
+            return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByLabel());
+        }
+        return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByPosition());
     }
 
     /**
@@ -72,7 +75,11 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        // TODO: Implement getFilterableInCatalogAttributes() method.
+        $attributeSearchCriteriaBuilder = $this->searchCriteriaBuilder->filterable();
+        if ($useAlphabeticalSearch) {
+            return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByLabel());
+        }
+        return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByPosition());
     }
 
     /**
@@ -82,7 +89,11 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getFilterableInCatalogOrSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        // TODO: Implement getFilterableInCatalogOrSearchAttributes() method.
+        $attributeSearchCriteriaBuilder = $this->searchCriteriaBuilder->filterableInCatalogOrSearch();
+        if ($useAlphabeticalSearch) {
+            return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByLabel());
+        }
+        return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByPosition());
     }
 
     /**

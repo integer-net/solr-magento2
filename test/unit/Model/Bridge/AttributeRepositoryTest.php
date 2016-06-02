@@ -8,9 +8,11 @@ use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
 use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\Framework\Api\Filter;
-use Magento\Framework\Api\Search\SearchCriteria;
-use Magento\Framework\Api\Search\SearchCriteriaBuilder;
-use Magento\Framework\Api\Search\SearchCriteriaBuilderFactory;
+use Magento\Framework\Api\Search\FilterGroup;
+use Magento\Framework\Api\SearchCriteria;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SearchCriteriaBuilderFactory;
+use Magento\Framework\Api\SortOrder;
 
 class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,6 +41,28 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return SortOrder
+     */
+    private static function dataOrderByPosition()
+    {
+        return new SortOrder([
+            SortOrder::FIELD => 'position',
+            SortOrder::DIRECTION => 'ASC'
+        ]);
+    }
+
+    /**
+     * @return SortOrder
+     */
+    private static function dataOrderByLabel()
+    {
+        return new SortOrder([
+            SortOrder::FIELD => 'frontend_label',
+            SortOrder::DIRECTION => 'ASC'
+        ]);
+    }
+
+    /**
      * @param array $dataAttributes
      * @param SearchCriteria $expectedSearchCriteria
      * @return ProductAttributeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -51,30 +75,85 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $expectedFilters
+     * @param $expectedSortOrder
      * @return SearchCriteriaBuilder|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function mockSearchCriteriaBuilder($expectedFilters)
+    protected function mockSearchCriteriaBuilder($expectedFilters, $expectedSortOrder)
     {
         $searchCriteriaBuilderMock = $this->getSearchCriteriaBuilderMock();
-        $searchCriteriaBuilderMock->expects($this->once())
-            ->method('addSortOrder')
-            ->with('frontend_label', AbstractCollection::SORT_ORDER_ASC);
-        $searchCriteriaBuilderMock->expects($this->exactly(count($expectedFilters)))
+        if ($expectedSortOrder) {
+            $searchCriteriaBuilderMock->expects($this->once())
+                ->method('addSortOrder')
+                ->with($expectedSortOrder);
+        } else {
+            $searchCriteriaBuilderMock->expects($this->never())
+                ->method('addSortOrder');
+        }
+        $expectedAddFilter = [];
+        $expectedAddFilters = [];
+        foreach ($expectedFilters as $expectedFilter) {
+            if ($expectedFilter instanceof FilterGroup) {
+                $expectedAddFilters[] = [ $expectedFilter->getFilters() ];
+            } else {
+                $expectedAddFilter[] = $expectedFilter;
+            }
+        }
+        $searchCriteriaBuilderMock->expects($this->exactly(count($expectedAddFilter)))
             ->method('addFilter')
-            ->withConsecutive(...$expectedFilters);
+            ->withConsecutive(...$expectedAddFilter);
+        $searchCriteriaBuilderMock->expects($this->exactly(count($expectedAddFilters)))
+            ->method('addFilters')
+            ->withConsecutive(...$expectedAddFilters);
         return $searchCriteriaBuilderMock;
     }
 
     /**
      * @dataProvider dataFilterableInSearchAttributes
      * @param array $dataAttributes
+     * @param $useAlphabeticalSearch
      * @param $expectedFilters
+     * @param $expectedSortOrder
      */
-    public function testItReturnsFilterableInSearchAttributes(array $dataAttributes, $expectedFilters)
+    public function testItReturnsFilterableInSearchAttributes(array $dataAttributes, $useAlphabeticalSearch, $expectedFilters, $expectedSortOrder)
     {
         $storeId = 0;
-        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters);
-        $attributes = $attributeRepository->getFilterableInSearchAttributes($storeId);
+        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
+        $attributes = $attributeRepository->getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch);
+        $this->assertAttributeCodes($dataAttributes, $attributes);
+
+        // deprecated getFilterableAttributes() assumes getFilterableInSearchAttributes(), but should not be used
+        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
+        $attributes = $attributeRepository->getFilterableAttributes($storeId, $useAlphabeticalSearch);
+        $this->assertAttributeCodes($dataAttributes, $attributes);
+    }
+
+    /**
+     * @dataProvider dataFilterableInCatalogAttributes
+     * @param array $dataAttributes
+     * @param $useAlphabeticalSearch
+     * @param $expectedFilters
+     * @param $expectedSortOrder
+     */
+    public function testItReturnsFilterableInCatalogAttributes(array $dataAttributes, $useAlphabeticalSearch, $expectedFilters, $expectedSortOrder)
+    {
+        $storeId = 0;
+        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
+        $attributes = $attributeRepository->getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch);
+        $this->assertAttributeCodes($dataAttributes, $attributes);
+    }
+
+    /**
+     * @dataProvider dataFilterableInCatalogOrSearchAttributes
+     * @param array $dataAttributes
+     * @param $useAlphabeticalSearch
+     * @param $expectedFilters
+     * @param $expectedSortOrder
+     */
+    public function testItReturnsFilterableInCatalogOrSearchAttributes(array $dataAttributes, $useAlphabeticalSearch, $expectedFilters, $expectedSortOrder)
+    {
+        $storeId = 0;
+        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
+        $attributes = $attributeRepository->getFilterableInCatalogOrSearchAttributes($storeId, $useAlphabeticalSearch);
         $this->assertAttributeCodes($dataAttributes, $attributes);
     }
 
@@ -82,11 +161,12 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
      * @dataProvider dataSearchableAttributes
      * @param array $dataAttributes
      * @param array $expectedFilters
+     * @param $expectedSortOrder
      */
-    public function testItReturnsSearchableAttributes(array $dataAttributes, array $expectedFilters)
+    public function testItReturnsSearchableAttributes(array $dataAttributes, array $expectedFilters, $expectedSortOrder)
     {
         $storeId = 0;
-        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters);
+        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
         $attributes = $attributeRepository->getSearchableAttributes($storeId);
         $this->assertAttributeCodes($dataAttributes, $attributes);
     }
@@ -94,13 +174,15 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider dataFilterableInSearchAttributes
      * @param array $dataAttributes
+     * @param $useAlphabeticalSearch
      * @param $expectedFilters
+     * @param $expectedSortOrder
      */
-    public function testItUsesStoreId(array $dataAttributes, $expectedFilters)
+    public function testItUsesStoreId(array $dataAttributes, $useAlphabeticalSearch, $expectedFilters, $expectedSortOrder)
     {
         $storeId = 1;
-        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters);
-        $attributes = $attributeRepository->getFilterableInSearchAttributes($storeId);
+        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
+        $attributes = $attributeRepository->getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch);
         $this->assertAttributeCodes($dataAttributes, $attributes);
         $this->setExpectedException(\InvalidArgumentException::class, 'Invalid store id 1');
         $attributes[0]->getStoreLabel();
@@ -110,54 +192,86 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $expectedFilters = [
             [
-                new Filter([
-                    Filter::KEY_FIELD => EavAttributeInterface::ATTRIBUTE_CODE,
-                    Filter::KEY_CONDITION_TYPE => 'neq',
-                    Filter::KEY_VALUE => 'status'
-                ])
+                EavAttributeInterface::ATTRIBUTE_CODE, 'status', 'neq'
             ],
             [
-            new Filter([
-                Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE_IN_SEARCH,
-                Filter::KEY_VALUE => '1'
-            ])
+                EavAttributeInterface::IS_FILTERABLE_IN_SEARCH, '1'
             ],
         ];
         return [
-            [self::dataAttributes(), $expectedFilters]
+            [self::dataAttributes(), true, $expectedFilters, self::dataOrderByLabel()],
+            [self::dataAttributes(), false, $expectedFilters, self::dataOrderByPosition()],
         ];
     }
+
     public static function dataSearchableAttributes()
     {
         $expectedFilters = [
             [
-                new Filter([
-                    Filter::KEY_FIELD => EavAttributeInterface::ATTRIBUTE_CODE,
-                    Filter::KEY_CONDITION_TYPE => 'neq',
-                    Filter::KEY_VALUE => 'status'
-                ])
+                EavAttributeInterface::ATTRIBUTE_CODE, 'status', 'neq'
             ],
             [
-            new Filter([
-                Filter::KEY_FIELD => EavAttributeInterface::IS_SEARCHABLE,
-                Filter::KEY_VALUE => '1'
-            ])
+                EavAttributeInterface::IS_SEARCHABLE, '1'
             ],
         ];
         return [
-            [self::dataAttributes(), $expectedFilters]
+            [self::dataAttributes(), $expectedFilters, null],
+        ];
+    }
+    public static function dataFilterableInCatalogAttributes()
+    {
+        $expectedFilters = [
+            [
+                EavAttributeInterface::ATTRIBUTE_CODE, 'status', 'neq'
+            ],
+            [
+                EavAttributeInterface::IS_FILTERABLE, '1'
+            ],
+        ];
+        return [
+            [self::dataAttributes(), true, $expectedFilters, self::dataOrderByLabel()],
+            [self::dataAttributes(), false, $expectedFilters, self::dataOrderByPosition()],
+        ];
+    }
+    public static function dataFilterableInCatalogOrSearchAttributes()
+    {
+        $expectedFilters = [
+            [
+                EavAttributeInterface::ATTRIBUTE_CODE, 'status', 'neq'
+            ],
+            new FilterGroup([
+                FilterGroup::FILTERS => [
+                    new Filter([
+                        Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE,
+                        Filter::KEY_VALUE => '1'
+                    ]),
+                ]
+            ]),
+            new FilterGroup([
+                FilterGroup::FILTERS => [
+                    new Filter([
+                        Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE_IN_SEARCH,
+                        Filter::KEY_VALUE => '1'
+                    ]),
+                ]
+            ])
+        ];
+        return [
+            [self::dataAttributes(), true, $expectedFilters, self::dataOrderByLabel()],
+            [self::dataAttributes(), false, $expectedFilters, self::dataOrderByPosition()],
         ];
     }
 
     /**
      * @param array $dataAttributes
      * @param array $expectedFilters
+     * @param $expectedSortOrder
      * @return AttributeRepository
      */
-    protected function getAttributeRepository(array $dataAttributes, array $expectedFilters)
+    protected function getAttributeRepository(array $dataAttributes, array $expectedFilters, $expectedSortOrder)
     {
         $searchCriteriaDummy = new SearchCriteria();
-        $searchCriteriaBuilderMock = $this->mockSearchCriteriaBuilder($expectedFilters);
+        $searchCriteriaBuilderMock = $this->mockSearchCriteriaBuilder($expectedFilters, $expectedSortOrder);
         $searchCriteriaBuilderMock->method('create')
             ->willReturn($searchCriteriaDummy);
         $searchCriteriaBuilderFactoryMock = $this->getMockBuilder(SearchCriteriaBuilderFactory::class)

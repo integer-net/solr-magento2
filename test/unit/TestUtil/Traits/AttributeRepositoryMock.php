@@ -1,9 +1,8 @@
 <?php
 namespace IntegerNet\Solr\TestUtil\Traits;
 
-use Magento\Catalog\Api\Data\EavAttributeInterface;
-use Magento\Framework\Api\Search\SearchCriteria;
-use Magento\Framework\Api\Search\SearchCriteriaBuilder;
+use Magento\Framework\Api\SearchCriteria;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchResultsInterface;
 
 trait AttributeRepositoryMock
@@ -73,7 +72,7 @@ trait AttributeRepositoryMock
     protected function getSearchCriteriaBuilderMock()
     {
         $searchCriteriaBuilderMock = $this->getMockBuilder(SearchCriteriaBuilder::class)
-            ->setMethods(['addFilter', 'addSortOrder', 'create'])
+            ->setMethods(['addFilter', 'addFilters', 'addSortOrder', 'create'])
             ->disableOriginalConstructor()
             ->getMock();
         return $searchCriteriaBuilderMock;

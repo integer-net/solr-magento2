@@ -4,10 +4,18 @@ namespace IntegerNet\Solr\Model\SearchCriteria;
 use Magento\Catalog\Api\Data\EavAttributeInterface;
 use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\Framework\Api\Filter;
-use Magento\Framework\Api\Search\SearchCriteriaBuilder;
-use Magento\Framework\Api\Search\SearchCriteriaBuilderFactory;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Api\SimpleBuilderInterface;
+use Magento\Framework\Api\SortOrder;
 
+/**
+ * Provides an explicit interface to create SearchCriterias for the AttributeRepository.
+ *
+ * All modifiers return a new instance, so that it can be used multiple times with different parameters
+ *
+ * @package IntegerNet\Solr\Model\SearchCriteria
+ */
 class AttributeSearchCriteriaBuilder implements SimpleBuilderInterface
 {
     /**
@@ -29,53 +37,115 @@ class AttributeSearchCriteriaBuilder implements SimpleBuilderInterface
     /**
      * Only include varchar attributes
      *
-     * @return AttributeSearchCriteriaBuilder
+     * @return AttributeSearchCriteriaBuilder new, modified builder instance
      */
     public function varchar()
     {
         $new = clone $this;
         $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
-            $builder->addFilter(new Filter([
-                Filter::KEY_FIELD => EavAttributeInterface::BACKEND_TYPE,
-                Filter::KEY_CONDITION_TYPE => 'in',
-                Filter::KEY_VALUE => ['static', 'varchar']
-            ]));
-            $builder->addFilter(new Filter([
-                Filter::KEY_FIELD => EavAttributeInterface::FRONTEND_INPUT,
-                Filter::KEY_VALUE => 'text'
-            ]));
+            $builder->addFilter(EavAttributeInterface::BACKEND_TYPE, ['static', 'varchar'], 'in');
+            $builder->addFilter(EavAttributeInterface::FRONTEND_INPUT, 'text');
         };
         return $new;
     }
 
+    /**
+     * Only include searchable attributes
+     *
+     * @return AttributeSearchCriteriaBuilder new, modified builder instance
+     */
     public function searchable()
     {
         $new = clone $this;
         $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
-            $builder->addFilter(new Filter([
-                Filter::KEY_FIELD => EavAttributeInterface::IS_SEARCHABLE,
-                Filter::KEY_VALUE => '1'
-            ]));
-        };
-        return $new;
-    }
-    public function filterableInSearch()
-    {
-        $new = clone $this;
-        $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
-            $builder->addFilter(new Filter([
-                Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE_IN_SEARCH,
-                Filter::KEY_VALUE => '1'
-            ]));
+            $builder->addFilter(EavAttributeInterface::IS_SEARCHABLE, '1');
         };
         return $new;
     }
 
+    /**
+     * Only include filterable attributes
+     *
+     * @return AttributeSearchCriteriaBuilder new, modified builder instance
+     */
+    public function filterable()
+    {
+        $new = clone $this;
+        $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
+            $builder->addFilter(EavAttributeInterface::IS_FILTERABLE, '1');
+        };
+        return $new;
+    }
+    /**
+     * Only include filterable in search attributes
+     *
+     * @return AttributeSearchCriteriaBuilder new, modified builder instance
+     */
+    public function filterableInSearch()
+    {
+        $new = clone $this;
+        $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
+            $builder->addFilter(EavAttributeInterface::IS_FILTERABLE_IN_SEARCH, '1');
+        };
+        return $new;
+    }
+
+    /**
+     * Include attributes that are filterable OR filterable in serach
+     *
+     * @return AttributeSearchCriteriaBuilder
+     */
+    public function filterableInCatalogOrSearch()
+    {
+        $new = clone $this;
+        $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
+            /*
+             * Groups are combined with OR
+             */
+            $builder->addFilters([
+                new Filter([
+                    Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE,
+                    Filter::KEY_VALUE => '1'
+                ])
+            ]);
+            $builder->addFilters([
+                new Filter([
+                    Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE_IN_SEARCH,
+                    Filter::KEY_VALUE => '1'
+                ])
+            ]);
+        };
+        return $new;
+    }
+    /**
+     * Sort alphabetically by frontend label
+     *
+     * @return AttributeSearchCriteriaBuilder new, modified builder instance
+     */
     public function sortedByLabel()
     {
         $new = clone $this;
         $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
-            $builder->addSortOrder(EavAttributeInterface::FRONTEND_LABEL, AbstractCollection::SORT_ORDER_ASC);
+            $builder->addSortOrder(new SortOrder([
+                SortOrder::FIELD => EavAttributeInterface::FRONTEND_LABEL,
+                SortOrder::DIRECTION =>SortOrder::SORT_ASC
+            ]));
+        };
+        return $new;
+    }
+    /**
+     * Sort alphabetically by position
+     *
+     * @return AttributeSearchCriteriaBuilder new, modified builder instance
+     */
+    public function sortedByPosition()
+    {
+        $new = clone $this;
+        $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
+            $builder->addSortOrder(new SortOrder([
+                SortOrder::FIELD => EavAttributeInterface::POSITION,
+                SortOrder::DIRECTION => SortOrder::SORT_ASC
+            ]));
         };
         return $new;
     }
@@ -83,26 +153,36 @@ class AttributeSearchCriteriaBuilder implements SimpleBuilderInterface
      * Exclude attributes by code
      *
      * @param array $attributeCodes
-     * @return $this
+     * @return AttributeSearchCriteriaBuilder new, modified builder instance
      */
     public function except(array $attributeCodes)
     {
         $new = clone $this;
         $new->buildCallbacks[] = function(SearchCriteriaBuilder $searchCriteriaBuilder) use ($attributeCodes) {
-            $searchCriteriaBuilder->addFilter(new Filter([
-                Filter::KEY_FIELD => EavAttributeInterface::ATTRIBUTE_CODE,
-                Filter::KEY_CONDITION_TYPE => count($attributeCodes) > 1 ? 'nin' : 'neq',
-                Filter::KEY_VALUE => count($attributeCodes) > 1 ? $attributeCodes : reset($attributeCodes)
-            ]));
+            $searchCriteriaBuilder->addFilter(
+                EavAttributeInterface::ATTRIBUTE_CODE,
+                count($attributeCodes) > 1 ? $attributeCodes : reset($attributeCodes),
+                count($attributeCodes) > 1 ? 'nin' : 'neq'
+            );
         };
         return $new;
     }
 
+    /**
+     * Builds and returns SearchCriteria instance
+     *
+     * @return \Magento\Framework\Api\SearchCriteria
+     */
     public function create()
     {
         return $this->getBuilder()->create();
     }
 
+    /**
+     * Returns data from underlying SearchCriteriaBuilder
+     *
+     * @return array
+     */
     public function getData()
     {
         return $this->getBuilder()->getData();

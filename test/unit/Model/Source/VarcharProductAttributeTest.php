@@ -7,9 +7,10 @@ use Magento\Catalog\Api\Data\EavAttributeInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\Framework\Api\Filter;
-use Magento\Framework\Api\Search\SearchCriteria;
-use Magento\Framework\Api\Search\SearchCriteriaBuilder;
-use Magento\Framework\Api\Search\SearchCriteriaBuilderFactory;
+use Magento\Framework\Api\SearchCriteria;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SearchCriteriaBuilderFactory;
+use Magento\Framework\Api\SortOrder;
 
 /**
  * @covers \IntegerNet\Solr\Model\Source\VarcharProductAttribute
@@ -98,8 +99,6 @@ class VarcharProductAttributeTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-
-
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|SearchCriteriaBuilder
      */
@@ -108,38 +107,32 @@ class VarcharProductAttributeTest extends \PHPUnit_Framework_TestCase
         $searchCriteriaBuilderMock = $this->getSearchCriteriaBuilderMock();
         $searchCriteriaBuilderMock->expects($this->once())
             ->method('addSortOrder')
-            ->with(EavAttributeInterface::FRONTEND_LABEL, AbstractCollection::SORT_ORDER_ASC);
+            ->with(new SortOrder([
+                SortOrder::FIELD => 'frontend_label',
+                SortOrder::DIRECTION => 'ASC'
+            ]));
         $searchCriteriaBuilderMock->expects($this->exactly(3))
             ->method('addFilter')
             ->withConsecutive(
                 [
-                    new Filter([
-                        Filter::KEY_FIELD => EavAttributeInterface::BACKEND_TYPE,
-                        Filter::KEY_CONDITION_TYPE => 'in',
-                        Filter::KEY_VALUE => ['static', 'varchar']
-                    ])
+                    EavAttributeInterface::BACKEND_TYPE, ['static', 'varchar'], 'in'
                 ],
                 [
-                    new Filter([
-                        Filter::KEY_FIELD => EavAttributeInterface::FRONTEND_INPUT,
-                        Filter::KEY_VALUE => 'text'
-                    ])
+                    EavAttributeInterface::FRONTEND_INPUT, 'text'
                 ],
                 [
-                    new Filter([
-                        Filter::KEY_FIELD => EavAttributeInterface::ATTRIBUTE_CODE,
-                        Filter::KEY_CONDITION_TYPE => 'nin',
-                        Filter::KEY_VALUE => [
-                            'url_path',
-                            'image_label',
-                            'small_image_label',
-                            'thumbnail_label',
-                            'category_ids',
-                            'required_options',
-                            'has_options',
-                            'created_at',
-                            'updated_at',                        ]
-                    ])
+                    EavAttributeInterface::ATTRIBUTE_CODE,
+                    [
+                        'url_path',
+                        'image_label',
+                        'small_image_label',
+                        'thumbnail_label',
+                        'category_ids',
+                        'required_options',
+                        'has_options',
+                        'created_at',
+                        'updated_at',
+                    ], 'nin'
                 ]
             );
         return $searchCriteriaBuilderMock;
