@@ -2,7 +2,6 @@
 namespace IntegerNet\Solr\Model\SearchCriteria;
 
 use Magento\Catalog\Api\Data\EavAttributeInterface;
-use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
@@ -111,6 +110,39 @@ class AttributeSearchCriteriaBuilder implements SimpleBuilderInterface
             $builder->addFilters([
                 new Filter([
                     Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE_IN_SEARCH,
+                    Filter::KEY_VALUE => '1'
+                ])
+            ]);
+        };
+        return $new;
+    }
+    /**
+     * Include attributes that are filterable OR filterable in serach OR searchable
+     *
+     * @return AttributeSearchCriteriaBuilder
+     */
+    public function indexable()
+    {
+        $new = clone $this;
+        $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
+            /*
+             * Groups are combined with OR
+             */
+            $builder->addFilters([
+                new Filter([
+                    Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE,
+                    Filter::KEY_VALUE => '1'
+                ])
+            ]);
+            $builder->addFilters([
+                new Filter([
+                    Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE_IN_SEARCH,
+                    Filter::KEY_VALUE => '1'
+                ])
+            ]);
+            $builder->addFilters([
+                new Filter([
+                    Filter::KEY_FIELD => EavAttributeInterface::IS_SEARCHABLE,
                     Filter::KEY_VALUE => '1'
                 ])
             ]);

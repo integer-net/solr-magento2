@@ -6,9 +6,11 @@ use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterf
 use IntegerNet\Solr\Model\SearchCriteria\AttributeSearchCriteriaBuilder;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class AttributeRepository implements AttributeRepositoryInterface
 {
+    private $attributeCodesToIndex = null;
     /**
      * @var ProductAttributeRepositoryInterface
      */
@@ -101,22 +103,33 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getAttributeCodesToIndex()
     {
-        // TODO: Implement getAttributeCodesToIndex() method.
+        if ($this->attributeCodesToIndex === null) {
+            $attributes = $this->loadAttributes(null, $this->searchCriteriaBuilder->indexable());
+            $this->attributeCodesToIndex = \array_map(function (Attribute $attribute) {
+                return $attribute->getAttributeCode();
+            }, $attributes);
+        }
+        return $this->attributeCodesToIndex;
     }
 
     /**
-     * @param int $storeId
+     * @param int|null $storeId
      * @param string $attributeCode
      * @return Attribute
      * @throws Exception
      */
     public function getAttributeByCode($storeId, $attributeCode)
     {
-        // TODO: Implement getAttributeByCode() method.
+        try {
+            $magentoAttribute = $this->attributeRepository->get($attributeCode);
+        } catch (NoSuchEntityException $e) {
+            throw new Exception(sprintf('Attribute %s does not exist', $attributeCode), 0, $e);
+        }
+        return new Attribute($magentoAttribute, $storeId);
     }
 
     /**
-     * @param $storeId
+     * @param int|null $storeId
      * @param AttributeSearchCriteriaBuilder $criteriaBuilder
      * @return array
      */

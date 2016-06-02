@@ -47,15 +47,7 @@ trait AttributeRepositoryMock
         $attributeRepositoryStub = $this->getMockForAbstractClass($repositoryInterface);
         $attributeStubs = [];
         foreach ($dataAttributes as $dataAttribute) {
-            $attributeStub = $this->getMockBuilder($attributeInterface)
-                ->disableOriginalConstructor()
-                ->setMethods(['getDefaultFrontendLabel', 'getAttributeCode'])
-                ->getMockForAbstractClass();
-            $attributeStub->method('getDefaultFrontendLabel')
-                ->willReturn($dataAttribute['frontend_label']);
-            $attributeStub->method('getAttributeCode')
-                ->willReturn($dataAttribute['attribute_code']);
-            $attributeStubs[] = $attributeStub;
+            $attributeStubs[] = $this->mockAttribute($attributeInterface, $dataAttribute, $attributeStubs);
         }
         $attributeSearchResultStub = $this->getMockForAbstractClass(SearchResultsInterface::class);
         $attributeSearchResultStub->method('getItems')
@@ -76,5 +68,23 @@ trait AttributeRepositoryMock
             ->disableOriginalConstructor()
             ->getMock();
         return $searchCriteriaBuilderMock;
+    }
+
+    /**
+     * @param $attributeInterface
+     * @param $dataAttribute
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function mockAttribute($attributeInterface, $dataAttribute)
+    {
+        $attributeStub = $this->getMockBuilder($attributeInterface)
+            ->disableOriginalConstructor()
+            ->setMethods(['getDefaultFrontendLabel', 'getAttributeCode'])
+            ->getMockForAbstractClass();
+        $attributeStub->method('getDefaultFrontendLabel')
+            ->willReturn($dataAttribute['frontend_label']);
+        $attributeStub->method('getAttributeCode')
+            ->willReturn($dataAttribute['attribute_code']);
+        return $attributeStub;
     }
 }
