@@ -3,7 +3,7 @@
  * integer_net Magento Module
  *
  * @category   IntegerNet
- * @package
+ * @package    IntegerNet_Solr
  * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
  */
@@ -12,7 +12,7 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
-use IntegerNet\Solr\Implementor\ProductIterator;
+use IntegerNet\Solr\Implementor\ProductIterator as ProductIteratorInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Framework\Event\ManagerInterface;
@@ -149,7 +149,7 @@ class Product implements ProductInterface
     }
 
     /**
-     * @return ProductIterator
+     * @return ProductIteratorInterface
      */
     public function getChildren()
     {
