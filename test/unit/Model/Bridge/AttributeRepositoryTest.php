@@ -15,6 +15,10 @@ use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\NoSuchEntityException;
 
+/**
+ * @covers AttributeRepository
+ * @covers AttributeSearchCriteriaBuilder
+ */
 class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -23,6 +27,10 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
     private $productAttributeRepositoryMock;
     use AttributeRepositoryMock;
 
+    protected function tearDown()
+    {
+        $this->productAttributeRepositoryMock = null;
+    }
     /**
      * @return array
      */
@@ -125,11 +133,13 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
         $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
         $attributes = $attributeRepository->getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch);
         $this->assertAttributeCodes($dataAttributes, $attributes);
+        $this->assertMagentoAttributeRegistry($attributes, $attributeRepository);
 
         // deprecated getFilterableAttributes() assumes getFilterableInSearchAttributes(), but should not be used
         $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
         $attributes = $attributeRepository->getFilterableAttributes($storeId, $useAlphabeticalSearch);
         $this->assertAttributeCodes($dataAttributes, $attributes);
+        $this->assertMagentoAttributeRegistry($attributes, $attributeRepository);
     }
 
     /**
@@ -145,6 +155,7 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
         $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
         $attributes = $attributeRepository->getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch);
         $this->assertAttributeCodes($dataAttributes, $attributes);
+        $this->assertMagentoAttributeRegistry($attributes, $attributeRepository);
     }
 
     /**
@@ -160,6 +171,7 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
         $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
         $attributes = $attributeRepository->getFilterableInCatalogOrSearchAttributes($storeId, $useAlphabeticalSearch);
         $this->assertAttributeCodes($dataAttributes, $attributes);
+        $this->assertMagentoAttributeRegistry($attributes, $attributeRepository);
     }
 
     /**
@@ -174,6 +186,7 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
         $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
         $attributes = $attributeRepository->getSearchableAttributes($storeId);
         $this->assertAttributeCodes($dataAttributes, $attributes);
+        $this->assertMagentoAttributeRegistry($attributes, $attributeRepository);
     }
 
     /**
@@ -217,6 +230,7 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Attribute::class, $attribute);
         $this->assertEquals($attributeCode, $attribute->getAttributeCode());
         $this->assertEquals($expectedLabel, $attribute->getStoreLabel());
+        $this->assertMagentoAttributeRegistry([$attribute], $attributeRepository);
     }
 
     public function testUnknownAttributeThrowsException()
@@ -392,13 +406,28 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
      * @param array $dataAttributes
      * @param $attributes
      */
-    protected function assertAttributeCodes(array $dataAttributes, $attributes)
+    private function assertAttributeCodes(array $dataAttributes, $attributes)
     {
         $this->assertCount(count($dataAttributes), $attributes);
         foreach ($attributes as $actualAttribute) {
             $this->assertInstanceOf(Attribute::class, $actualAttribute);
             $expectedAttributeCode = \array_shift($dataAttributes)[EavAttributeInterface::ATTRIBUTE_CODE];
             $this->assertEquals($expectedAttributeCode, $actualAttribute->getAttributeCode());
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $attributeRepository
+     */
+    private function assertMagentoAttributeRegistry($attributes, $attributeRepository)
+    {
+        foreach ($attributes as $actualAttribute) {
+            $this->assertNotNull($attributeRepository->getMagentoAttribute($actualAttribute),
+                'Magento attribute should be registered in repository');
+            $this->assertEquals($actualAttribute->getAttributeCode(),
+                $attributeRepository->getMagentoAttribute($actualAttribute)->getAttributeCode(),
+                'Registered Magento attribute should have same code');
         }
     }
 

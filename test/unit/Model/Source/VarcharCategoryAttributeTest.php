@@ -5,8 +5,6 @@ use IntegerNet\Solr\Model\SearchCriteria\AttributeSearchCriteriaBuilder;
 use IntegerNet\Solr\TestUtil\Traits\AttributeRepositoryMock;
 use Magento\Catalog\Api\CategoryAttributeRepositoryInterface;
 use Magento\Catalog\Api\Data\EavAttributeInterface;
-use Magento\Eav\Model\Entity\Collection\AbstractCollection;
-use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
@@ -14,6 +12,7 @@ use Magento\Framework\Api\SortOrder;
 
 /**
  * @covers \IntegerNet\Solr\Model\Source\VarcharCategoryAttribute
+ * @covers AttributeSearchCriteriaBuilder
  */
 class VarcharCategoryAttributeTest extends \PHPUnit_Framework_TestCase
 {

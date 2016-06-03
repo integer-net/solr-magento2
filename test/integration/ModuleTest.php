@@ -83,4 +83,8 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceof(\IntegerNet\Solr\Model\Bridge\AttributeRepository::class, $this->objectManager->create(AttributeRepository::class));
     }
 
+    public function testExtensionAttributes()
+    {
+        $this->markTestIncomplete('TODO: add extension attributes like solr_boost');
+    }
 }

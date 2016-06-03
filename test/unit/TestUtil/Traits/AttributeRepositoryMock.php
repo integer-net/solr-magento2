@@ -47,7 +47,7 @@ trait AttributeRepositoryMock
         $attributeRepositoryStub = $this->getMockForAbstractClass($repositoryInterface);
         $attributeStubs = [];
         foreach ($dataAttributes as $dataAttribute) {
-            $attributeStubs[] = $this->mockAttribute($attributeInterface, $dataAttribute, $attributeStubs);
+            $attributeStubs[] = $this->mockAttribute($attributeInterface, $dataAttribute);
         }
         $attributeSearchResultStub = $this->getMockForAbstractClass(SearchResultsInterface::class);
         $attributeSearchResultStub->method('getItems')

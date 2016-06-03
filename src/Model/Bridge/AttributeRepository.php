@@ -2,6 +2,7 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Exception;
+use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
 use IntegerNet\Solr\Model\SearchCriteria\AttributeSearchCriteriaBuilder;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
@@ -10,6 +11,13 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 class AttributeRepository implements AttributeRepositoryInterface
 {
+    /**
+     * Holds attribute instances with their Magento attributes as attached data
+     *
+     * @var \SplObjectStorage
+     */
+    private $attributeStorage;
+
     private $attributeCodesToIndex = null;
     /**
      * @var ProductAttributeRepositoryInterface
@@ -31,6 +39,7 @@ class AttributeRepository implements AttributeRepositoryInterface
     {
         $this->attributeRepository = $attributeRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder->except(['status']);
+        $this->attributeStorage = new \SplObjectStorage;
     }
 
     /**
@@ -125,7 +134,19 @@ class AttributeRepository implements AttributeRepositoryInterface
         } catch (NoSuchEntityException $e) {
             throw new Exception(sprintf('Attribute %s does not exist', $attributeCode), 0, $e);
         }
-        return new Attribute($magentoAttribute, $storeId);
+        return $this->registerAttribute($storeId, $magentoAttribute);
+    }
+
+    /**
+     * @param AttributeInterface $attribute
+     * @return AttributeResource
+     */
+    public function getMagentoAttribute(AttributeInterface $attribute)
+    {
+        if ($this->attributeStorage->contains($attribute)) {
+            return $this->attributeStorage[$attribute];
+        }
+        return null;
     }
 
     /**
@@ -137,8 +158,20 @@ class AttributeRepository implements AttributeRepositoryInterface
     {
         $result = $this->attributeRepository->getList($criteriaBuilder->create());
         return \array_map(function (AttributeResource $magentoAttribute) use ($storeId) {
-            return new Attribute($magentoAttribute, $storeId);
+            return $this->registerAttribute($storeId, $magentoAttribute);
         }, $result->getItems());
+    }
+
+    /**
+     * @param $storeId
+     * @param $magentoAttribute
+     * @return Attribute
+     */
+    private function registerAttribute($storeId, $magentoAttribute)
+    {
+        $attribute = new Attribute($magentoAttribute, $storeId);
+        $this->attributeStorage->attach($attribute, $magentoAttribute);
+        return $attribute;
     }
 
 }
