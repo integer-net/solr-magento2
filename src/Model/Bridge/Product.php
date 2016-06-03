@@ -13,11 +13,17 @@ namespace IntegerNet\Solr\Model\Bridge;
 use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use IntegerNet\Solr\Implementor\ProductIterator;
-use Magento\Catalog\Api\Data\ProductInterface as MagentoProduct;
+use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
+use Magento\Framework\Event\ManagerInterface;
 
 class Product implements ProductInterface
 {
+    const EVENT_CAN_INDEX_PRODUCT = 'integernet_solr_can_index_product';
     /**
+     * Magento product. Only access this directly if methods are needed that are not available in the
+     * Service Contract. Prefer {@see getMagentoProduct()} if possible
+     *
      * @var MagentoProduct
      */
     private $magentoProduct;
@@ -29,16 +35,25 @@ class Product implements ProductInterface
      * @var AttributeRepository
      */
     private $attributeRepository;
+    /**
+     * @var ManagerInterface
+     */
+    private $eventManager;
 
     /**
+     * Note: needs concrete Product model class for attribute frontend model, which expects a data object (Magento 2.0).
+     *
      * @param MagentoProduct $magentoProduct
      * @param AttributeRepository $attributeRepository
-     * @param int|null $storeId
+     * @param ManagerInterface $eventManager
+     * @param int|null $storeId store id for store specific values (null for default)
      */
-    public function __construct(MagentoProduct $magentoProduct, AttributeRepository $attributeRepository, $storeId = null)
+    public function __construct(MagentoProduct $magentoProduct, AttributeRepository $attributeRepository,
+                                ManagerInterface $eventManager, $storeId = null)
     {
         $this->magentoProduct = $magentoProduct;
         $this->attributeRepository = $attributeRepository;
+        $this->eventManager = $eventManager;
         $this->storeId = $storeId;
     }
 
@@ -55,12 +70,28 @@ class Product implements ProductInterface
      */
     public function isIndexable()
     {
-        // TODO: Implement isIndexable() method.
+        $this->eventManager->dispatch(self::EVENT_CAN_INDEX_PRODUCT, ['product' => $this->getMagentoProduct()]);
+        if ($this->getMagentoProduct()->getStatus() == MagentoProduct\Attribute\Source\Status::STATUS_DISABLED) {
+            return false;
+        }
+        if (! $this->isVisibleInCatalog() && ! $this->isVisibleInSearch()) {
+            return false;
+        }
+        if (! \in_array($this->magentoProduct->getStore()->getWebsiteId(), $this->magentoProduct->getWebsiteIds())) {
+            return false;
+        }
+        if (! $this->getMagentoProduct()->getExtensionAttributes()->getStockItem()->getIsInStock()) {
+            return false;
+        }
+        if ($this->getMagentoProduct()->getExtensionAttributes()->getSolrExclude()) {
+            return false;
+        }
+        return true;
     }
 
     public function getId()
     {
-        return $this->magentoProduct->getId();
+        return $this->getMagentoProduct()->getId();
     }
 
     public function getStoreId()
@@ -70,27 +101,33 @@ class Product implements ProductInterface
 
     public function isVisibleInCatalog()
     {
-        // TODO: Implement isVisibleInCatalog() method.
+        return \in_array($this->magentoProduct->getVisibility(), [
+            MagentoProduct\Visibility::VISIBILITY_IN_CATALOG,
+            MagentoProduct\Visibility::VISIBILITY_BOTH,
+        ]);
     }
 
     public function isVisibleInSearch()
     {
-        // TODO: Implement isVisibleInSearch() method.
+        return \in_array($this->magentoProduct->getVisibility(), [
+            MagentoProduct\Visibility::VISIBILITY_IN_SEARCH,
+            MagentoProduct\Visibility::VISIBILITY_BOTH,
+        ]);
     }
 
     public function getSolrBoost()
     {
-        return $this->magentoProduct->getExtensionAttributes()->getSolrBoost();
+        return $this->getMagentoProduct()->getExtensionAttributes()->getSolrBoost();
     }
 
     public function getPrice()
     {
-        return $this->magentoProduct->getPrice();
+        return $this->getMagentoProduct()->getPrice();
     }
 
     public function getAttributeValue(AttributeInterface $attribute)
     {
-        return $this->magentoProduct->getCustomAttribute($attribute->getAttributeCode())->getValue();
+        return $this->getMagentoProduct()->getCustomAttribute($attribute->getAttributeCode())->getValue();
     }
 
     /**
@@ -108,8 +145,7 @@ class Product implements ProductInterface
 
     public function getCategoryIds()
     {
-        //TODO: find a way to get these with service contracts
-        //       or require actual product resource instance
+        return $this->magentoProduct->getCategoryIds();
     }
 
     /**
@@ -117,8 +153,17 @@ class Product implements ProductInterface
      */
     public function getChildren()
     {
-        // TODO: find a way to get product type or children with service contracts
-        //       or require actual product resource instance
+        //TODO implement
+    }
+
+    /**
+     * Returns Magento product. Use this method to type hint against the Service Contract interface.
+     *
+     * @return MagentoProductInterface
+     */
+    private function getMagentoProduct()
+    {
+        return $this->magentoProduct;
     }
 
 }

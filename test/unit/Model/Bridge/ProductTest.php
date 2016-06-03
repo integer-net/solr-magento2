@@ -11,10 +11,14 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\Stub\AttributeStub;
+use Magento\Catalog\Api\Data\ProductExtensionInterface;
+use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
+use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\Eav\Model\Entity\Attribute\Frontend\AbstractFrontend;
 use Magento\Framework\Api\AttributeValue;
-use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
+use Magento\Framework\Event\ManagerInterface;
+use Magento\Store\Api\Data\StoreInterface;
 
 /**
  * @covers Product
@@ -23,27 +27,36 @@ class ProductTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ProductInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|MagentoProduct
      */
     private $magentoProductStub;
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|AttributeRepository
      */
     private $productAttributeRepositoryMock;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerInterface
+     */
+    private $eventManagerMock;
 
     protected function setUp()
     {
-        $this->magentoProductStub = $this->getMockBuilder(ProductInterface::class)
-            ->getMockForAbstractClass();
+        $this->magentoProductStub = $this->getMockBuilder(MagentoProduct::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->productAttributeRepositoryMock = $this->getMockBuilder(AttributeRepository::class)
             ->disableOriginalConstructor()
             ->setMethods(['getMagentoAttribute'])
             ->getMock();
+        $this->eventManagerMock = $this->getMockBuilder(ManagerInterface::class)
+            ->setMethods(['dispatch'])
+            ->getMockForAbstractClass();
     }
     protected function tearDown()
     {
         $this->magentoProductStub = null;
         $this->productAttributeRepositoryMock = null;
+        $this->eventManagerMock = null;
     }
 
     public function testCoreAttributes()
@@ -55,7 +68,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             'solr_boost' => 1.5,
             'category_ids' => [1,2,3]
         ];
-        $extensionAttributesStub = $this->getMockBuilder(\Magento\Catalog\Api\Data\ProductExtensionInterface::class)
+        $extensionAttributesStub = $this->getMockBuilder(ProductExtensionInterface::class)
             ->setMethods(['getSolrBoost'])
             ->getMockForAbstractClass();
 
@@ -64,16 +77,21 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->magentoProductStub->method('getStoreId')->willReturn($storeId);
         $this->magentoProductStub->method('getExtensionAttributes')->willReturn($extensionAttributesStub);
         $extensionAttributesStub->method('getSolrBoost')->willReturn($productData['solr_boost']);
-        $productBridge = new Product($this->magentoProductStub, $this->productAttributeRepositoryMock, $storeId);
+        $this->magentoProductStub->method('getCategoryIds')->willReturn($productData['category_ids']);
+        $productBridge = $this->makeProductBridge($storeId);
 
         $this->assertEquals($storeId, $productBridge->getStoreId(), 'store_id');
         $this->assertEquals($productData['id'], $productBridge->getId(), 'id');
         $this->assertEquals($productData['id'] . '_' . $storeId, $productBridge->getSolrId(), 'solr_id');
         $this->assertEquals($productData['solr_boost'], $productBridge->getSolrBoost(), 'solr_boost');
         $this->assertEquals($productData['price'], $productBridge->getPrice(), 'price');
+        $this->assertEquals($productData['category_ids'], $productBridge->getCategoryIds(), 'category_ids');
 
-        // $this->assertEquals($productData['category_ids'], $productBridge->getCategoryIds(), 'category_ids');
-        $this->markTestIncomplete('Missing: getCategoryIds(), getChildren()');
+    }
+
+    public function testChildren()
+    {
+        $this->markTestIncomplete('getChildren() for configurable products');
     }
 
     /**
@@ -96,16 +114,125 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->productAttributeRepositoryMock->method('getMagentoAttribute')
             ->willReturn($this->mockMagentoAttribute($expectedSearchableValue));
 
-        $productBridge = new Product($this->magentoProductStub, $this->productAttributeRepositoryMock, $storeId);
+        $productBridge = $this->makeProductBridge($storeId);
         $this->assertEquals($attributeValue, $productBridge->getAttributeValue($attributeStub));
 
-        $this->markTestIncomplete('getFrontend()->getValue() expects DataObject, API Interface is not enough');
         $this->assertEquals($expectedSearchableValue, $productBridge->getSearchableAttributeValue($attributeStub));
     }
 
-    public function testIndexable()
+    /**
+     * @dataProvider dataIndexable
+     * @param $storeAndWebsiteId
+     * @param $status
+     * @param $visibility
+     * @param $websiteIds
+     * @param $inStock
+     * @param $solrExclude
+     * @param $expectedResult
+     */
+    public function testIndexable($storeAndWebsiteId, $status, $visibility, $websiteIds, $inStock, $solrExclude, $expectedResult)
     {
-        $this->markTestIncomplete('Check: exclude by event, disabled, visibility, website assignment, out of stock');
+        $this->eventManagerMock->expects($this->once())
+            ->method('dispatch')
+            ->with(Product::EVENT_CAN_INDEX_PRODUCT, ['product' => $this->magentoProductStub]);
+
+        $storeStub = $this->getMockBuilder(StoreInterface::class)
+            ->setMethods(['getWebsiteId'])
+            ->getMockForAbstractClass();
+        $storeStub->method('getWebsiteId')->willReturn($storeAndWebsiteId);
+
+        $stockItemStub = $this->getMockBuilder(StockItemInterface::class)
+            ->setMethods(['getIsInStock'])
+            ->getMockForAbstractClass();
+        $stockItemStub->method('getIsInStock')->willReturn($inStock);
+        $extensionAttributesStub = $this->getMockBuilder(ProductExtensionInterface::class)
+            ->setMethods(['getStockItem', 'getSolrExclude'])
+            ->getMockForAbstractClass();
+        $extensionAttributesStub->method('getStockItem')->willReturn($stockItemStub);
+        $extensionAttributesStub->method('getSolrExclude')->willReturn($solrExclude);
+
+        $this->magentoProductStub->method('getStatus')->willReturn($status);
+        $this->magentoProductStub->method('getVisibility')->willReturn($visibility);
+        $this->magentoProductStub->method('getStore')->willReturn($storeStub);
+        $this->magentoProductStub->method('getWebsiteIds')->willReturn($websiteIds);
+        $this->magentoProductStub->method('getExtensionAttributes')->willReturn($extensionAttributesStub);
+
+        $productBridge = $this->makeProductBridge($storeAndWebsiteId);
+        $this->assertEquals($expectedResult, $productBridge->isIndexable());
+    }
+    public static function dataIndexable()
+    {
+        return [
+            'indexable' => [
+                'store_id' => 1,
+                'status' => MagentoProduct\Attribute\Source\Status::STATUS_ENABLED,
+                'visibility' => MagentoProduct\Visibility::VISIBILITY_IN_CATALOG,
+                'website_ids' => [1, 2],
+                'in_stock' => true,
+                'solr_exclude' => false,
+                'expected_result' => true,
+            ],
+            'disabled' => [
+                'store_id' => 1,
+                'status' => MagentoProduct\Attribute\Source\Status::STATUS_DISABLED,
+                'visibility' => MagentoProduct\Visibility::VISIBILITY_IN_CATALOG,
+                'website_ids' => [1, 2],
+                'in_stock' => true,
+                'solr_exclude' => false,
+                'expected_result' => false,
+            ],
+            'not visible' => [
+                'store_id' => 1,
+                'status' => MagentoProduct\Attribute\Source\Status::STATUS_ENABLED,
+                'visibility' => MagentoProduct\Visibility::VISIBILITY_NOT_VISIBLE,
+                'website_ids' => [1, 2],
+                'in_stock' => true,
+                'solr_exclude' => false,
+                'expected_result' => false,
+            ],
+            'not in website' => [
+                'store_id' => 3,
+                'status' => MagentoProduct\Attribute\Source\Status::STATUS_ENABLED,
+                'visibility' => MagentoProduct\Visibility::VISIBILITY_IN_CATALOG,
+                'website_ids' => [1, 2],
+                'in_stock' => true,
+                'solr_exclude' => false,
+                'expected_result' => false,
+            ],
+            'not in stock' => [
+                'store_id' => 1,
+                'status' => MagentoProduct\Attribute\Source\Status::STATUS_ENABLED,
+                'visibility' => MagentoProduct\Visibility::VISIBILITY_IN_CATALOG,
+                'website_ids' => [1, 2],
+                'in_stock' => false,
+                'solr_exclude' => false,
+                'expected_result' => false
+                ,
+            ],
+            'solr exclude' => [
+                'store_id' => 1,
+                'status' => MagentoProduct\Attribute\Source\Status::STATUS_ENABLED,
+                'visibility' => MagentoProduct\Visibility::VISIBILITY_IN_CATALOG,
+                'website_ids' => [1, 2],
+                'in_stock' => true,
+                'solr_exclude' => true,
+                'expected_result' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataVisibility
+     * @param $storeId
+     * @param $expectedVisibleInCatalog
+     * @param $expectedVisibleInSearch
+     */
+    public function testVisibility($storeId, $visibility, $expectedVisibleInCatalog, $expectedVisibleInSearch)
+    {
+        $this->magentoProductStub->method('getVisibility')->willReturn($visibility);
+        $productBridge = $this->makeProductBridge($storeId);
+        $this->assertEquals($expectedVisibleInCatalog, $productBridge->isVisibleInCatalog(), 'visible in catalog');
+        $this->assertEquals($expectedVisibleInSearch, $productBridge->isVisibleInSearch(), 'visible in search');
     }
 
     public static function dataCustomAttributes()
@@ -123,6 +250,35 @@ class ProductTest extends \PHPUnit_Framework_TestCase
                 'attribute_value' => 666,
                 'expected_searchable_value' => 'Number of the Beast',
             ]
+        ];
+    }
+    public static function dataVisibility()
+    {
+        return [
+            [
+                'store_id' => 1,
+                'visibility' => MagentoProduct\Visibility::VISIBILITY_BOTH,
+                'visible_in_catalog' => true,
+                'visible_in_search' => true,
+            ],
+            [
+                'store_id' => 1,
+                'visibility' => MagentoProduct\Visibility::VISIBILITY_IN_CATALOG,
+                'visible_in_catalog' => true,
+                'visible_in_search' => false,
+            ],
+            [
+                'store_id' => 1,
+                'visibility' => MagentoProduct\Visibility::VISIBILITY_IN_SEARCH,
+                'visible_in_catalog' => false,
+                'visible_in_search' => true,
+            ],
+            [
+                'store_id' => 1,
+                'visibility' => MagentoProduct\Visibility::VISIBILITY_NOT_VISIBLE,
+                'visible_in_catalog' => false,
+                'visible_in_search' => false,
+            ],
         ];
     }
 
@@ -144,5 +300,14 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $attributeFrontendStub->method('getValue')->with($this->magentoProductStub)->willReturn($frontendValueForCurrentProduct);
         $magentoAttributeStub->method('getFrontend')->willReturn($attributeFrontendStub);
         return $magentoAttributeStub;
+    }
+
+    /**
+     * @param $storeId
+     * @return Product
+     */
+    private function makeProductBridge($storeId)
+    {
+        return new Product($this->magentoProductStub, $this->productAttributeRepositoryMock, $this->eventManagerMock, $storeId);
     }
 }
