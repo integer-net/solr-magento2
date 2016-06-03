@@ -11,43 +11,43 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\ProductIterator as ProductIteratorInterface;
-use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
-use Magento\Framework\Event\ManagerInterface;
+use Magento\Catalog\Model\Product as MagentoProduct;
 
 class ProductIterator extends \IteratorIterator implements ProductIteratorInterface
 {
-
-    /**
-     * @var AttributeRepository
-     */
-    private $attributeRepository;
-    /**
-     * @var ManagerInterface
-     */
-    private $eventManager;
     /**
      * @var int|null
      */
     private $storeId;
-
     /**
-     * @param ProductCollection $collection
-     * @param AttributeRepository $attributeRepository
-     * @param ManagerInterface $eventManager
+     * @var ProductFactory
+     */
+    private $productFactory;
+
+    /**#@+
+     * Named constructor parameters
+     */
+    const PARAM_MAGENTO_PRODUCTS = 'magentoProducts';
+    const PARAM_STORE_ID = 'storeId';
+    /**#@-*/
+    /**
+     * @param ProductFactory $productFactory
+     * @param MagentoProduct[] $magentoProducts
      * @param int|null $storeId
      */
-    public function __construct(ProductCollection $collection, AttributeRepository $attributeRepository,
-                                ManagerInterface $eventManager, $storeId = null)
+    public function __construct(ProductFactory $productFactory, array $magentoProducts, $storeId = null)
     {
-        parent::__construct($collection->getIterator());
-        $this->attributeRepository = $attributeRepository;
-        $this->eventManager = $eventManager;
+        parent::__construct(new \ArrayIterator($magentoProducts));
         $this->storeId = $storeId;
+        $this->productFactory = $productFactory;
     }
 
     public function current()
     {
-        return new Product(parent::current(), $this->attributeRepository, $this->eventManager, $this->storeId);
+        return $this->productFactory->create([
+            Product::PARAM_MAGENTO_PRODUCT => parent::current(),
+            Product::PARAM_STORE_ID => $this->storeId
+        ]);
     }
 
 }

@@ -11,7 +11,6 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
-use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Framework\Event\ManagerInterface;
 
 /**
@@ -26,16 +25,25 @@ class ProductIteratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testIterator($storeId, $productIds)
     {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ProductFactory $productFactory */
+        $productFactory = $this->getMockBuilder(ProductFactory::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['create'])
+            ->getMock();
+        $productFactory->expects($this->exactly(count($productIds)))
+            ->method('create')
+            ->willReturnCallback(function($arguments) {
+                return new Product(
+                    $arguments[Product::PARAM_MAGENTO_PRODUCT],
+                    $this->getAttributeRepositoryStub(),
+                    $this->getEventManagerStub(),
+                    $arguments[Product::PARAM_STORE_ID]);
+            });
         $products = \array_map(function($productId) {
             return $this->getProductStub($productId);
         }, $productIds);
 
-        $iterator = new ProductIterator(
-            $this->getCollectionStub($products),
-            $this->getAttributeRepositoryStub(),
-            $this->getEventManagerStub(),
-            $storeId
-        );
+        $iterator = new ProductIterator($productFactory, $products, $storeId);
         /** @var Product[] $productsFromIterator */
         $productsFromIterator = \iterator_to_array($iterator);
 
@@ -77,20 +85,6 @@ class ProductIteratorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $productMock->method('getId')->willReturn($productId);
         return $productMock;
-    }
-
-    /**
-     * @param $products
-     * @return \PHPUnit_Framework_MockObject_MockObject|ProductCollection
-     */
-    private function getCollectionStub($products)
-    {
-        $collectionMock = $this->getMockBuilder(ProductCollection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getIterator'])
-            ->getMock();
-        $collectionMock->method('getIterator')->willReturn(new \ArrayIterator($products));
-        return $collectionMock;
     }
 
     /**

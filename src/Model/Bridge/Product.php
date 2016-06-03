@@ -20,6 +20,7 @@ use Magento\Framework\Event\ManagerInterface;
 class Product implements ProductInterface
 {
     const EVENT_CAN_INDEX_PRODUCT = 'integernet_solr_can_index_product';
+
     /**
      * Magento product. Only access this directly if methods are needed that are not available in the
      * Service Contract. Prefer {@see getMagentoProduct()} if possible
@@ -40,6 +41,12 @@ class Product implements ProductInterface
      */
     private $eventManager;
 
+    /**#@+
+     * Named constructor parameters
+     */
+    const PARAM_MAGENTO_PRODUCT = 'magentoProduct';
+    const PARAM_STORE_ID = 'storeId';
+    /**#@-*/
     /**
      * Note: needs concrete Product model class for attribute frontend model, which expects a data object (Magento 2.0).
      *
