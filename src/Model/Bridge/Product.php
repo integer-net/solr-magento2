@@ -162,11 +162,13 @@ class Product implements ProductInterface
     }
 
     /**
+     * @deprecated use ProductRepository::getChildProducts() instead
      * @return ProductIteratorInterface
      */
     public function getChildren()
     {
-        //TODO deprecate and move to ProductRepository
+        //TODO eliminate usage of deprecated method in library
+        throw new \BadMethodCallException('Deprecated method ' . __METHOD__ . ' is not implemented.');
     }
 
     /**

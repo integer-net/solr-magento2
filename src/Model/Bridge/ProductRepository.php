@@ -10,12 +10,12 @@
 
 namespace IntegerNet\Solr\Model\Bridge;
 
-use IntegerNet\Solr\Implementor\ProductRepository as ProductRepositoryInterface;
 use IntegerNet\Solr\Implementor\ProductIterator as ProductIteratorInterface;
 use IntegerNet\Solr\Implementor\ProductIteratorFactory;
+use IntegerNet\Solr\Implementor\ProductRepository as ProductRepositoryInterface;
 use IntegerNet\Solr\Model\SearchCriteria\ProductSearchCriteriaBuilder;
 use Magento\Catalog\Api\ProductRepositoryInterface as MagentoProductRepository;
-use Magento\Framework\Api\SearchCriteriaBuilderFactory;
+use Magento\ConfigurableProduct\Api\LinkManagementInterface;
 
 class ProductRepository implements ProductRepositoryInterface
 {
@@ -31,18 +31,25 @@ class ProductRepository implements ProductRepositoryInterface
      * @var ProductIteratorFactory
      */
     private $iteratorFactory;
+    /**
+     * @var LinkManagementInterface
+     */
+    private $productLinkManagement;
 
     /**
      * ProductRepository constructor.
      * @param MagentoProductRepository $productRepository
+     * @param LinkManagementInterface $productLinkManagement
      * @param ProductIteratorFactory $iteratorFactory
      * @param ProductSearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(MagentoProductRepository $productRepository,
+                                LinkManagementInterface $productLinkManagement,
                                 ProductIteratorFactory $iteratorFactory,
                                 ProductSearchCriteriaBuilder $searchCriteriaBuilder)
     {
         $this->productRepository = $productRepository;
+        $this->productLinkManagement = $productLinkManagement;
         $this->iteratorFactory = $iteratorFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
@@ -67,5 +74,18 @@ class ProductRepository implements ProductRepositoryInterface
             ]);
         //TODO implement LazyProductIterator that uses paginated product collection
     }
+
+    /**
+     * Return product iterator for child products
+     *
+     * @param int $storeId Child products will be returned that are visible in this store and with store specific values
+     * @param string $parentSku SKU of the composite parent product
+     * @return ProductIteratorInterface
+     */
+    public function getChildProducts($storeId, $parentSku)
+    {
+        // TODO: Implement getChildProducts() method.
+    }
+
 
 }

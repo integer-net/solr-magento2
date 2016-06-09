@@ -61,7 +61,7 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getFilterableAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        //TODO deprecate method in interface and eliminate usage. We don't know the context here!
+        //TODO eliminate usage of deprecated method in library. We don't know the context here!
         return $this->getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch);
     }
 
