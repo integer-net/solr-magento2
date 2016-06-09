@@ -134,7 +134,13 @@ class Product implements ProductInterface
 
     public function getAttributeValue(AttributeInterface $attribute)
     {
-        return $this->getMagentoProduct()->getCustomAttribute($attribute->getAttributeCode())->getValue();
+        $attributeCode = $attribute->getAttributeCode();
+        $method = 'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $attributeCode)));
+        $product = $this->getMagentoProduct();
+        if (\method_exists($product, $method)) {
+            return $product->$method();
+        }
+        return $this->getMagentoProduct()->getCustomAttribute($attributeCode)->getValue();
     }
 
     /**
@@ -160,7 +166,7 @@ class Product implements ProductInterface
      */
     public function getChildren()
     {
-        //TODO implement
+        //TODO deprecate and move to ProductRepository
     }
 
     /**

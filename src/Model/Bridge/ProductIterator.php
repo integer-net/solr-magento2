@@ -11,6 +11,7 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\ProductIterator as ProductIteratorInterface;
+use IntegerNet\Solr\Implementor\ProductFactory;
 use Magento\Catalog\Model\Product as MagentoProduct;
 
 class ProductIterator extends \IteratorIterator implements ProductIteratorInterface

@@ -10,6 +10,7 @@
 
 namespace IntegerNet\Solr\Model\Bridge;
 
+use IntegerNet\Solr\Implementor\ProductFactory;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Event\ManagerInterface;
 

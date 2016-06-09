@@ -10,7 +10,6 @@ use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\Search\FilterGroup;
 use Magento\Framework\Api\SearchCriteria;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -84,40 +83,6 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         return $this->mockAttributeRepository($dataAttributes, $expectedSearchCriteria,
             ProductAttributeRepositoryInterface::class, AttributeResource::class);
-    }
-
-    /**
-     * @param $expectedFilters
-     * @param $expectedSortOrder
-     * @return SearchCriteriaBuilder|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function mockSearchCriteriaBuilder($expectedFilters, $expectedSortOrder)
-    {
-        $searchCriteriaBuilderMock = $this->getSearchCriteriaBuilderMock();
-        if ($expectedSortOrder) {
-            $searchCriteriaBuilderMock->expects($this->once())
-                ->method('addSortOrder')
-                ->with($expectedSortOrder);
-        } else {
-            $searchCriteriaBuilderMock->expects($this->never())
-                ->method('addSortOrder');
-        }
-        $expectedAddFilter = [];
-        $expectedAddFilters = [];
-        foreach ($expectedFilters as $expectedFilter) {
-            if ($expectedFilter instanceof FilterGroup) {
-                $expectedAddFilters[] = [ $expectedFilter->getFilters() ];
-            } else {
-                $expectedAddFilter[] = $expectedFilter;
-            }
-        }
-        $searchCriteriaBuilderMock->expects($this->exactly(count($expectedAddFilter)))
-            ->method('addFilter')
-            ->withConsecutive(...$expectedAddFilter);
-        $searchCriteriaBuilderMock->expects($this->exactly(count($expectedAddFilters)))
-            ->method('addFilters')
-            ->withConsecutive(...$expectedAddFilters);
-        return $searchCriteriaBuilderMock;
     }
 
     /**
@@ -386,19 +351,11 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
     protected function getAttributeRepository(array $dataAttributes, array $expectedFilters, $expectedSortOrder)
     {
         $searchCriteriaDummy = new SearchCriteria();
-        $searchCriteriaBuilderMock = $this->mockSearchCriteriaBuilder($expectedFilters, $expectedSortOrder);
-        $searchCriteriaBuilderMock->method('create')
-            ->willReturn($searchCriteriaDummy);
-        $searchCriteriaBuilderFactoryMock = $this->getMockBuilder(SearchCriteriaBuilderFactory::class)
-            ->setMethods(['create'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $searchCriteriaBuilderFactoryMock->method('create')->willReturn($searchCriteriaBuilderMock);
-
+        $searchCriteriaBuilderMock = $this->mockSearchCriteriaBuilder($expectedFilters, $expectedSortOrder, $searchCriteriaDummy);
         $this->productAttributeRepositoryMock = $this->mockProductAttributeRepository($dataAttributes, $searchCriteriaDummy);
         $attributeRepository = new AttributeRepository(
             $this->productAttributeRepositoryMock,
-            new AttributeSearchCriteriaBuilder($searchCriteriaBuilderFactoryMock));
+            new AttributeSearchCriteriaBuilder($this->mockSearchCriteriaBuilderFactory($searchCriteriaBuilderMock)));
         return $attributeRepository;
     }
 
