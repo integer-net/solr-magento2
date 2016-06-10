@@ -68,10 +68,7 @@ class ProductRepository implements ProductRepositoryInterface
             $searchCriteriaBuilder = $searchCriteriaBuilder->withIds($productIds);
         }
         $products = $this->productRepository->getList($searchCriteriaBuilder->create())->getItems();
-        return $this->iteratorFactory->create([
-            ProductIterator::PARAM_STORE_ID => null,
-            ProductIterator::PARAM_MAGENTO_PRODUCTS => $products
-            ]);
+        return $this->createProductIterator($storeId, $products);
         //TODO implement LazyProductIterator that uses paginated product collection
     }
 
@@ -84,7 +81,21 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function getChildProducts($storeId, $parentSku)
     {
-        // TODO: Implement getChildProducts() method.
+        $products = $this->productLinkManagement->getChildren($parentSku);
+        return $this->createProductIterator($storeId, $products);
+    }
+
+    /**
+     * @param $storeId
+     * @param $products
+     * @return ProductIteratorInterface
+     */
+    private function createProductIterator($storeId, $products)
+    {
+        return $this->iteratorFactory->create([
+            ProductIterator::PARAM_STORE_ID => $storeId,
+            ProductIterator::PARAM_MAGENTO_PRODUCTS => $products
+        ]);
     }
 
 

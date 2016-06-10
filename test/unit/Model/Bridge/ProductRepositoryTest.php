@@ -92,7 +92,7 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $actualResult = $this->productRepository->getProductsForIndex($storeId, $productIds);
 
-        $this->assertIteratorContainsProducts($actualResult, $productsInSearchResult);
+        $this->assertIteratorContainsProducts($actualResult, $productsInSearchResult, $storeId);
     }
 
     public static function dataProductsForIndex()
@@ -109,11 +109,13 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testChildProducts($storeId, $parentSku)
     {
+        $productsInSearchResult = $this->mockProducts([100, 101, 103]);
         $this->linkManagementMock->expects($this->once())
             ->method('getChildren')
-            ->with($parentSku);
-        $this->productRepository->getChildProducts($storeId, $parentSku);
-        $this->markTestIncomplete('TODO: test getChildProducts()');
+            ->with($parentSku)
+            ->willReturn($productsInSearchResult);
+        $actualResult = $this->productRepository->getChildProducts($storeId, $parentSku);
+        $this->assertIteratorContainsProducts($actualResult, $productsInSearchResult, $storeId);
     }
 
     public static function dataChildProducts()
@@ -192,17 +194,19 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param \Iterator $actualResult
-     * @param \PHPUnit_Framework_MockObject_MockObject[]|MagentoProduct[] $productsInSearchResult
+     * @param \PHPUnit_Framework_MockObject_MockObject[]|MagentoProduct[] $expectedProducts
+     * @param $expectedStoreId
      */
-    private function assertIteratorContainsProducts($actualResult, $productsInSearchResult)
+    private function assertIteratorContainsProducts($actualResult, $expectedProducts, $expectedStoreId)
     {
         $this->assertInstanceOf(ProductIterator::class, $actualResult);
         $productsFromIterator = \iterator_to_array($actualResult);
-        $this->assertCount(\count($productsInSearchResult), $productsFromIterator);
+        $this->assertCount(\count($expectedProducts), $productsFromIterator);
         foreach ($productsFromIterator as $actualProduct) {
             /** @var Product $actualProduct */
             $this->assertInstanceOf(Product::class, $actualProduct);
-            $this->assertEquals(\array_shift($productsInSearchResult)->getId(), $actualProduct->getId());
+            $this->assertEquals(\array_shift($expectedProducts)->getId(), $actualProduct->getId(), 'product id');
+            $this->assertEquals($expectedStoreId, $actualProduct->getStoreId(), 'store id');
         }
     }
 }

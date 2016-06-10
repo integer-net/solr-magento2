@@ -167,7 +167,7 @@ class Product implements ProductInterface
      */
     public function getChildren()
     {
-        //TODO eliminate usage of deprecated method in library
+        //TODO eliminate usage of deprecated method in library (use ProductRepository::getChildProducts())
         throw new \BadMethodCallException('Deprecated method ' . __METHOD__ . ' is not implemented.');
     }
 
