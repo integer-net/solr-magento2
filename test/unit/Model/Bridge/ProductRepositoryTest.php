@@ -11,7 +11,7 @@ use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
 use Magento\ConfigurableProduct\Api\LinkManagementInterface;
 use Magento\Framework\Api\SearchCriteria;
-use Magento\Framework\Api\SearchCriteriaBuilderFactory;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Event\ManagerInterface;
 
 /**
@@ -30,6 +30,22 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject|LinkManagementInterface
      */
     private $linkManagementMock;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilderMock;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ProductIteratorFactory
+     */
+    private $productIteratorFactoryMock;
+    /**
+     * @var ProductSearchCriteriaBuilder
+     */
+    private $productSearchCriteriaBuilder;
+    /**
+     * @var ProductRepository
+     */
+    private $productRepository;
 
     protected function setUp()
     {
@@ -41,47 +57,75 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(['getChildren'])
             ->getMockForAbstractClass();
+        $this->searchCriteriaBuilderMock = $this->getSearchCriteriaBuilderMock();
+        $this->productSearchCriteriaBuilder = new ProductSearchCriteriaBuilder($this->mockSearchCriteriaBuilderFactory($this->searchCriteriaBuilderMock));
+        $this->productIteratorFactoryMock = $this->mockProductIteratorFactory();
+
+        $this->productRepository = new ProductRepository(
+            $this->magentoProductRepositoryMock,
+            $this->linkManagementMock,
+            $this->productIteratorFactoryMock,
+            $this->productSearchCriteriaBuilder
+        );
+
     }
     protected function tearDown()
     {
-        $this->magentoProductRepositoryMock = null;
     }
 
-    public function testProductsForIndex()
+    /**
+     * @dataProvider dataProductsForIndex
+     * @param $storeId
+     * @param $productIds
+     */
+    public function testProductsForIndex($storeId, $productIds)
     {
-        $storeId = 1;
-        $productIds = [11, 12];
-        $products = [
-            $this->mockProduct(11),
-            $this->mockProduct(12),
-        ];
+        $productsInSearchResult = $this->mockProducts($productIds);
         $searchCriteriaDummy = new SearchCriteria();
         $this->magentoProductRepositoryMock->expects($this->once())
             ->method('getList')
             ->with($this->identicalTo($searchCriteriaDummy))
-            ->willReturn($this->mockSearchResults($products));
-        $productRepository = new ProductRepository(
-            $this->magentoProductRepositoryMock,
-            $this->linkManagementMock,
-            $this->mockProductIteratorFactory(),
-            new ProductSearchCriteriaBuilder($this->mockSearchCriteriaBuilderFactory($this->mockSearchCriteriaBuilder(
-                [['store_id', $storeId], ['entity_id', $productIds, 'in']], null, $searchCriteriaDummy)))
-        );
-        $actualResult = $productRepository->getProductsForIndex($storeId, $productIds);
-        $this->assertInstanceOf(ProductIterator::class, $actualResult);
-        $productsFromIterator = \iterator_to_array($actualResult);
-        $this->assertCount(\count($products), $productsFromIterator);
-        foreach ($productsFromIterator as $actualProduct) {
-            $this->assertInstanceOf(Product::class, $actualProduct);
-            $this->assertEquals(\array_shift($products)->getId(), $actualProduct->getId());
-        }
+            ->willReturn($this->mockSearchResults($productsInSearchResult));
+        $this->searchCriteriaBuilderExpects(
+            $this->searchCriteriaBuilderMock,
+            [['store_id', $storeId], ['entity_id', $productIds, 'in']], null, $searchCriteriaDummy);
+
+        $actualResult = $this->productRepository->getProductsForIndex($storeId, $productIds);
+
+        $this->assertIteratorContainsProducts($actualResult, $productsInSearchResult);
     }
 
-    public function testChildProducts()
+    public static function dataProductsForIndex()
     {
+        return [
+            ['store_id' => 1, 'product_id' => [11, 12]]
+        ];
+    }
+
+    /**
+     * @dataProvider dataChildProducts
+     * @param $storeId
+     * @param $parentSku
+     */
+    public function testChildProducts($storeId, $parentSku)
+    {
+        $this->linkManagementMock->expects($this->once())
+            ->method('getChildren')
+            ->with($parentSku);
+        $this->productRepository->getChildProducts($storeId, $parentSku);
         $this->markTestIncomplete('TODO: test getChildProducts()');
     }
 
+    public static function dataChildProducts()
+    {
+        return [
+            ['store_id' => 1, 'parent_sku' => 'the_parent']
+        ];
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ProductIteratorFactory
+     */
     protected function mockProductIteratorFactory()
     {
         $searchCriteriaBuilderFactoryMock = $this->getMockBuilder(ProductIteratorFactory::class)
@@ -96,6 +140,10 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
         });
         return $searchCriteriaBuilderFactoryMock;
     }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ProductFactory
+     */
     protected function mockProductFactory()
     {
         $searchCriteriaBuilderFactoryMock = $this->getMockBuilder(ProductFactory::class)
@@ -103,10 +151,14 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $searchCriteriaBuilderFactoryMock->method('create')->willReturnCallback(function($data) {
+            /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeRepository $attributeRepositoryMock */
+            $attributeRepositoryMock = $this->getMockBuilder(AttributeRepository::class)->disableOriginalConstructor()->getMock();
+            /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerInterface $linkManagerMock */
+            $linkManagerMock = $this->getMockBuilder(ManagerInterface::class)->getMockForAbstractClass();
             return new Product(
                 $data[Product::PARAM_MAGENTO_PRODUCT],
-                $this->getMockBuilder(AttributeRepository::class)->disableOriginalConstructor()->getMock(),
-                $this->getMockBuilder(ManagerInterface::class)->getMockForAbstractClass(),
+                $attributeRepositoryMock,
+                $linkManagerMock,
                 $data[Product::PARAM_STORE_ID]
             );
         });
@@ -115,7 +167,7 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $productId
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|MagentoProduct
      */
     protected function mockProduct($productId)
     {
@@ -125,5 +177,32 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $productMock->method('getId')->willReturn($productId);
         return $productMock;
+    }
+
+    /**
+     * @param $productIds
+     * @return \PHPUnit_Framework_MockObject_MockObject[]|MagentoProduct[]
+     */
+    protected function mockProducts($productIds)
+    {
+        return \array_map(function ($productId) {
+            return $this->mockProduct($productId);
+        }, $productIds);
+    }
+
+    /**
+     * @param \Iterator $actualResult
+     * @param \PHPUnit_Framework_MockObject_MockObject[]|MagentoProduct[] $productsInSearchResult
+     */
+    private function assertIteratorContainsProducts($actualResult, $productsInSearchResult)
+    {
+        $this->assertInstanceOf(ProductIterator::class, $actualResult);
+        $productsFromIterator = \iterator_to_array($actualResult);
+        $this->assertCount(\count($productsInSearchResult), $productsFromIterator);
+        foreach ($productsFromIterator as $actualProduct) {
+            /** @var Product $actualProduct */
+            $this->assertInstanceOf(Product::class, $actualProduct);
+            $this->assertEquals(\array_shift($productsInSearchResult)->getId(), $actualProduct->getId());
+        }
     }
 }

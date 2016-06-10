@@ -49,7 +49,7 @@ trait SearchCriteriaBuilderMock
     abstract public function never();
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|SearchCriteriaBuilder
      */
     protected function getSearchCriteriaBuilderMock()
     {
@@ -61,14 +61,14 @@ trait SearchCriteriaBuilderMock
     }
 
     /**
+     * @param $searchCriteriaBuilderMock SearchCriteriaBuilder|\PHPUnit_Framework_MockObject_MockObject
      * @param $expectedFilters
      * @param $expectedSortOrder
      * @param SearchCriteria $searchCriteria
      * @return SearchCriteriaBuilder|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function mockSearchCriteriaBuilder($expectedFilters, $expectedSortOrder, SearchCriteria $searchCriteria)
+    protected function searchCriteriaBuilderExpects(\PHPUnit_Framework_MockObject_MockObject $searchCriteriaBuilderMock, $expectedFilters, $expectedSortOrder, SearchCriteria $searchCriteria)
     {
-        $searchCriteriaBuilderMock = $this->getSearchCriteriaBuilderMock();
         $searchCriteriaBuilderMock->method('create')
             ->willReturn($searchCriteria);
         if ($expectedSortOrder) {
@@ -100,16 +100,16 @@ trait SearchCriteriaBuilderMock
     }
 
     /**
-     * @param $searchCriteriaBuilderMock
+     * @param $returnSearchCriteriaBuilder SearchCriteriaBuilder|\PHPUnit_Framework_MockObject_MockObject
      * @return \PHPUnit_Framework_MockObject_MockObject|SearchCriteriaBuilderFactory
      */
-    protected function mockSearchCriteriaBuilderFactory($searchCriteriaBuilderMock)
+    protected function mockSearchCriteriaBuilderFactory($returnSearchCriteriaBuilder)
     {
         $searchCriteriaBuilderFactoryMock = $this->getMockBuilder(SearchCriteriaBuilderFactory::class)
             ->setMethods(['create'])
             ->disableOriginalConstructor()
             ->getMock();
-        $searchCriteriaBuilderFactoryMock->method('create')->willReturn($searchCriteriaBuilderMock);
+        $searchCriteriaBuilderFactoryMock->method('create')->willReturn($returnSearchCriteriaBuilder);
         return $searchCriteriaBuilderFactoryMock;
     }
 

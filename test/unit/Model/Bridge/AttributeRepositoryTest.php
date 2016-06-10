@@ -351,7 +351,7 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
     protected function getAttributeRepository(array $dataAttributes, array $expectedFilters, $expectedSortOrder)
     {
         $searchCriteriaDummy = new SearchCriteria();
-        $searchCriteriaBuilderMock = $this->mockSearchCriteriaBuilder($expectedFilters, $expectedSortOrder, $searchCriteriaDummy);
+        $searchCriteriaBuilderMock = $this->searchCriteriaBuilderExpects($this->getSearchCriteriaBuilderMock(), $expectedFilters, $expectedSortOrder, $searchCriteriaDummy);
         $this->productAttributeRepositoryMock = $this->mockProductAttributeRepository($dataAttributes, $searchCriteriaDummy);
         $attributeRepository = new AttributeRepository(
             $this->productAttributeRepositoryMock,
