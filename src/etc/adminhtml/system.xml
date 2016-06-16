@@ -224,6 +224,11 @@
           <comment>0 = don't show</comment>
           <validate>validate-number validate-zero-or-greater</validate>
         </field>
+        <field id="max_number_cms_page_suggestions" translate="label,comment" sortOrder="50" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Maximum number of CMS page suggestions</label>
+          <comment>0 = don't show&lt;br /&gt;Indexing of CMS pages must be active.&lt;br /&gt;Attention: This will affect the performance of the autosuggest!</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
         <field id="show_complete_category_path" translate="label" sortOrder="60" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Show complete category path</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

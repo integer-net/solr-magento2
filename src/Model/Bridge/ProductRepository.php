@@ -10,6 +10,7 @@
 
 namespace IntegerNet\Solr\Model\Bridge;
 
+use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use IntegerNet\Solr\Implementor\ProductIterator as ProductIteratorInterface;
 use IntegerNet\Solr\Implementor\ProductIteratorFactory;
 use IntegerNet\Solr\Implementor\ProductRepository as ProductRepositoryInterface;
@@ -75,14 +76,13 @@ class ProductRepository implements ProductRepositoryInterface
     /**
      * Return product iterator for child products
      *
-     * @param int $storeId Child products will be returned that are visible in this store and with store specific values
-     * @param string $parentSku SKU of the composite parent product
-     * @return ProductIteratorInterface
+     * @param ProductInterface|Product $parent The composite parent product. Child products will be returned that are visible in the same store and with store specific values
+     * @return ProductIterator
      */
-    public function getChildProducts($storeId, $parentSku)
+    public function getChildProducts(ProductInterface $parent)
     {
-        $products = $this->productLinkManagement->getChildren($parentSku);
-        return $this->createProductIterator($storeId, $products);
+        $products = $this->productLinkManagement->getChildren($parent->getSku());
+        return $this->createProductIterator($parent->getStoreId(), $products);
     }
 
     /**

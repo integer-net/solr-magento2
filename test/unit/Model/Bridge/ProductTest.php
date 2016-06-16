@@ -87,11 +87,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($productData['price'], $productBridge->getPrice(), 'price');
         $this->assertEquals($productData['category_ids'], $productBridge->getCategoryIds(), 'category_ids');
 
-    }
-
-    public function testChildren()
-    {
-        $this->markTestIncomplete('getChildren() for configurable products');
+        $this->markTestIncomplete('TODO: Test hasSpecialPrice()');
     }
 
     /**

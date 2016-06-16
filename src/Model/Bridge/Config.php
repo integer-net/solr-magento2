@@ -12,12 +12,14 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 
 use IntegerNet\Solr\Config\AutosuggestConfig;
+use IntegerNet\Solr\Config\CategoryConfig;
 use IntegerNet\Solr\Config\FuzzyConfig;
 use IntegerNet\Solr\Config\GeneralConfig;
 use IntegerNet\Solr\Config\IndexingConfig;
 use IntegerNet\Solr\Config\ResultsConfig;
 use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Config\StoreConfig;
+use IntegerNet\Solr\Config\CmsConfig;
 use IntegerNet\Solr\Implementor\Config as ConfigInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -87,6 +89,10 @@ class Config implements ConfigInterface
      * @var CmsConfig
      */
     private $cms;
+    /**
+     * @var CategoryConfig
+     */
+    private $category;
 
     const PARAM_STORE_ID = 'storeId';
     /**
@@ -143,19 +149,22 @@ class Config implements ConfigInterface
      */
     public function getServerConfig()
     {
-        $prefix = 'integernet_solr/general/';
-        return new ServerConfig(
-            $this->_getConfig($prefix . 'host'),
-            $this->_getConfig($prefix . 'port'),
-            $this->_getConfig($prefix . 'path'),
-            $this->_getConfig($prefix . 'core'),
-            $this->_getConfig('integernet_solr/indexing/swap_core'),
-            $this->_getConfigFlag($prefix . 'use_https'),
-            $this->_getConfig($prefix . 'http_method'),
-            $this->_getConfigFlag($prefix . 'use_http_basic_auth'),
-            $this->_getConfig($prefix . 'http_basic_auth_username'),
-            $this->_getConfig($prefix . 'http_basic_auth_password')
-        );
+        if ($this->server === null) {
+            $prefix = 'integernet_solr/general/';
+            $this->server = new ServerConfig(
+                $this->_getConfig($prefix . 'host'),
+                $this->_getConfig($prefix . 'port'),
+                $this->_getConfig($prefix . 'path'),
+                $this->_getConfig($prefix . 'core'),
+                $this->_getConfig('integernet_solr/indexing/swap_core'),
+                $this->_getConfigFlag($prefix . 'use_https'),
+                $this->_getConfig($prefix . 'http_method'),
+                $this->_getConfigFlag($prefix . 'use_http_basic_auth'),
+                $this->_getConfig($prefix . 'http_basic_auth_username'),
+                $this->_getConfig($prefix . 'http_basic_auth_password')
+            );
+        }
+        return $this->server;
     }
 
     /**
@@ -190,6 +199,7 @@ class Config implements ConfigInterface
                 $this->_getConfig($prefix . 'max_number_searchword_suggestions'),
                 $this->_getConfig($prefix . 'max_number_product_suggestions'),
                 $this->_getConfig($prefix . 'max_number_category_suggestions'),
+                $this->_getConfig($prefix . 'max_number_cms_page_suggestions'),
                 $this->_getConfigFlag($prefix . 'show_complete_category_path'),
                 $this->_getConfigFlag($prefix . 'category_link_type'),
                 @unserialize($this->_getConfig($prefix . 'attribute_filter_suggestions'))
@@ -266,6 +276,24 @@ class Config implements ConfigInterface
             );
         }
         return $this->cms;
+    }
+
+    /**
+     * Returns category configuration
+     *
+     * @return CategoryConfig
+     */
+    public function getCategoryConfig()
+    {
+        if ($this->category === null) {
+            $prefix = 'integernet_solr/category/';
+            $this->category = new CategoryConfig(
+                $this->_getConfigFlag($prefix . 'is_active'),
+                $this->_getConfig($prefix . 'filter_position'),
+                $this->_getConfigFlag($prefix . 'is_indexer_active')
+            );
+        }
+        return $this->category;
     }
 
     /**

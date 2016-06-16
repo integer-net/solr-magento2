@@ -161,14 +161,9 @@ class Product implements ProductInterface
         return $this->magentoProduct->getCategoryIds();
     }
 
-    /**
-     * @deprecated use ProductRepository::getChildProducts() instead
-     * @return ProductIteratorInterface
-     */
-    public function getChildren()
+    public function hasSpecialPrice()
     {
-        //TODO eliminate usage of deprecated method in library (use ProductRepository::getChildProducts())
-        throw new \BadMethodCallException('Deprecated method ' . __METHOD__ . ' is not implemented.');
+        // TODO: Implement hasSpecialPrice() method.
     }
 
     /**
@@ -181,4 +176,11 @@ class Product implements ProductInterface
         return $this->magentoProduct;
     }
 
+    /**
+     * @return string
+     */
+    public function getSku()
+    {
+        return $this->getMagentoProduct()->getSku();
+    }
 }

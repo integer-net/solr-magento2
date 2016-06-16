@@ -107,21 +107,29 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
      * @param $storeId
      * @param $parentSku
      */
-    public function testChildProducts($storeId, $parentSku)
+    public function testChildProducts($parentId, $storeId, $parentSku)
     {
+        $magentoProductStub = $this->mockProduct($parentId);
+        $magentoProductStub->method('getSku')->willReturn($parentSku);
+        $magentoProductStub->method('getStoreId')->willReturn($storeId);
+        $product = $this->mockProductFactory()->create([
+            Product::PARAM_STORE_ID => $storeId,
+            Product::PARAM_MAGENTO_PRODUCT => $magentoProductStub,
+        ]);
+
         $productsInSearchResult = $this->mockProducts([100, 101, 103]);
         $this->linkManagementMock->expects($this->once())
             ->method('getChildren')
             ->with($parentSku)
             ->willReturn($productsInSearchResult);
-        $actualResult = $this->productRepository->getChildProducts($storeId, $parentSku);
+        $actualResult = $this->productRepository->getChildProducts($product);
         $this->assertIteratorContainsProducts($actualResult, $productsInSearchResult, $storeId);
     }
 
     public static function dataChildProducts()
     {
         return [
-            ['store_id' => 1, 'parent_sku' => 'the_parent']
+            ['parent_id' => 1, 'store_id' => 1, 'parent_sku' => 'the_parent']
         ];
     }
 
@@ -175,7 +183,7 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $productMock = $this->getMockBuilder(MagentoProduct::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getId'])
+            ->setMethods(['getId', 'getSku', 'getStoreId'])
             ->getMock();
         $productMock->method('getId')->willReturn($productId);
         return $productMock;
