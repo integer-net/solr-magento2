@@ -52,20 +52,6 @@ class AttributeRepository implements AttributeRepositoryInterface
     }
 
     /**
-     * Return filterable attributes in current context (catalog or search)
-     *
-     * @deprecated use getFilterableInSearchAttributes() or getFilterableInCatalogAttributes() directly!
-     * @param int $storeId
-     * @param bool $useAlphabeticalSearch
-     * @return Attribute[]
-     */
-    public function getFilterableAttributes($storeId, $useAlphabeticalSearch = true)
-    {
-        //TODO eliminate usage of deprecated method in library. We don't know the context here!
-        return $this->getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch);
-    }
-
-    /**
      * @param int $storeId
      * @param bool $useAlphabeticalSearch
      * @return Attribute[]

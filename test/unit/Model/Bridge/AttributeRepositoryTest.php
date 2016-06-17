@@ -99,12 +99,6 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
         $attributes = $attributeRepository->getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch);
         $this->assertAttributeCodes($dataAttributes, $attributes);
         $this->assertMagentoAttributeRegistry($attributes, $attributeRepository);
-
-        // deprecated getFilterableAttributes() assumes getFilterableInSearchAttributes(), but should not be used
-        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
-        $attributes = $attributeRepository->getFilterableAttributes($storeId, $useAlphabeticalSearch);
-        $this->assertAttributeCodes($dataAttributes, $attributes);
-        $this->assertMagentoAttributeRegistry($attributes, $attributeRepository);
     }
 
     /**
