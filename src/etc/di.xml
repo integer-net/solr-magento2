@@ -6,6 +6,7 @@
   <preference for="IntegerNet\Solr\Implementor\ProductIterator" type="IntegerNet\Solr\Model\Bridge\ProductIterator" />
   <preference for="IntegerNet\Solr\Implementor\Product" type="IntegerNet\Solr\Model\Bridge\Product" />
   <preference for="IntegerNet\Solr\Implementor\Config" type="IntegerNet\Solr\Model\Bridge\Config"/>
+  <preference for="IntegerNet\Solr\Implementor\StoreEmulation" type="IntegerNet\Solr\Model\Bridge\StoreEmulation" />
   <type name="IntegerNet\Solr\Model\Bridge\Config" shared="false"/>
   <!--
   <preference for="Magento\Catalog\Model\ResourceModel\Layer\Filter\Attribute" type="IntegerNet\Solr\Model\Resource\Catalog\Layer\Filter\Attribute"/>
