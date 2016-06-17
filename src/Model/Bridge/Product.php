@@ -108,7 +108,7 @@ class Product implements ProductInterface
 
     public function isVisibleInCatalog()
     {
-        return \in_array($this->magentoProduct->getVisibility(), [
+        return \in_array($this->getMagentoProduct()->getVisibility(), [
             MagentoProduct\Visibility::VISIBILITY_IN_CATALOG,
             MagentoProduct\Visibility::VISIBILITY_BOTH,
         ]);
@@ -116,7 +116,7 @@ class Product implements ProductInterface
 
     public function isVisibleInSearch()
     {
-        return \in_array($this->magentoProduct->getVisibility(), [
+        return \in_array($this->getMagentoProduct()->getVisibility(), [
             MagentoProduct\Visibility::VISIBILITY_IN_SEARCH,
             MagentoProduct\Visibility::VISIBILITY_BOTH,
         ]);
@@ -163,7 +163,7 @@ class Product implements ProductInterface
 
     public function hasSpecialPrice()
     {
-        // TODO: Implement hasSpecialPrice() method.
+        return $this->magentoProduct->getFinalPrice() < $this->getMagentoProduct()->getPrice();
     }
 
     /**

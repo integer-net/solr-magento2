@@ -59,21 +59,19 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->eventManagerMock = null;
     }
 
-    public function testCoreAttributes()
+    /**
+     * @dataProvider dataCoreAttributes
+     */
+    public function testCoreAttributes($storeId, $productData, $expectedHasSpecialPrice)
     {
-        $storeId = 1;
-        $productData = [
-            'id' => 42,
-            'price' => 13.37,
-            'solr_boost' => 1.5,
-            'category_ids' => [1,2,3]
-        ];
         $extensionAttributesStub = $this->getMockBuilder(ProductExtensionInterface::class)
             ->setMethods(['getSolrBoost'])
             ->getMockForAbstractClass();
 
         $this->magentoProductStub->method('getId')->willReturn($productData['id']);
         $this->magentoProductStub->method('getPrice')->willReturn($productData['price']);
+        $finalPrice = isset($productData['special_price']) ? $productData['special_price'] : $productData['price'];
+        $this->magentoProductStub->method('getFinalPrice')->willReturn($finalPrice);
         $this->magentoProductStub->method('getStoreId')->willReturn($storeId);
         $this->magentoProductStub->method('getExtensionAttributes')->willReturn($extensionAttributesStub);
         $extensionAttributesStub->method('getSolrBoost')->willReturn($productData['solr_boost']);
@@ -87,7 +85,33 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($productData['price'], $productBridge->getPrice(), 'price');
         $this->assertEquals($productData['category_ids'], $productBridge->getCategoryIds(), 'category_ids');
 
-        $this->markTestIncomplete('TODO: Test hasSpecialPrice()');
+        $this->assertEquals($expectedHasSpecialPrice, $productBridge->hasSpecialPrice(), 'has_special_price');
+    }
+    public static function dataCoreAttributes()
+    {
+        return [
+            [
+                'store_id' => 1,
+                'product_data' => [
+                    'id' => 42,
+                    'price' => 13.37,
+                    'solr_boost' => 1.5,
+                    'category_ids' => [1,2,3]
+                ],
+                'expected_has_special_price' => false
+            ],
+            [
+                'store_id' => 1,
+                'product_data' => [
+                    'id' => 42,
+                    'price' => 13.37,
+                    'special_price' => 9.99,
+                    'solr_boost' => 1.5,
+                    'category_ids' => [1,2,3]
+                ],
+                'expected_has_special_price' => true
+            ],
+        ];
     }
 
     /**
