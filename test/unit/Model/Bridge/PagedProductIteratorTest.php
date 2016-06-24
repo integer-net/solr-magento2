@@ -11,29 +11,35 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\ProductFactory;
-use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 /**
  * @covers ProductIterator
  */
-class ProductIteratorTest extends \PHPUnit_Framework_TestCase
+class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider dataIterator
      * @param $storeId
      * @param $productIds
+     * @param int $pageSize
      */
-    public function testIterator($storeId, $productIds)
+    public function testIterator($storeId, $productIds, $pageSize)
     {
+        $expectedPageCount = (int)\ceil(\count($productIds) / $pageSize);
         $productFactory = $this->mockProductFactory($productIds);
         $products = $this->getProductStubs($productIds);
+        $collectionFactory = $this->mockCollectionFactory($storeId, $expectedPageCount, $productIds, $products);
 
-        $iterator = new ProductIterator($productFactory, $products, $storeId);
+        $iterator = new PagedProductIterator($collectionFactory, $productFactory, $productIds, $pageSize, $storeId);
+        $iterator->setPageCallback($this->mockCallback($expectedPageCount));
         /** @var Product[] $productsFromIterator */
         $productsFromIterator = \iterator_to_array($iterator);
 
-        $this->assertEquals(count($products), count($productsFromIterator));
+        $this->assertEquals(\count($products), \count($productsFromIterator));
         foreach ($productsFromIterator as $actualProduct) {
             $this->assertInstanceOf(Product::class, $actualProduct, 'Should be instance of product bridge');
             $this->assertEquals(current($products)->getId(), $actualProduct->getId(), 'Product ID');
@@ -46,15 +52,18 @@ class ProductIteratorTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'store_id' => null,
-                'product_ids' => [11]
+                'product_ids' => [11],
+                'page_size' => 10,
             ],
             [
                 'store_id' => 1,
-                'product_ids' => []
+                'product_ids' => [],
+                'page_size' => 10,
             ],
             [
                 'store_id' => 2,
-                'product_ids' => [11, 12, 17]
+                'product_ids' => [11, 12, 17],
+                'page_size' => 2,
             ],
         ];
     }
@@ -126,5 +135,68 @@ class ProductIteratorTest extends \PHPUnit_Framework_TestCase
             return $this->getProductStub($productId);
         }, $productIds);
         return $products;
+    }
+
+    /**
+     * @param $storeId
+     * @param $expectedCalls
+     * @param $productIds
+     * @param $products
+     * @return \PHPUnit_Framework_MockObject_MockObject|CollectionFactory
+     */
+    private function mockCollectionFactory($storeId, $expectedCalls, $productIds, $products)
+    {
+        $collectionFactory = $this->getMockBuilder(CollectionFactory::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['create'])
+            ->getMock();
+        $collectionFactory->expects($this->exactly($expectedCalls))
+            ->method('create')
+            ->willReturnCallback(function() use ($storeId, $productIds, $products) {
+                return $this->mockCollection($storeId, $productIds, $products);
+            });
+        return $collectionFactory;
+    }
+
+    /**
+     * @param $storeId
+     * @param $productIds
+     * @param $products
+     * @return \PHPUnit_Framework_MockObject_MockObject|Collection
+     */
+    private function mockCollection($storeId, $productIds, $products)
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Collection $collectionStub */
+        $collectionStub = $this->getMockBuilder(Collection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['setStoreId', 'addIdFilter', 'getIterator', 'load', 'getSize'])
+            ->getMock();
+        $collectionStub->expects($storeId === null ? $this->never() : $this->once())->method('setStoreId')->with($storeId);
+        $collectionStub->method('getSize')->willReturn(count($products));
+        $collectionStub->expects($this->once())->method('addIdFilter')->with($productIds);
+        $collectionStub->method('getIterator')
+            ->willReturnCallback(function() use ($collectionStub, $productIds, $products) {
+                $offset = ($collectionStub->getCurPage() - 1) * $collectionStub->getPageSize();
+                $limit = $collectionStub->getPageSize();
+                return new \ArrayIterator(
+                    \array_combine(
+                        \array_slice($productIds, $offset, $limit),
+                        \array_slice($products, $offset, $limit)
+                    )
+                );
+            });
+        return $collectionStub;
+    }
+
+    /**
+     * @param $expectedCallCount
+     * @return \PHPUnit_Framework_MockObject_MockObject|callable
+     */
+    private function mockCallback($expectedCallCount)
+    {
+        $callbackMock = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
+        $callbackMock->expects($this->exactly($expectedCallCount))
+            ->method('__invoke');
+        return $callbackMock;
     }
 }

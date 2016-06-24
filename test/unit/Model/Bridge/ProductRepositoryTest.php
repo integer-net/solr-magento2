@@ -3,12 +3,14 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\ProductFactory;
 use IntegerNet\Solr\Implementor\ProductIteratorFactory;
+use IntegerNet\Solr\Implementor\PagedProductIteratorFactory;
 use IntegerNet\Solr\Model\SearchCriteria\ProductSearchCriteriaBuilder;
 use IntegerNet\Solr\TestUtil\Traits\SearchCriteriaBuilderMock;
 use IntegerNet\Solr\TestUtil\Traits\SearchResultsMock;
 use Magento\Catalog\Api\ProductRepositoryInterface as MagentoProductRepository;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\ConfigurableProduct\Api\LinkManagementInterface;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -39,6 +41,10 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     private $productIteratorFactoryMock;
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|PagedProductIteratorFactory
+     */
+    private $pagedProductIteratorFactoryMock;
+    /**
      * @var ProductSearchCriteriaBuilder
      */
     private $productSearchCriteriaBuilder;
@@ -60,11 +66,13 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->searchCriteriaBuilderMock = $this->getSearchCriteriaBuilderMock();
         $this->productSearchCriteriaBuilder = new ProductSearchCriteriaBuilder($this->mockSearchCriteriaBuilderFactory($this->searchCriteriaBuilderMock));
         $this->productIteratorFactoryMock = $this->mockProductIteratorFactory();
+        $this->pagedProductIteratorFactoryMock = $this->mockPagedProductIteratorFactory();
 
         $this->productRepository = new ProductRepository(
             $this->magentoProductRepositoryMock,
             $this->linkManagementMock,
             $this->productIteratorFactoryMock,
+            $this->pagedProductIteratorFactoryMock,
             $this->productSearchCriteriaBuilder
         );
 
@@ -138,17 +146,34 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function mockProductIteratorFactory()
     {
-        $searchCriteriaBuilderFactoryMock = $this->getMockBuilder(ProductIteratorFactory::class)
+        $productIteratorFactoryMock = $this->getMockBuilder(ProductIteratorFactory::class)
             ->setMethods(['create'])
             ->disableOriginalConstructor()
             ->getMock();
-        $searchCriteriaBuilderFactoryMock->method('create')->willReturnCallback(function($data) {
+        $productIteratorFactoryMock->method('create')->willReturnCallback(function($data) {
             return new ProductIterator(
                 $this->mockProductFactory(),
                 $data[ProductIterator::PARAM_MAGENTO_PRODUCTS],
                 $data[ProductIterator::PARAM_STORE_ID]);
         });
-        return $searchCriteriaBuilderFactoryMock;
+        return $productIteratorFactoryMock;
+    }
+
+    protected function mockPagedProductIteratorFactory()
+    {
+        $productIteratorFactoryMock = $this->getMockBuilder(PagedProductIteratorFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $productIteratorFactoryMock->method('create')->willReturnCallback(function($data) {
+            return new PagedProductIterator(
+                $this->mockCollectionFactory(),
+                $this->mockProductFactory(),
+                $data[PagedProductIterator::PARAM_PRODUCT_ID_FILTER],
+                $data[PagedProductIterator::PARAM_PAGE_SIZE],
+                $data[PagedProductIterator::PARAM_STORE_ID]);
+        });
+        return $productIteratorFactoryMock;
     }
 
     /**
@@ -217,4 +242,15 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($expectedStoreId, $actualProduct->getStoreId(), 'store id');
         }
     }
+
+    private function mockCollectionFactory()
+    {
+        $collectionFactoryMock = $this->getMockBuilder(CollectionFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        //TODO mock create() if needed
+        return $collectionFactoryMock;
+    }
+
 }

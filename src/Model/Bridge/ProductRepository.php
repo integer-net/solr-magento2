@@ -10,9 +10,11 @@
 
 namespace IntegerNet\Solr\Model\Bridge;
 
+use IntegerNet\Solr\Implementor\PagedProductIterator as PagedProductIteratorInterface;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use IntegerNet\Solr\Implementor\ProductIterator as ProductIteratorInterface;
-use IntegerNet\Solr\Implementor\ProductIteratorFactory;
+use IntegerNet\Solr\Implementor\ProductIteratorFactory as ProductIteratorInterfaceFactory;
+use IntegerNet\Solr\Implementor\PagedProductIteratorFactory as PagedProductIteratorInterfaceFactory;
 use IntegerNet\Solr\Implementor\ProductRepository as ProductRepositoryInterface;
 use IntegerNet\Solr\Model\SearchCriteria\ProductSearchCriteriaBuilder;
 use Magento\Catalog\Api\ProductRepositoryInterface as MagentoProductRepository;
@@ -29,49 +31,60 @@ class ProductRepository implements ProductRepositoryInterface
      */
     private $searchCriteriaBuilder;
     /**
-     * @var ProductIteratorFactory
+     * @var ProductIteratorInterfaceFactory
      */
     private $iteratorFactory;
     /**
      * @var LinkManagementInterface
      */
     private $productLinkManagement;
+    /**
+     * @var int
+     */
+    private $pageSize;
+    /**
+     * @var PagedProductIteratorInterfaceFactory
+     */
+    private $pagedIteratorFactory;
 
     /**
-     * ProductRepository constructor.
      * @param MagentoProductRepository $productRepository
      * @param LinkManagementInterface $productLinkManagement
-     * @param ProductIteratorFactory $iteratorFactory
+     * @param ProductIteratorInterfaceFactory $iteratorFactory
+     * @param PagedProductIteratorInterfaceFactory $pagedIteratorFactory
      * @param ProductSearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(MagentoProductRepository $productRepository,
                                 LinkManagementInterface $productLinkManagement,
-                                ProductIteratorFactory $iteratorFactory,
+                                ProductIteratorInterfaceFactory $iteratorFactory,
+                                PagedProductIteratorInterfaceFactory $pagedIteratorFactory,
                                 ProductSearchCriteriaBuilder $searchCriteriaBuilder)
     {
         $this->productRepository = $productRepository;
         $this->productLinkManagement = $productLinkManagement;
         $this->iteratorFactory = $iteratorFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->pagedIteratorFactory = $pagedIteratorFactory;
     }
 
     /**
      * Set maximum number of products to load at once during index
      *
      * @param int $pageSize
-     * @return ProductRepositoryInterface
+     * @return $this
      */
     public function setPageSizeForIndex($pageSize)
     {
-        // TODO: Implement setPageSizeForIndex() method.
+        $this->pageSize = $pageSize;
+        return $this;
     }
 
     /**
-     * Return product iterator, which may implement lazy loading
+     * Return product iterator, which should implement lazy loading and allows a callback for batch processing
      *
      * @param int $storeId Products will be returned that are visible in this store and with store specific values
      * @param null|int[] $productIds filter by product ids
-     * @return ProductIteratorInterface
+     * @return PagedProductIteratorInterface
      */
     public function getProductsForIndex($storeId, $productIds = null)
     {
