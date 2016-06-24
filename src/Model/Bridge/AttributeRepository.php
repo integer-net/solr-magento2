@@ -99,7 +99,7 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getSortableAttributes($storeId)
     {
-        // TODO: Implement getSortableAttributes() method.
+        return $this->loadAttributes($storeId, $this->searchCriteriaBuilder->sortable());
     }
 
     /**

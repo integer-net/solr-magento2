@@ -61,6 +61,19 @@ class AttributeSearchCriteriaBuilder implements SimpleBuilderInterface
         };
         return $new;
     }
+    /**
+     * Only include sortable attributes
+     *
+     * @return AttributeSearchCriteriaBuilder new, modified builder instance
+     */
+    public function sortable()
+    {
+        $new = clone $this;
+        $new->buildCallbacks[] = function(SearchCriteriaBuilder $builder) {
+            $builder->addFilter(EavAttributeInterface::USED_FOR_SORT_BY, '1');
+        };
+        return $new;
+    }
 
     /**
      * Only include filterable attributes

@@ -149,6 +149,21 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider dataSortableAttributes
+     * @param array $dataAttributes
+     * @param array $expectedFilters
+     * @param $expectedSortOrder
+     */
+    public function testSortableAttributes(array $dataAttributes, array $expectedFilters, $expectedSortOrder)
+    {
+        $storeId = 0;
+        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
+        $attributes = $attributeRepository->getSortableAttributes($storeId);
+        $this->assertAttributeCodes($dataAttributes, $attributes);
+        $this->assertMagentoAttributeRegistry($attributes, $attributeRepository);
+    }
+
+    /**
      * getAttributeCodesToIndex() should return filterable (in catalog or search) and searchable attributes,
      *
      * @dataProvider dataAttributeCodesToIndex
@@ -227,6 +242,20 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 EavAttributeInterface::IS_SEARCHABLE, '1'
+            ],
+        ];
+        return [
+            [self::dataAttributes(), $expectedFilters, null],
+        ];
+    }
+    public static function dataSortableAttributes()
+    {
+        $expectedFilters = [
+            [
+                EavAttributeInterface::ATTRIBUTE_CODE, 'status', 'neq'
+            ],
+            [
+                EavAttributeInterface::USED_FOR_SORT_BY, '1'
             ],
         ];
         return [
