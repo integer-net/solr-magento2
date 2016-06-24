@@ -16,6 +16,7 @@ use IntegerNet\Solr\Implementor\Product;
 use Magento\Catalog\Api\CategoryRepositoryInterface as MagentoCategoryRepository;
 use Magento\Catalog\Api\Data\CategoryInterface as MagentoCategoryInterface;
 use Magento\Catalog\Model\Category as MagentoCategory;
+use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\ResourceModel\Category\Collection;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\Store\Model\Store;
@@ -114,12 +115,23 @@ class CategoryRepository implements IndexCategoryRepository
     private function getExcludedCategoryIds($storeId)
     {
         $result = [];
-        //TODO load categories with solr_exclude, add to result
-        $this->collectionFactory->create()->setStoreId($storeId);
-        //TODO load categories with solr_exclude_children
-        $this->collectionFactory->create()->setStoreId($storeId);
-        //TODO load children of these, add to result
-        $this->collectionFactory->create()->setStoreId($storeId);
+        $excludedIds = $this->collectionFactory->create()->setStoreId($storeId)
+            ->addAttributeToFilter('solr_exclude', '1')
+            ->getAllIds();
+        $result = \array_merge($result, $excludedIds);
+
+        $parentsCollection = $this->collectionFactory->create()->setStoreId($storeId)
+            ->addAttributeToFilter('solr_exclude_children', '1');
+        $parentIds = $parentsCollection->getAllIds();
+        $parentPaths = ArrayCollection::fromArray($parentsCollection->getColumnValues(Category::KEY_PATH))->values();
+
+        $pathFilter = $parentPaths->map(function($path) {
+            return ['like' => $path . '/%'];
+        })->getArrayCopy();
+        $excludedChildIds = $this->collectionFactory->create()->setStoreId($storeId)
+            ->addAttributeToFilter('path', $pathFilter)
+            ->getAllIds();
+        $result = \array_merge($result, $excludedChildIds);
 
         return $result;
     }
@@ -134,6 +146,10 @@ class CategoryRepository implements IndexCategoryRepository
  */
 class ArrayCollection extends \ArrayIterator
 {
+    public static function fromArray(array $array)
+    {
+        return new static($array);
+    }
     /**
      * @param callable $callback
      * @return static
@@ -150,6 +166,11 @@ class ArrayCollection extends \ArrayIterator
     public function filter(callable $callback)
     {
         return new static(\array_filter($this->getArrayCopy(), $callback));
+    }
+
+    public function keys()
+    {
+        return new static(\array_keys($this->getArrayCopy()));
     }
 
     /**

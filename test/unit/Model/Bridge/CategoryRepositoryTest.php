@@ -106,13 +106,13 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->mockIdLookupCollection($productCategoryIds, $categoryData));
         $this->collectionFactory->expects($this->at(1))
             ->method('create')
-            ->willReturn($this->mockExcludeLookupCollection());
+            ->willReturn($this->mockExcludeLookupCollection($categoryData));
         $this->collectionFactory->expects($this->at(2))
             ->method('create')
-            ->willReturn($this->mockExcludeParentsLookupCollection());
+            ->willReturn($this->mockExcludeParentsLookupCollection($categoryData));
         $this->collectionFactory->expects($this->at(3))
             ->method('create')
-            ->willReturn($this->mockExcludeChildrenLookupCollection());
+            ->willReturn($this->mockExcludeChildrenLookupCollection($categoryData));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ProductInterface $product */
         $product = $this->getMockBuilder(ProductInterface::class)
@@ -123,8 +123,6 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $actualCategoryIds = $this->categoryRepository->getCategoryIds($product);
         $this->assertEquals($expectedCategoryIds, $actualCategoryIds, '', 0.0, 10, true);
-
-        $this->markTestIncomplete('TODO test for solr_exclude');
     }
     public static function dataCategoryIds()
     {
@@ -164,6 +162,28 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
                 'include_in_menu' => 1,
                 'path' => '1/2/6/7',
             ],
+            '8' => [
+                'is_active' => 1,
+                'include_in_menu' => 1,
+                'path' => '1/2/8',
+                'solr_exclude' => true,
+            ],
+            '9' => [
+                'is_active' => 1,
+                'include_in_menu' => 1,
+                'path' => '1/2/8/9',
+            ],
+            '10' => [
+                'is_active' => 1,
+                'include_in_menu' => 1,
+                'path' => '1/2/10',
+                'solr_exclude_children' => true,
+            ],
+            '11' => [
+                'is_active' => 1,
+                'include_in_menu' => 1,
+                'path' => '1/2/10/11',
+            ],
             '100' => [
                 'is_active' => 1,
                 'include_in_menu' => 0,
@@ -201,6 +221,16 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
                 'category_data' => $categoryData,
                 'expected_category_ids' => ['3', '4'],
             ],
+            'not_include_category_with_solr_exclude_attribute' => [
+                'product_category_ids' => ['3', '4', '8', '9'],
+                'category_data' => $categoryData,
+                'expected_category_ids' => ['3', '4', '9'],
+            ],
+            'not_include_children_of_category_with_solr_exclude_children_attribute' => [
+                'product_category_ids' => ['3', '4', '10', '11'],
+                'category_data' => $categoryData,
+                'expected_category_ids' => ['3', '4', '10'],
+            ],
         ];
     }
 
@@ -211,11 +241,13 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         return $this->getMockBuilder(CategoryCollection::class)
             ->disableOriginalConstructor()
-            ->setMethods(['addAttributeToSelect', 'addFieldToFilter', 'getIterator'])
+            ->setMethods(['addAttributeToSelect', 'addAttributeToFilter', 'addFieldToFilter', 'getIterator','getAllIds', 'getColumnValues'])
             ->getMock();
     }
 
     /**
+     * @param $categoryIds
+     * @param $categoryData
      * @return CategoryCollection|\PHPUnit_Framework_MockObject_MockObject
      */
     private function mockIdLookupCollection($categoryIds, $categoryData)
@@ -246,26 +278,100 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $categoryData
      * @return CategoryCollection|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function mockExcludeLookupCollection()
+    private function mockExcludeLookupCollection(array $categoryData)
     {
-        return $this->mockCollection();
+        $excludedIds = ArrayCollection::fromArray($categoryData)
+            ->filter(function($category) {
+                return ! empty($category['solr_exclude']);
+            })
+            ->keys()
+            ->getArrayCopy();
+        $collection = $this->mockCollection();
+        $collection->expects($this->once())
+            ->method('addAttributeToFilter')
+            ->with('solr_exclude', '1')
+            ->willReturnSelf();
+        $collection->expects($this->once())
+            ->method('getAllIds')
+            ->willReturn($excludedIds);
+        return $collection;
     }
 
     /**
+     * @param array $categoryData
      * @return CategoryCollection|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function mockExcludeChildrenLookupCollection()
+    private function mockExcludeParentsLookupCollection(array $categoryData)
     {
-        return $this->mockCollection();
+        $parentCategoryData = ArrayCollection::fromArray($categoryData)
+            ->filter(function ($category) {
+                return !empty($category['solr_exclude_children']);
+            });
+        $excludedIds = $parentCategoryData
+            ->keys()
+            ->getArrayCopy();
+        $excludedPaths = $parentCategoryData
+            ->map(function($category) {
+                return $category['path'];
+            })
+            ->getArrayCopy();
+        $collection = $this->mockCollection();
+        $collection->expects($this->once())
+            ->method('addAttributeToFilter')
+            ->with('solr_exclude_children', '1')
+            ->willReturnSelf();
+        $collection->expects($this->once())
+            ->method('getColumnValues')
+            ->with('path')
+            ->willReturn($excludedPaths);
+        $collection->expects($this->once())
+            ->method('getAllIds')
+            ->willReturn($excludedIds);
+        return $collection;
     }
 
     /**
+     * @param array $categoryData
      * @return CategoryCollection|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function mockExcludeParentsLookupCollection()
+    private function mockExcludeChildrenLookupCollection(array $categoryData)
     {
-        return $this->mockCollection();
+        $collection = $this->mockCollection();
+        $excludedIds = ArrayCollection::fromArray($categoryData)
+            ->filter(function($category) use ($categoryData) {
+                $parentIds = explode('/', $category['path']);
+                \array_pop($parentIds);
+                foreach ($parentIds as $parentId) {
+                    if (!empty($categoryData[$parentId]['solr_exclude_children'])) {
+                        return true;
+                    }
+                }
+                return false;
+            })
+            ->keys()
+            ->getArrayCopy();
+        $parentPaths = ArrayCollection::fromArray($categoryData)
+            ->filter(function($category) {
+                return ! empty($category['solr_exclude_children']);
+            })
+            ->map(function($category) {
+                return $category['path'];
+            });
+        $expectedFilterConditions = [];
+        foreach ($parentPaths as $parentPath) {
+            $expectedFilterConditions[] = ['like' => $parentPath . '/%'];
+        }
+        $collection->expects($this->once())
+            ->method('addAttributeToFilter')
+            ->with('path', $expectedFilterConditions)
+            ->willReturnSelf();
+        $collection->expects($this->once())
+            ->method('getAllIds')
+            ->willReturn($excludedIds);
+        return $collection;
     }
+
 }
