@@ -6,6 +6,7 @@ use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
 
 class Attribute implements AttributeInterface
 {
+
     /**
      * @var AttributeResource
      */
@@ -84,7 +85,7 @@ class Attribute implements AttributeInterface
     }
 
     /**
-     * @return string
+     * @return string See constants. 'decimal', 'text', 'int', or 'varchar' (default)
      */
     public function getBackendType()
     {
@@ -97,14 +98,6 @@ class Attribute implements AttributeInterface
     public function getUsedForSortBy()
     {
         return $this->magentoAttribute->getUsedForSortBy();
-    }
-
-    /**
-     * @return string
-     */
-    public function getInputType()
-    {
-        // TODO: Implement getInputType() method.
     }
 
 }
