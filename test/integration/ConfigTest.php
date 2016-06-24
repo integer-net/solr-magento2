@@ -20,8 +20,15 @@ use Magento\TestFramework\TestCase\AbstractBackendController;
 
 class ConfigTest extends  AbstractBackendController
 {
+    /** @var  Response */
+    private static $lastResponse;
     /** @var  ObjectManager */
     protected $objectManager;
+
+    public static function tearDownAfterClass()
+    {
+        self::$lastResponse = null;
+    }
 
     private function mockStatusMessages()
     {
@@ -108,7 +115,9 @@ class ConfigTest extends  AbstractBackendController
     public function testAclHasAccess()
     {
         parent::testAclHasAccess();
-        return $this->getResponse();
+        // we do not pass the response as parameter to dependent test because PHPUnit would take ages
+        // to go through the object tree, looking for mock objects.
+        self::$lastResponse = $this->getResponse();
     }
 
     /**
@@ -129,10 +138,10 @@ class ConfigTest extends  AbstractBackendController
 
     /**
      * @depends testAclHasAccess
-     * @param Response $response
      */
-    public function testConfigSectionLoads(Response $response)
+    public function testConfigSectionLoads()
     {
+        $response = self::$lastResponse;
         $this->assertEquals(200, $response->getStatusCode(), 'HTTP Status Code');
         $dom = $this->getResponseDom($response);
         $this->assertStatusMessages($dom);

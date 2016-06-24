@@ -61,7 +61,7 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
      * @param $storeLabel
      * @param $usedForSortBy
      */
-    public function testInvalidStoreScopeThrowsException($attributeCode, $backendType, $frontendInput, $isSearchable, $solrBoost, $storeLabel, $usedForSortBy)
+    public function testDefaultLabelOnInvalidStoreScope($attributeCode, $backendType, $frontendInput, $isSearchable, $solrBoost, $storeLabel, $usedForSortBy)
     {
         $storeLabelStub = $this->getMockForAbstractClass(AttributeFrontendLabelInterface::class);
         $storeLabelStub->method('getLabel')->willReturn($storeLabel . '-1');
@@ -74,8 +74,7 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $invalidStoreId = 999;
         $attributeBridge = new Attribute($this->magentoAttributeStub, $invalidStoreId);
 
-        $this->setExpectedException(\InvalidArgumentException::class);
-        $attributeBridge->getStoreLabel();
+        $this->assertEquals($storeLabel, $attributeBridge->getStoreLabel());
     }
 
     /**

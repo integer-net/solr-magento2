@@ -185,7 +185,7 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
             ->willReturnCallback(function($code) use ($dataAttributes) {
                 return $this->mockAttribute(AttributeResource::class, $dataAttributes[$code]);
             });
-        $attribute = $attributeRepository->getAttributeByCode($storeId, $attributeCode);
+        $attribute = $attributeRepository->getAttributeByCode($attributeCode, $storeId);
         $this->assertInstanceOf(Attribute::class, $attribute);
         $this->assertEquals($attributeCode, $attribute->getAttributeCode());
         $this->assertEquals($expectedLabel, $attribute->getStoreLabel());
@@ -200,24 +200,7 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willThrowException(new NoSuchEntityException());
         $this->setExpectedException(Exception::class, 'Attribute whatever does not exist');
-        $attributeRepository->getAttributeByCode(null, 'whatever');
-    }
-
-    /**
-     * @dataProvider dataFilterableInSearchAttributes
-     * @param array $dataAttributes
-     * @param $useAlphabeticalSearch
-     * @param $expectedFilters
-     * @param $expectedSortOrder
-     */
-    public function testItUsesStoreId(array $dataAttributes, $useAlphabeticalSearch, $expectedFilters, $expectedSortOrder)
-    {
-        $storeId = 1;
-        $attributeRepository = $this->getAttributeRepository($dataAttributes, $expectedFilters, $expectedSortOrder);
-        $attributes = $attributeRepository->getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch);
-        $this->assertAttributeCodes($dataAttributes, $attributes);
-        $this->setExpectedException(\InvalidArgumentException::class, 'Invalid store id 1');
-        $attributes[0]->getStoreLabel();
+        $attributeRepository->getAttributeByCode('whatever', null);
     }
 
     public static function dataFilterableInSearchAttributes()

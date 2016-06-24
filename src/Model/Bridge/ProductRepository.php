@@ -56,6 +56,17 @@ class ProductRepository implements ProductRepositoryInterface
     }
 
     /**
+     * Set maximum number of products to load at once during index
+     *
+     * @param int $pageSize
+     * @return ProductRepositoryInterface
+     */
+    public function setPageSizeForIndex($pageSize)
+    {
+        // TODO: Implement setPageSizeForIndex() method.
+    }
+
+    /**
      * Return product iterator, which may implement lazy loading
      *
      * @param int $storeId Products will be returned that are visible in this store and with store specific values

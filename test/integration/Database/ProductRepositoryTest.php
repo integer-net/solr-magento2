@@ -67,7 +67,7 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         /** @var AttributeRepository $attributeRepository */
         $attributeRepository = $this->objectManager->create(AttributeRepository::class);
-        $nameAttribute = $attributeRepository->getAttributeByCode(null, $attributeCode);
+        $nameAttribute = $attributeRepository->getAttributeByCode($attributeCode, null);
         return $nameAttribute;
     }
 }

@@ -94,6 +94,15 @@ class AttributeRepository implements AttributeRepositoryInterface
     }
 
     /**
+     * @param int $storeId
+     * @return AttributeInterface[]
+     */
+    public function getSortableAttributes($storeId)
+    {
+        // TODO: Implement getSortableAttributes() method.
+    }
+
+    /**
      * @return string[]
      */
     public function getAttributeCodesToIndex()
@@ -108,12 +117,12 @@ class AttributeRepository implements AttributeRepositoryInterface
     }
 
     /**
-     * @param int|null $storeId
      * @param string $attributeCode
+     * @param int|null $storeId
      * @return Attribute
      * @throws Exception
      */
-    public function getAttributeByCode($storeId, $attributeCode)
+    public function getAttributeByCode($attributeCode, $storeId)
     {
         try {
             $magentoAttribute = $this->attributeRepository->get($attributeCode);

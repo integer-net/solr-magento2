@@ -46,7 +46,7 @@ class Attribute implements AttributeInterface
         }
         $labels = $this->magentoAttribute->getFrontendLabels();
         if (! isset($labels[$this->storeId])) {
-            throw new \InvalidArgumentException('Invalid store id ' . $this->storeId);
+            return $this->magentoAttribute->getDefaultFrontendLabel();
         }
         return $labels[$this->storeId]->getLabel();
     }
@@ -97,6 +97,14 @@ class Attribute implements AttributeInterface
     public function getUsedForSortBy()
     {
         return $this->magentoAttribute->getUsedForSortBy();
+    }
+
+    /**
+     * @return string
+     */
+    public function getInputType()
+    {
+        // TODO: Implement getInputType() method.
     }
 
 }
