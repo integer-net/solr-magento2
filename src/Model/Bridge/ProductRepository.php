@@ -94,7 +94,7 @@ class ProductRepository implements ProductRepositoryInterface
         }
         $products = $this->productRepository->getList($searchCriteriaBuilder->create())->getItems();
         return $this->createProductIterator($storeId, $products);
-        //TODO implement LazyProductIterator that uses paginated product collection
+        //TODO use PagedProductIterator with lazy loading (at least if count($productIds)>$pageSize)
     }
 
     /**

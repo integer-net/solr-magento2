@@ -99,6 +99,7 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
             [['store_id', $storeId], ['entity_id', $productIds, 'in']], null, $searchCriteriaDummy);
 
         $actualResult = $this->productRepository->getProductsForIndex($storeId, $productIds);
+        $actualResult->setPageCallback($this->mockCallback(1));
 
         $this->assertIteratorContainsProducts($actualResult, $productsInSearchResult, $storeId);
     }
@@ -251,6 +252,19 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         //TODO mock create() if needed
         return $collectionFactoryMock;
+    }
+
+    /**
+     * @param $callbackCount
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function mockCallback($callbackCount)
+    {
+        $callbackMock = $this->getMockBuilder(\stdClass::class)
+            ->setMethods(['__invoke'])
+            ->getMock();
+        $callbackMock->expects($this->exactly($callbackCount))->method('__invoke');
+        return $callbackMock;
     }
 
 }
