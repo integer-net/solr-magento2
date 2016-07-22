@@ -12,6 +12,9 @@ use Magento\Catalog\Model\Product\Visibility;
     );
     $product->isObjectNew(true);
     $product->setSku('product-1')
+        ->setId(
+            333
+        )
         ->setAttributeSetId(4)
         ->setWebsiteIds([1])
         ->setTypeId(Type::TYPE_SIMPLE)
@@ -38,4 +41,34 @@ use Magento\Catalog\Model\Product\Visibility;
         ->setStatus(Status::STATUS_ENABLED)
         ->setUrlKey('product-1-store-1')
         ->save();
+
+
+    $category = $objectManager->create(
+        \Magento\Catalog\Model\Category::class
+    );
+    $category->isObjectNew(true);
+    $category->setId(
+        333
+    )->setCreatedAt(
+        '2014-06-23 09:50:07'
+    )->setName(
+        'Category 1'
+    )->setParentId(
+        2
+    )->setPath(
+        '1/2/333'
+    )->setLevel(
+        2
+    )->setAvailableSortBy(
+        ['position', 'name']
+    )->setDefaultSortBy(
+        'name'
+    )->setIsActive(
+        true
+    )->setPosition(
+        1
+    )->setPostedProducts(
+        [333 => 10]
+    )->save();
+
 });

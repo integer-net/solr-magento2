@@ -13,10 +13,12 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\IndexCategoryRepository;
 use IntegerNet\Solr\Implementor\Product;
+use IntegerNet\Solr\Indexer\Data\CategoryPositionCollection;
+use IntegerNet\Solr\Model\Data\ArrayCollection;
+use IntegerNet\Solr\Model\ResourceModel\CategoryPosition;
 use Magento\Catalog\Api\CategoryRepositoryInterface as MagentoCategoryRepository;
 use Magento\Catalog\Api\Data\CategoryInterface as MagentoCategoryInterface;
 use Magento\Catalog\Model\Category as MagentoCategory;
-use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\ResourceModel\Category\Collection;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\Store\Model\Store;
@@ -36,17 +38,24 @@ class CategoryRepository implements IndexCategoryRepository
      * @var StoreManagerInterface
      */
     private $storeManager;
+    /**
+     * @var CategoryPosition
+     */
+    private $categoryPositionResource;
 
     /**
      * CategoryRepository constructor.
      * @param MagentoCategoryRepository $categoryRepository
      * @param CollectionFactory $collectionFactory
+     * @param CategoryPosition $categoryPositionResource
+     * @param StoreManagerInterface $storeManager
      */
-    public function __construct(MagentoCategoryRepository $categoryRepository, CollectionFactory $collectionFactory, StoreManagerInterface $storeManager)
+    public function __construct(MagentoCategoryRepository $categoryRepository, CollectionFactory $collectionFactory, CategoryPosition $categoryPositionResource, StoreManagerInterface $storeManager)
     {
         $this->categoryRepository = $categoryRepository;
         $this->collectionFactory = $collectionFactory;
         $this->storeManager = $storeManager;
+        $this->categoryPositionResource = $categoryPositionResource;
     }
 
     /**
@@ -89,7 +98,7 @@ class CategoryRepository implements IndexCategoryRepository
             ->filterInRoot($rootCategoryId)
             ->idsWithParents()
             ->unique()
-            ->without([1, 2])
+            ->without([1, $rootCategoryId])
             ->without($this->getExcludedCategoryIds($product->getStoreId()))
             ->values();
 
@@ -101,11 +110,13 @@ class CategoryRepository implements IndexCategoryRepository
      * Retrieve product category identifiers
      *
      * @param Product $product
-     * @return array
+     * @return CategoryPositionCollection
      */
     public function getCategoryPositions($product)
     {
-        // TODO: Implement getCategoryPositions() method.
+        return CategoryPositionCollection::fromArray(
+            $this->categoryPositionResource->getCategoryPositions($product->getId(), $product->getStoreId())
+        );
     }
 
     /**
@@ -123,7 +134,7 @@ class CategoryRepository implements IndexCategoryRepository
         $parentsCollection = $this->collectionFactory->create()->setStoreId($storeId)
             ->addAttributeToFilter('solr_exclude_children', '1');
         $parentIds = $parentsCollection->getAllIds();
-        $parentPaths = ArrayCollection::fromArray($parentsCollection->getColumnValues(Category::KEY_PATH))->values();
+        $parentPaths = ArrayCollection::fromArray($parentsCollection->getColumnValues(MagentoCategory::KEY_PATH))->values();
 
         $pathFilter = $parentPaths->map(function($path) {
             return ['like' => $path . '/%'];
@@ -138,93 +149,7 @@ class CategoryRepository implements IndexCategoryRepository
 
 }
 
-/**
- * Utility class for collection pipelines
- *
- * @internal
- * @todo move to solr-base library if used more often
- */
-class ArrayCollection extends \ArrayIterator
-{
-    public static function fromArray(array $array)
-    {
-        return new static($array);
-    }
-    /**
-     * @param callable $callback
-     * @return static
-     */
-    public function map(callable $callback)
-    {
-        return new static(\array_map($callback, $this->getArrayCopy()));
-    }
 
-    /**
-     * @param callable $callback
-     * @return static
-     */
-    public function filter(callable $callback)
-    {
-        return new static(\array_filter($this->getArrayCopy(), $callback));
-    }
-
-    public function keys()
-    {
-        return new static(\array_keys($this->getArrayCopy()));
-    }
-
-    /**
-     * @param callable $callback
-     * @param null $initial
-     * @return static
-     */
-    public function reduce(callable $callback, $initial = null)
-    {
-        return new static(\array_reduce($this->getArrayCopy(), $callback, $initial));
-    }
-
-    /**
-     * @return static
-     */
-    public function unique()
-    {
-        return new static(\array_unique($this->getArrayCopy()));
-    }
-
-    /**
-     * @return static
-     */
-    public function collapse()
-    {
-        return $this->reduce(function($carry, $item) {
-            if (\is_array($item)) {
-                return \array_merge($carry, $item);
-            } else {
-                return \array_merge($carry, [$item]);
-            }
-        }, []);
-    }
-
-    /**
-     * @param array $values
-     * @return static
-     */
-    public function without(array $values)
-    {
-        return new static(\array_filter($this->getArrayCopy(), function($value) use ($values) {
-            return ! \in_array($value, $values);
-        }));
-    }
-
-    /**
-     * @return static
-     */
-    public function values()
-    {
-        return new static(\array_values($this->getArrayCopy()));
-    }
-
-}
 /**
  * @internal
  */
@@ -262,11 +187,11 @@ class CategoryCollection extends ArrayCollection
     }
 
     /**
-     * @return IdCollection
+     * @return ArrayCollection
      */
     public function idsWithParents()
     {
-        return new IdCollection(
+        return new ArrayCollection(
             $this
                 ->map(function(MagentoCategoryInterface $category) {
                     return \explode('/', $category->getPath());
@@ -275,10 +200,4 @@ class CategoryCollection extends ArrayCollection
                 ->getArrayCopy()
         );
     }
-}
-/**
- * @internal
- */
-class IdCollection extends ArrayCollection
-{
 }

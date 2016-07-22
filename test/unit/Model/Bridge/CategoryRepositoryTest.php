@@ -10,6 +10,8 @@
 
 namespace IntegerNet\Solr\Model\Bridge;
 
+use IntegerNet\Solr\Model\Data\ArrayCollection;
+use IntegerNet\Solr\Model\ResourceModel\CategoryPosition;
 use Magento\Catalog\Api\CategoryRepositoryInterface as MagentoCategoryRepository;
 use Magento\Catalog\Api\Data\CategoryInterface;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
@@ -33,6 +35,10 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     private $collectionFactory;
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|CategoryPosition
+     */
+    private $categoryPositionResource;
+    /**
      * @var CategoryRepository
      */
     private $categoryRepository;
@@ -47,10 +53,15 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['create'])
             ->disableOriginalConstructor()
             ->getMock();
+        $this->categoryPositionResource = $this->getMockBuilder(CategoryPosition::class)
+            ->setMethods(['getCategoryPositions'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
             ->setMethods(['getStore'])
             ->getMockForAbstractClass();
-        $this->categoryRepository = new CategoryRepository($this->magentoCategoryRepository, $this->collectionFactory, $this->storeManager);
+        $this->categoryRepository = new CategoryRepository($this->magentoCategoryRepository, $this->collectionFactory,
+            $this->categoryPositionResource, $this->storeManager);
     }
 
     /**
@@ -114,10 +125,7 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('create')
             ->willReturn($this->mockExcludeChildrenLookupCollection($categoryData));
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ProductInterface $product */
-        $product = $this->getMockBuilder(ProductInterface::class)
-            ->setMethods(['getCategoryIds'])
-            ->getMockForAbstractClass();
+        $product = $this->stubProduct();
         $product->method('getCategoryIds')->willReturn($productCategoryIds);
         $product->method('getStoreId')->willReturn($storeId);
 
@@ -232,6 +240,31 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
                 'expected_category_ids' => ['3', '4', '10'],
             ],
         ];
+    }
+
+    public function testCategoryPositions()
+    {
+        $productId = 333;
+        $storeId = 1;
+        $positionData = [
+            ['category_id' => '33', 'position' => '1'],
+            ['category_id' => '333', 'position' => '11'],
+        ];
+        $this->categoryPositionResource->expects($this->once())
+            ->method('getCategoryPositions')
+            ->with($productId, $storeId)
+            ->willReturn($positionData);
+        $product = $this->stubProduct();
+        $product->method('getId')->willReturn($productId);
+        $product->method('getStoreId')->willReturn($storeId);
+        $categoryPositionCollection = $this->categoryRepository->getCategoryPositions($product);
+        $this->assertCount(\count($positionData), $categoryPositionCollection);
+        \reset($positionData);
+        foreach ($categoryPositionCollection as $categoryPosition) {
+            $this->assertEquals(current($positionData)['category_id'], $categoryPosition->getCategoryId());
+            $this->assertEquals(current($positionData)['position'], $categoryPosition->getPosition());
+            \next($positionData);
+        }
     }
 
     /**
@@ -372,6 +405,17 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('getAllIds')
             ->willReturn($excludedIds);
         return $collection;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ProductInterface
+     */
+    private function stubProduct()
+    {
+        $product = $this->getMockBuilder(ProductInterface::class)
+            ->setMethods(['getId', 'getStoreId', 'getCategoryIds'])
+            ->getMockForAbstractClass();
+        return $product;
     }
 
 }
