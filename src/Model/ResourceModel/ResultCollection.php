@@ -1,0 +1,1708 @@
+<?php
+/**
+ * integer_net Magento Module
+ *
+ * @category   IntegerNet
+ * @package    IntegerNet_Solr
+ * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
+ * @author     Fabian Schmengler <fs@integer-net.de>
+ */
+
+namespace IntegerNet\Solr\Model\ResourceModel;
+
+use Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection as ProductCollection;
+use Magento\Customer\Api\GroupManagementInterface;
+use Magento\Framework\Api\ExtensionAttribute\JoinDataInterface;
+use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
+use Magento\Framework\Api\Search\SearchResultFactory;
+use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\DB\Select;
+
+class ResultCollection extends ProductCollection
+{
+    /**
+     * @param \Magento\Framework\Data\Collection\EntityFactory $entityFactory
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
+     * @param \Magento\Framework\Event\ManagerInterface $eventManager
+     * @param \Magento\Eav\Model\Config $eavConfig
+     * @param \Magento\Framework\App\ResourceConnection $resource
+     * @param \Magento\Eav\Model\EntityFactory $eavEntityFactory
+     * @param \Magento\Catalog\Model\ResourceModel\Helper $resourceHelper
+     * @param \Magento\Framework\Validator\UniversalFactory $universalFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Catalog\Model\Indexer\Product\Flat\State $catalogProductFlatState
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Catalog\Model\Product\OptionFactory $productOptionFactory
+     * @param \Magento\Catalog\Model\ResourceModel\Url $catalogUrl
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Framework\Stdlib\DateTime $dateTime
+     * @param \Magento\Customer\Api\GroupManagementInterface $groupManagement
+     * @param \Magento\Search\Model\QueryFactory $catalogSearchData
+     * @param \Magento\Framework\Search\Request\Builder $requestBuilder
+     * @param \Magento\Search\Model\SearchEngine $searchEngine
+     * @param \Magento\Framework\Search\Adapter\Mysql\TemporaryStorageFactory $temporaryStorageFactory
+     * @param \Magento\Framework\DB\Adapter\AdapterInterface $connection
+     * @param string $searchRequestName
+     * @param SearchResultFactory $searchResultFactory
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
+    public function __construct(
+        \Magento\Framework\Data\Collection\EntityFactory $entityFactory,
+        \Psr\Log\LoggerInterface $logger,
+        \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy,
+        \Magento\Framework\Event\ManagerInterface $eventManager,
+        \Magento\Eav\Model\Config $eavConfig,
+        \Magento\Framework\App\ResourceConnection $resource,
+        \Magento\Eav\Model\EntityFactory $eavEntityFactory,
+        \Magento\Catalog\Model\ResourceModel\Helper $resourceHelper,
+        \Magento\Framework\Validator\UniversalFactory $universalFactory,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Catalog\Model\Indexer\Product\Flat\State $catalogProductFlatState,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Catalog\Model\Product\OptionFactory $productOptionFactory,
+        \Magento\Catalog\Model\ResourceModel\Url $catalogUrl,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Framework\Stdlib\DateTime $dateTime,
+        \Magento\Customer\Api\GroupManagementInterface $groupManagement,
+        \Magento\Search\Model\QueryFactory $catalogSearchData,
+        \Magento\Framework\Search\Request\Builder $requestBuilder,
+        \Magento\Search\Model\SearchEngine $searchEngine,
+        \Magento\Framework\Search\Adapter\Mysql\TemporaryStorageFactory $temporaryStorageFactory,
+        \Magento\Framework\DB\Adapter\AdapterInterface $connection = null,
+        $searchRequestName = 'catalog_view_container',
+        SearchResultFactory $searchResultFactory = null
+    )
+    {
+        parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $eavConfig, $resource, $eavEntityFactory, $resourceHelper, $universalFactory, $storeManager, $moduleManager, $catalogProductFlatState, $scopeConfig, $productOptionFactory, $catalogUrl, $localeDate, $customerSession, $dateTime, $groupManagement, $catalogSearchData, $requestBuilder, $searchEngine, $temporaryStorageFactory, $connection, $searchRequestName, $searchResultFactory); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * @deprecated
+     * @param \Magento\Search\Api\SearchInterface $object
+     * @return void
+     */
+    public function setSearch(\Magento\Search\Api\SearchInterface $object)
+    {
+        parent::setSearch($object); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * @deprecated
+     * @param \Magento\Framework\Api\Search\SearchCriteriaBuilder $object
+     * @return void
+     */
+    public function setSearchCriteriaBuilder(\Magento\Framework\Api\Search\SearchCriteriaBuilder $object)
+    {
+        parent::setSearchCriteriaBuilder($object); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * @deprecated
+     * @param \Magento\Framework\Api\FilterBuilder $object
+     * @return void
+     */
+    public function setFilterBuilder(\Magento\Framework\Api\FilterBuilder $object)
+    {
+        parent::setFilterBuilder($object); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Stub method for compatibility with other search engines
+     *
+     * @return $this
+     */
+    public function setGeneralDefaultQuery()
+    {
+        return parent::setGeneralDefaultQuery(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Return field faceted data from faceted search result
+     *
+     * @param string $field
+     * @return array
+     * @throws StateException
+     */
+    public function getFacetedData($field)
+    {
+        return parent::getFacetedData($field); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get cloned Select after dispatching 'catalog_prepare_price_select' event
+     *
+     * @return \Magento\Framework\DB\Select
+     */
+    public function getCatalogPreparedSelect()
+    {
+        return ProductCollection::getCatalogPreparedSelect(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get price expression sql part
+     *
+     * @param \Magento\Framework\DB\Select $select
+     * @return string
+     */
+    public function getPriceExpression($select)
+    {
+        return ProductCollection::getPriceExpression($select); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get additional price expression sql part
+     *
+     * @param \Magento\Framework\DB\Select $select
+     * @return string
+     */
+    public function getAdditionalPriceExpression($select)
+    {
+        return ProductCollection::getAdditionalPriceExpression($select); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get currency rate
+     *
+     * @return float
+     */
+    public function getCurrencyRate()
+    {
+        return ProductCollection::getCurrencyRate(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve Catalog Product Flat Helper object
+     *
+     * @return \Magento\Catalog\Model\Indexer\Product\Flat\State
+     */
+    public function getFlatState()
+    {
+        return ProductCollection::getFlatState(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve is flat enabled flag
+     * Return always false if magento run admin
+     *
+     * @return bool
+     */
+    public function isEnabledFlat()
+    {
+        return ProductCollection::isEnabledFlat(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve collection empty item
+     * Redeclared for specifying id field name without getting resource model inside model
+     *
+     * @return \Magento\Framework\DataObject
+     */
+    public function getNewEmptyItem()
+    {
+        return ProductCollection::getNewEmptyItem(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set entity to use for attributes
+     *
+     * @param \Magento\Eav\Model\Entity\AbstractEntity $entity
+     * @return $this
+     */
+    public function setEntity($entity)
+    {
+        return ProductCollection::setEntity($entity); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set Store scope for collection
+     *
+     * @param mixed $store
+     * @return $this
+     */
+    public function setStore($store)
+    {
+        return ProductCollection::setStore($store); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add attribute to entities in collection
+     * If $attribute=='*' select all attributes
+     *
+     * @param array|string|integer|\Magento\Framework\App\Config\Element $attribute
+     * @param bool|string $joinType
+     * @return $this
+     */
+    public function addAttributeToSelect($attribute, $joinType = false)
+    {
+        return ProductCollection::addAttributeToSelect($attribute, $joinType); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add collection filters by identifiers
+     *
+     * @param mixed $productId
+     * @param boolean $exclude
+     * @return $this
+     */
+    public function addIdFilter($productId, $exclude = false)
+    {
+        return ProductCollection::addIdFilter($productId, $exclude); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Adding product website names to result collection
+     * Add for each product websites information
+     *
+     * @return $this
+     */
+    public function addWebsiteNamesToResult()
+    {
+        return ProductCollection::addWebsiteNamesToResult(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function load($printQuery = false, $logQuery = false)
+    {
+        return $this; // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add store availability filter. Include availability product
+     * for store website
+     *
+     * @param null|string|bool|int|Store $store
+     * @return $this
+     */
+    public function addStoreFilter($store = null)
+    {
+        return ProductCollection::addStoreFilter($store); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add website filter to collection
+     *
+     * @param null|bool|int|string|array $websites
+     * @return $this
+     */
+    public function addWebsiteFilter($websites = null)
+    {
+        return ProductCollection::addWebsiteFilter($websites); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get filters applied to collection
+     *
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection\ProductLimitation
+     */
+    public function getLimitationFilters()
+    {
+        return ProductCollection::getLimitationFilters(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Specify category filter for product collection
+     *
+     * @param \Magento\Catalog\Model\Category $category
+     * @return $this
+     */
+    public function addCategoryFilter(\Magento\Catalog\Model\Category $category)
+    {
+        return ProductCollection::addCategoryFilter($category); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Filter Product by Categories
+     *
+     * @param array $categoriesFilter
+     */
+    public function addCategoriesFilter(array $categoriesFilter)
+    {
+        ProductCollection::addCategoriesFilter($categoriesFilter); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Join minimal price attribute to result
+     *
+     * @return $this
+     */
+    public function joinMinimalPrice()
+    {
+        return ProductCollection::joinMinimalPrice(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve max value by attribute
+     *
+     * @param string $attribute
+     * @return array|null
+     */
+    public function getMaxAttributeValue($attribute)
+    {
+        return ProductCollection::getMaxAttributeValue($attribute); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve ranging product count for arrtibute range
+     *
+     * @param string $attribute
+     * @param int $range
+     * @return array
+     */
+    public function getAttributeValueCountByRange($attribute, $range)
+    {
+        return ProductCollection::getAttributeValueCountByRange($attribute, $range); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve product count by some value of attribute
+     *
+     * @param string $attribute
+     * @return array ($value => $count)
+     */
+    public function getAttributeValueCount($attribute)
+    {
+        return ProductCollection::getAttributeValueCount($attribute); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Return all attribute values as array in form:
+     * array(
+     *   [entity_id_1] => array(
+     *          [store_id_1] => store_value_1,
+     *          [store_id_2] => store_value_2,
+     *          ...
+     *          [store_id_n] => store_value_n
+     *   ),
+     *   ...
+     * )
+     *
+     * @param string $attribute attribute code
+     * @return array
+     */
+    public function getAllAttributeValues($attribute)
+    {
+        return ProductCollection::getAllAttributeValues($attribute); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get SQL for get record count without left JOINs
+     *
+     * @return \Magento\Framework\DB\Select
+     */
+    public function getSelectCountSql()
+    {
+        return ProductCollection::getSelectCountSql(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve all ids for collection
+     *
+     * @param int|string $limit
+     * @param int|string $offset
+     * @return array
+     */
+    public function getAllIds($limit = null, $offset = null)
+    {
+        return ProductCollection::getAllIds($limit, $offset); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve product count select for categories
+     *
+     * @return \Magento\Framework\DB\Select
+     */
+    public function getProductCountSelect()
+    {
+        return ProductCollection::getProductCountSelect(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Destruct product count select
+     *
+     * @return $this
+     */
+    public function unsProductCountSelect()
+    {
+        return ProductCollection::unsProductCountSelect(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Adding product count to categories collection
+     *
+     * @param \Magento\Eav\Model\Entity\Collection\AbstractCollection $categoryCollection
+     * @return $this
+     */
+    public function addCountToCategories($categoryCollection)
+    {
+        return ProductCollection::addCountToCategories($categoryCollection); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve unique attribute set ids in collection
+     *
+     * @return array
+     */
+    public function getSetIds()
+    {
+        return ProductCollection::getSetIds(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Return array of unique product type ids in collection
+     *
+     * @return array
+     */
+    public function getProductTypeIds()
+    {
+        return ProductCollection::getProductTypeIds(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Joins url rewrite rules to collection
+     *
+     * @return $this
+     */
+    public function joinUrlRewrite()
+    {
+        return ProductCollection::joinUrlRewrite(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add URL rewrites data to product
+     * If collection loadded - run processing else set flag
+     *
+     * @param int|string $categoryId
+     * @return $this
+     */
+    public function addUrlRewrite($categoryId = '')
+    {
+        return ProductCollection::addUrlRewrite($categoryId); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add minimal price data to result
+     *
+     * @return $this
+     */
+    public function addMinimalPrice()
+    {
+        return ProductCollection::addMinimalPrice(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add price data for calculate final price
+     *
+     * @return $this
+     */
+    public function addFinalPrice()
+    {
+        return ProductCollection::addFinalPrice(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve all ids
+     *
+     * @param boolean $resetCache
+     * @return array
+     */
+    public function getAllIdsCache($resetCache = false)
+    {
+        return ProductCollection::getAllIdsCache($resetCache); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set all ids
+     *
+     * @param array $value
+     * @return $this
+     */
+    public function setAllIdsCache($value)
+    {
+        return ProductCollection::setAllIdsCache($value); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add Price Data to result
+     *
+     * @param int $customerGroupId
+     * @param int $websiteId
+     * @return $this
+     */
+    public function addPriceData($customerGroupId = null, $websiteId = null)
+    {
+        return ProductCollection::addPriceData($customerGroupId, $websiteId); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add attribute to filter
+     *
+     * @param \Magento\Eav\Model\Entity\Attribute\AbstractAttribute|string $attribute
+     * @param array $condition
+     * @param string $joinType
+     * @return $this
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function addAttributeToFilter($attribute, $condition = null, $joinType = 'inner')
+    {
+        return ProductCollection::addAttributeToFilter($attribute, $condition, $joinType); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add requere tax percent flag for product collection
+     *
+     * @return $this
+     */
+    public function addTaxPercents()
+    {
+        return ProductCollection::addTaxPercents(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get require tax percent flag value
+     *
+     * @return bool
+     */
+    public function requireTaxPercent()
+    {
+        return ProductCollection::requireTaxPercent(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Adding product custom options to result collection
+     *
+     * @return $this
+     */
+    public function addOptionsToResult()
+    {
+        return ProductCollection::addOptionsToResult(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Filter products with required options
+     *
+     * @return $this
+     */
+    public function addFilterByRequiredOptions()
+    {
+        return ProductCollection::addFilterByRequiredOptions(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set product visibility filter for enabled products
+     *
+     * @param array $visibility
+     * @return $this
+     */
+    public function setVisibility($visibility)
+    {
+        return ProductCollection::setVisibility($visibility); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add attribute to sort order
+     *
+     * @param string $attribute
+     * @param string $dir
+     * @return $this
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    public function addAttributeToSort($attribute, $dir = self::SORT_ORDER_ASC)
+    {
+        return ProductCollection::addAttributeToSort($attribute, $dir); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Apply front-end price limitation filters to the collection
+     *
+     * @return $this
+     */
+    public function applyFrontendPriceLimitations()
+    {
+        return ProductCollection::applyFrontendPriceLimitations(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add category ids to loaded items
+     *
+     * @return $this
+     */
+    public function addCategoryIds()
+    {
+        return ProductCollection::addCategoryIds(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add tier price data to loaded items
+     *
+     * @return $this
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    public function addTierPriceData()
+    {
+        return ProductCollection::addTierPriceData(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add field comparison expression
+     *
+     * @param string $comparisonFormat - expression for sprintf()
+     * @param array $fields - list of fields
+     * @return $this
+     * @throws \Exception
+     */
+    public function addPriceDataFieldFilter($comparisonFormat, $fields)
+    {
+        return ProductCollection::addPriceDataFieldFilter($comparisonFormat, $fields); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Clear collection
+     *
+     * @return $this
+     */
+    public function clear()
+    {
+        return ProductCollection::clear(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set Order field
+     *
+     * @param string $attribute
+     * @param string $dir
+     * @return $this
+     */
+    public function setOrder($attribute, $dir = Select::SQL_DESC)
+    {
+        return ProductCollection::setOrder($attribute, $dir); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get products max price
+     *
+     * @return float
+     */
+    public function getMaxPrice()
+    {
+        return ProductCollection::getMaxPrice(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get products min price
+     *
+     * @return float
+     */
+    public function getMinPrice()
+    {
+        return ProductCollection::getMinPrice(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get standard deviation of products price
+     *
+     * @return float
+     */
+    public function getPriceStandardDeviation()
+    {
+        return ProductCollection::getPriceStandardDeviation(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get count of product prices
+     *
+     * @return int
+     */
+    public function getPricesCount()
+    {
+        return ProductCollection::getPricesCount(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve table name
+     *
+     * @param string $table
+     * @return string
+     * @codeCoverageIgnore
+     */
+    public function getTable($table)
+    {
+        return parent::getTable($table); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get collection's entity object
+     *
+     * @return \Magento\Eav\Model\Entity\AbstractEntity
+     * @throws LocalizedException
+     */
+    public function getEntity()
+    {
+        return parent::getEntity(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get resource instance
+     *
+     * @return \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+     * @codeCoverageIgnore
+     */
+    public function getResource()
+    {
+        return parent::getResource(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set template object for the collection
+     *
+     * @param   \Magento\Framework\DataObject $object
+     * @return $this
+     */
+    public function setObject($object = null)
+    {
+        return parent::setObject($object); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add an object to the collection
+     *
+     * @param \Magento\Framework\DataObject $object
+     * @return $this
+     * @throws LocalizedException
+     */
+    public function addItem(\Magento\Framework\DataObject $object)
+    {
+        return parent::addItem($object); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve entity attribute
+     *
+     * @param   string $attributeCode
+     * @return  \Magento\Eav\Model\Entity\Attribute\AbstractAttribute
+     */
+    public function getAttribute($attributeCode)
+    {
+        return parent::getAttribute($attributeCode); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Wrapper for compatibility with \Magento\Framework\Data\Collection\AbstractDb
+     *
+     * @param mixed $attribute
+     * @param mixed $condition
+     * @return $this|AbstractDb
+     * @codeCoverageIgnore
+     */
+    public function addFieldToFilter($attribute, $condition = null)
+    {
+        return parent::addFieldToFilter($attribute, $condition); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add entity type to select statement
+     *
+     * @param string $entityType
+     * @param string $prefix
+     * @return $this
+     * @codeCoverageIgnore
+     */
+    public function addEntityTypeToSelect($entityType, $prefix)
+    {
+        return parent::addEntityTypeToSelect($entityType, $prefix); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add field to static
+     *
+     * @param string $field
+     * @return $this
+     */
+    public function addStaticField($field)
+    {
+        return parent::addStaticField($field); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add attribute expression (SUM, COUNT, etc)
+     *
+     * Example: ('sub_total', 'SUM({{attribute}})', 'revenue')
+     * Example: ('sub_total', 'SUM({{revenue}})', 'revenue')
+     *
+     * For some functions like SUM use groupByAttribute.
+     *
+     * @param string $alias
+     * @param string $expression
+     * @param string $attribute
+     * @return $this
+     * @throws LocalizedException
+     */
+    public function addExpressionAttributeToSelect($alias, $expression, $attribute)
+    {
+        return parent::addExpressionAttributeToSelect($alias, $expression, $attribute); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Groups results by specified attribute
+     *
+     * @param string|array $attribute
+     * @return $this
+     */
+    public function groupByAttribute($attribute)
+    {
+        return parent::groupByAttribute($attribute); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add attribute from joined entity to select
+     *
+     * Examples:
+     * ('billing_firstname', 'customer_address/firstname', 'default_billing')
+     * ('billing_lastname', 'customer_address/lastname', 'default_billing')
+     * ('shipping_lastname', 'customer_address/lastname', 'default_billing')
+     * ('shipping_postalcode', 'customer_address/postalcode', 'default_shipping')
+     * ('shipping_city', $cityAttribute, 'default_shipping')
+     *
+     * Developer is encouraged to use existing instances of attributes and entities
+     * After first use of string entity name it will be cached in the collection
+     *
+     * @todo connect between joined attributes of same entity
+     * @param string $alias alias for the joined attribute
+     * @param string|\Magento\Eav\Model\Entity\Attribute\AbstractAttribute $attribute
+     * @param string $bind attribute of the main entity to link with joined $filter
+     * @param string $filter primary key for the joined entity (entity_id default)
+     * @param string $joinType inner|left
+     * @param null $storeId
+     * @return $this
+     * @throws LocalizedException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    public function joinAttribute($alias, $attribute, $bind, $filter = null, $joinType = 'inner', $storeId = null)
+    {
+        return parent::joinAttribute($alias, $attribute, $bind, $filter, $joinType, $storeId); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Join regular table field and use an attribute as fk
+     *
+     * Examples:
+     * ('country_name', 'directory_country_name', 'name', 'country_id=shipping_country',
+     *      "{{table}}.language_code='en'", 'left')
+     *
+     * @param string $alias 'country_name'
+     * @param string $table 'directory_country_name'
+     * @param string $field 'name'
+     * @param string $bind 'PK(country_id)=FK(shipping_country_id)'
+     * @param string|array $cond "{{table}}.language_code='en'" OR array('language_code'=>'en')
+     * @param string $joinType 'left'
+     * @return $this
+     * @throws LocalizedException
+     */
+    public function joinField($alias, $table, $field, $bind, $cond = null, $joinType = 'inner')
+    {
+        return parent::joinField($alias, $table, $field, $bind, $cond, $joinType); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Join a table
+     *
+     * @param string|array $table
+     * @param string $bind
+     * @param string|array $fields
+     * @param null|array $cond
+     * @param string $joinType
+     * @return $this
+     * @throws LocalizedException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function joinTable($table, $bind, $fields = null, $cond = null, $joinType = 'inner')
+    {
+        return parent::joinTable($table, $bind, $fields, $cond, $joinType); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Remove an attribute from selection list
+     *
+     * @param string $attribute
+     * @return $this
+     */
+    public function removeAttributeToSelect($attribute = null)
+    {
+        return parent::removeAttributeToSelect($attribute); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set collection page start and records to show
+     *
+     * @param integer $pageNum
+     * @param integer $pageSize
+     * @return $this
+     * @codeCoverageIgnore
+     */
+    public function setPage($pageNum, $pageSize)
+    {
+        return parent::setPage($pageNum, $pageSize); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve all ids sql
+     *
+     * @return Select
+     */
+    public function getAllIdsSql()
+    {
+        return parent::getAllIdsSql(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Save all the entities in the collection
+     *
+     * @todo make batch save directly from collection
+     *
+     * @return $this
+     */
+    public function save()
+    {
+        return parent::save(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Delete all the entities in the collection
+     *
+     * @todo make batch delete directly from collection
+     *
+     * @return $this
+     */
+    public function delete()
+    {
+        return parent::delete(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Import 2D array into collection as objects
+     *
+     * If the imported items already exist, update the data for existing objects
+     *
+     * @param array $arr
+     * @return $this
+     */
+    public function importFromArray($arr)
+    {
+        return parent::importFromArray($arr); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get collection data as a 2D array
+     *
+     * @return array
+     */
+    public function exportToArray()
+    {
+        return parent::exportToArray(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve row id field name
+     *
+     * @return string
+     * @codeCoverageIgnore
+     */
+    public function getRowIdFieldName()
+    {
+        return parent::getRowIdFieldName(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Id field name getter
+     *
+     * @return string
+     */
+    public function getIdFieldName()
+    {
+        return parent::getIdFieldName(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set row id field name
+     *
+     * @param string $fieldName
+     * @return $this
+     */
+    public function setRowIdFieldName($fieldName)
+    {
+        return parent::setRowIdFieldName($fieldName); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve array of attributes
+     *
+     * @param array $arrAttributes
+     * @return array
+     */
+    public function toArray($arrAttributes = [])
+    {
+        return parent::toArray($arrAttributes); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Returns already loaded element ids
+     *
+     * @return array
+     * @codeCoverageIgnore
+     */
+    public function getLoadedIds()
+    {
+        return parent::getLoadedIds(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Remove all items from collection
+     * @return $this
+     */
+    public function removeAllItems()
+    {
+        return parent::removeAllItems(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Remove item from collection by item key
+     *
+     * @param mixed $key
+     * @return $this
+     */
+    public function removeItemByKey($key)
+    {
+        return parent::removeItemByKey($key); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Returns main table name - extracted from "module/table" style and
+     * validated by db adapter
+     *
+     * @return string
+     */
+    public function getMainTable()
+    {
+        return parent::getMainTable(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Wrapper for compatibility with \Magento\Framework\Data\Collection\AbstractDb
+     *
+     * @param string $field
+     * @param string $alias
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @return $this|\Magento\Framework\Data\Collection\AbstractDb
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @codeCoverageIgnore
+     */
+    public function addFieldToSelect($field, $alias = null)
+    {
+        return parent::addFieldToSelect($field, $alias); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Wrapper for compatibility with \Magento\Framework\Data\Collection\AbstractDb
+     *
+     * @param string $field
+     * @return $this|\Magento\Framework\Data\Collection\AbstractDb
+     * @codeCoverageIgnore
+     */
+    public function removeFieldFromSelect($field)
+    {
+        return parent::removeFieldFromSelect($field); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Wrapper for compatibility with \Magento\Framework\Data\Collection\AbstractDb
+     *
+     * @return $this|\Magento\Framework\Data\Collection\AbstractDb
+     * @codeCoverageIgnore
+     */
+    public function removeAllFieldsFromSelect()
+    {
+        return parent::removeAllFieldsFromSelect(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set store scope
+     *
+     * @param int|string|\Magento\Store\Api\Data\StoreInterface $storeId
+     * @return $this
+     */
+    public function setStoreId($storeId)
+    {
+        return parent::setStoreId($storeId); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Return current store id
+     *
+     * @return int
+     */
+    public function getStoreId()
+    {
+        return parent::getStoreId(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve default store id
+     *
+     * @return int
+     */
+    public function getDefaultStoreId()
+    {
+        return parent::getDefaultStoreId(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add variable to bind list
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return $this
+     */
+    public function addBindParam($name, $value)
+    {
+        return parent::addBindParam($name, $value); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set database connection adapter
+     *
+     * @param \Magento\Framework\DB\Adapter\AdapterInterface $conn
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function setConnection(\Magento\Framework\DB\Adapter\AdapterInterface $conn)
+    {
+        return parent::setConnection($conn); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get \Magento\Framework\DB\Select instance
+     *
+     * @return Select
+     */
+    public function getSelect()
+    {
+        return parent::getSelect(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve connection object
+     *
+     * @return AdapterInterface
+     */
+    public function getConnection()
+    {
+        return parent::getConnection(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get collection size
+     *
+     * @return int
+     */
+    public function getSize()
+    {
+        return parent::getSize(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get sql select string or object
+     *
+     * @param   bool $stringMode
+     * @return  string|\Magento\Framework\DB\Select
+     */
+    public function getSelectSql($stringMode = false)
+    {
+        return parent::getSelectSql($stringMode); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * self::setOrder() alias
+     *
+     * @param string $field
+     * @param string $direction
+     * @return $this
+     */
+    public function addOrder($field, $direction = self::SORT_ORDER_DESC)
+    {
+        return parent::addOrder($field, $direction); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add select order to the beginning
+     *
+     * @param string $field
+     * @param string $direction
+     * @return $this
+     */
+    public function unshiftOrder($field, $direction = self::SORT_ORDER_DESC)
+    {
+        return parent::unshiftOrder($field, $direction); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set select distinct
+     *
+     * @param   bool $flag
+     * @return  $this
+     */
+    public function distinct($flag)
+    {
+        return parent::distinct($flag); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Load data with filter in place
+     *
+     * @param   bool $printQuery
+     * @param   bool $logQuery
+     * @return  $this
+     */
+    public function loadWithFilter($printQuery = false, $logQuery = false)
+    {
+        return parent::loadWithFilter($printQuery, $logQuery); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Returns a collection item that corresponds to the fetched row
+     * and moves the internal data pointer ahead
+     *
+     * @return  \Magento\Framework\Model\AbstractModel|bool
+     */
+    public function fetchItem()
+    {
+        return parent::fetchItem(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get all data array for collection
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return parent::getData(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Reset loaded for collection data array
+     *
+     * @return $this
+     */
+    public function resetData()
+    {
+        return parent::resetData(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Load the data.
+     *
+     * @param bool $printQuery
+     * @param bool $logQuery
+     * @return $this
+     */
+    public function loadData($printQuery = false, $logQuery = false)
+    {
+        return parent::loadData($printQuery, $logQuery); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Print and/or log query
+     *
+     * @param   bool $printQuery
+     * @param   bool $logQuery
+     * @param   string $sql
+     * @return  $this
+     */
+    public function printLogQuery($printQuery = false, $logQuery = false, $sql = null)
+    {
+        return parent::printLogQuery($printQuery, $logQuery, $sql); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add filter to Map
+     *
+     * @param string $filter
+     * @param string $alias
+     * @param string $group default 'fields'
+     * @return $this
+     */
+    public function addFilterToMap($filter, $alias, $group = 'fields')
+    {
+        return parent::addFilterToMap($filter, $alias, $group); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Clone $this->_select during cloning collection, otherwise both collections will share the same $this->_select
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        parent::__clone(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Join extension attribute.
+     *
+     * @param JoinDataInterface $join
+     * @param JoinProcessorInterface $extensionAttributesJoinProcessor
+     * @return $this
+     */
+    public function joinExtensionAttribute(
+        JoinDataInterface $join,
+        JoinProcessorInterface $extensionAttributesJoinProcessor
+    )
+    {
+        return parent::joinExtensionAttribute($join, $extensionAttributesJoinProcessor); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get collection item object class name.
+     *
+     * @return string
+     */
+    public function getItemObjectClass()
+    {
+        return parent::getItemObjectClass(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function __sleep()
+    {
+        return parent::__sleep(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function __wakeup()
+    {
+        parent::__wakeup(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add collection filter
+     *
+     * @param string $field
+     * @param string $value
+     * @param string $type and|or|string
+     * @return $this
+     */
+    public function addFilter($field, $value, $type = 'and')
+    {
+        return parent::addFilter($field, $value, $type); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Search for a filter by specified field
+     *
+     * Multiple filters can be matched if an array is specified:
+     * - 'foo' -- get the first filter with field name 'foo'
+     * - array('foo') -- get all filters with field name 'foo'
+     * - array('foo', 'bar') -- get all filters with field name 'foo' or 'bar'
+     * - array() -- get all filters
+     *
+     * @param string|string[] $field
+     * @return \Magento\Framework\DataObject|\Magento\Framework\DataObject[]|void
+     */
+    public function getFilter($field)
+    {
+        return parent::getFilter($field); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve collection loading status
+     *
+     * @return bool
+     */
+    public function isLoaded()
+    {
+        return parent::isLoaded(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Get current collection page
+     *
+     * @param  int $displacement
+     * @return int
+     */
+    public function getCurPage($displacement = 0)
+    {
+        return parent::getCurPage($displacement); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve collection last page number
+     *
+     * @return int
+     */
+    public function getLastPageNumber()
+    {
+        return parent::getLastPageNumber(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve collection page size
+     *
+     * @return int
+     */
+    public function getPageSize()
+    {
+        return parent::getPageSize(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve collection first item
+     *
+     * @return \Magento\Framework\DataObject
+     */
+    public function getFirstItem()
+    {
+        return parent::getFirstItem(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve collection last item
+     *
+     * @return \Magento\Framework\DataObject
+     */
+    public function getLastItem()
+    {
+        return parent::getLastItem(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve collection items
+     *
+     * @return \Magento\Framework\DataObject[]
+     */
+    public function getItems()
+    {
+        return parent::getItems(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve field values from all items
+     *
+     * @param   string $colName
+     * @return  array
+     */
+    public function getColumnValues($colName)
+    {
+        return parent::getColumnValues($colName); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Search all items by field value
+     *
+     * @param   string $column
+     * @param   mixed $value
+     * @return  array
+     */
+    public function getItemsByColumnValue($column, $value)
+    {
+        return parent::getItemsByColumnValue($column, $value); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Search first item by field value
+     *
+     * @param   string $column
+     * @param   mixed $value
+     * @return  \Magento\Framework\DataObject || null
+     */
+    public function getItemByColumnValue($column, $value)
+    {
+        return parent::getItemByColumnValue($column, $value); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Walk through the collection and run model method or external callback
+     * with optional arguments
+     *
+     * Returns array with results of callback for each item
+     *
+     * @param string $callback
+     * @param array $args
+     * @return array
+     */
+    public function walk($callback, array $args = [])
+    {
+        return parent::walk($callback, $args); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * @param string|array $objMethod
+     * @param array $args
+     * @return void
+     */
+    public function each($objMethod, $args = [])
+    {
+        parent::each($objMethod, $args); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Setting data for all collection items
+     *
+     * @param   mixed $key
+     * @param   mixed $value
+     * @return $this
+     */
+    public function setDataToAll($key, $value = null)
+    {
+        return parent::setDataToAll($key, $value); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set current page
+     *
+     * @param   int $page
+     * @return $this
+     */
+    public function setCurPage($page)
+    {
+        return parent::setCurPage($page); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set collection page size
+     *
+     * @param   int $size
+     * @return $this
+     */
+    public function setPageSize($size)
+    {
+        return parent::setPageSize($size); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set collection item class name
+     *
+     * @param  string $className
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    public function setItemObjectClass($className)
+    {
+        return parent::setItemObjectClass($className); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Convert collection to XML
+     *
+     * @return string
+     */
+    public function toXml()
+    {
+        return parent::toXml(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * @return array
+     */
+    public function toOptionArray()
+    {
+        return parent::toOptionArray(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * @return array
+     */
+    public function toOptionHash()
+    {
+        return parent::toOptionHash(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve item by id
+     *
+     * @param   mixed $idValue
+     * @return  \Magento\Framework\DataObject
+     */
+    public function getItemById($idValue)
+    {
+        return parent::getItemById($idValue); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Implementation of \IteratorAggregate::getIterator()
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return parent::getIterator(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve count of collection loaded items
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return parent::count(); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Retrieve Flag
+     *
+     * @param string $flag
+     * @return bool|null
+     */
+    public function getFlag($flag)
+    {
+        return parent::getFlag($flag); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Set Flag
+     *
+     * @param string $flag
+     * @param bool|null $value
+     * @return $this
+     */
+    public function setFlag($flag, $value = null)
+    {
+        return parent::setFlag($flag, $value); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Has Flag
+     *
+     * @param string $flag
+     * @return bool
+     */
+    public function hasFlag($flag)
+    {
+        return parent::hasFlag($flag); // TODO: Change the autogenerated stub
+    }
+
+    /**
+     * Add search query filter
+     *
+     * @param string $query
+     * @return $this
+     */
+    public function addSearchFilter($query)
+    {
+        return parent::addSearchFilter($query); // TODO: Change the autogenerated stub
+    }
+
+}

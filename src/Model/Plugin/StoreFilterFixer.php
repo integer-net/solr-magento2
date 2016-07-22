@@ -11,6 +11,7 @@ class StoreFilterFixer
     /**
      * Enable filtration by store_id or website_id. The only supported condition is 'eq'
      *
+     * @see \Magento\Catalog\Model\ResourceModel\Product\Collection::addFieldToFilter()
      * @param ProductCollection $subject
      * @param \Closure $proceed
      * @param array $fields
