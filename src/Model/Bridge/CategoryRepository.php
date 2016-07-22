@@ -133,7 +133,6 @@ class CategoryRepository implements IndexCategoryRepository
 
         $parentsCollection = $this->collectionFactory->create()->setStoreId($storeId)
             ->addAttributeToFilter('solr_exclude_children', '1');
-        $parentIds = $parentsCollection->getAllIds();
         $parentPaths = ArrayCollection::fromArray($parentsCollection->getColumnValues(MagentoCategory::KEY_PATH))->values();
 
         $pathFilter = $parentPaths->map(function($path) {

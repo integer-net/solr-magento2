@@ -343,9 +343,6 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
             ->filter(function ($category) {
                 return !empty($category['solr_exclude_children']);
             });
-        $excludedIds = $parentCategoryData
-            ->keys()
-            ->getArrayCopy();
         $excludedPaths = $parentCategoryData
             ->map(function($category) {
                 return $category['path'];
@@ -360,9 +357,6 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('getColumnValues')
             ->with('path')
             ->willReturn($excludedPaths);
-        $collection->expects($this->once())
-            ->method('getAllIds')
-            ->willReturn($excludedIds);
         return $collection;
     }
 

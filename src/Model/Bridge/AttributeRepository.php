@@ -139,7 +139,7 @@ class AttributeRepository implements AttributeRepositoryInterface
     public function getMagentoAttribute(AttributeInterface $attribute)
     {
         if ($this->attributeStorage->contains($attribute)) {
-            return $this->attributeStorage[$attribute];
+            return $this->attributeStorage->offsetGet($attribute);
         }
         return null;
     }

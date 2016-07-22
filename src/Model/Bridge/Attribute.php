@@ -3,6 +3,7 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
+use Magento\Eav\Api\Data\AttributeFrontendLabelInterface;
 
 class Attribute implements AttributeInterface
 {
@@ -45,6 +46,7 @@ class Attribute implements AttributeInterface
         if ($this->storeId === null) {
             return $this->magentoAttribute->getDefaultFrontendLabel();
         }
+        /** @var AttributeFrontendLabelInterface[] $labels */
         $labels = $this->magentoAttribute->getFrontendLabels();
         if (! isset($labels[$this->storeId])) {
             return $this->magentoAttribute->getDefaultFrontendLabel();
