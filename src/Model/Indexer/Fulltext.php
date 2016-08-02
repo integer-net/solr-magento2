@@ -9,11 +9,23 @@
  */
 namespace IntegerNet\Solr\Model\Indexer;
 
+use IntegerNet\Solr\Indexer\ProductIndexer;
 use Magento\Framework\Indexer\ActionInterface;
 use Magento\Framework\Mview\ActionInterface as MviewActionInterface;
 
 class Fulltext implements ActionInterface, MviewActionInterface
 {
+    /** @var ProductIndexer */
+    private $solrIndexer;
+
+    /**
+     * @param ProductIndexerFactory $solrIndexerFactory
+     */
+    public function __construct(ProductIndexerFactory $solrIndexerFactory)
+    {
+        $this->solrIndexer = $solrIndexerFactory->create();
+    }
+
     /**
      * Execute full indexation
      *

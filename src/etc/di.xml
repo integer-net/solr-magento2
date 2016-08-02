@@ -2,11 +2,14 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
   <preference for="IntegerNet\Solr\Model\StatusMessages" type="IntegerNet\Solr\Model\SolrStatusMessages" />
   <preference for="IntegerNet\Solr\Implementor\AttributeRepository" type="IntegerNet\Solr\Model\Bridge\AttributeRepository" />
+  <preference for="IntegerNet\Solr\Implementor\IndexCategoryRepository" type="IntegerNet\Solr\Model\Bridge\CategoryRepository" />
   <preference for="IntegerNet\Solr\Implementor\ProductRepository" type="IntegerNet\Solr\Model\Bridge\ProductRepository" />
   <preference for="IntegerNet\Solr\Implementor\ProductIterator" type="IntegerNet\Solr\Model\Bridge\ProductIterator" />
   <preference for="IntegerNet\Solr\Implementor\Product" type="IntegerNet\Solr\Model\Bridge\Product" />
   <preference for="IntegerNet\Solr\Implementor\Config" type="IntegerNet\Solr\Model\Bridge\Config"/>
   <preference for="IntegerNet\Solr\Implementor\StoreEmulation" type="IntegerNet\Solr\Model\Bridge\StoreEmulation" />
+  <preference for="IntegerNet\Solr\Implementor\ProductRenderer" type="IntegerNet\Solr\Model\Bridge\ProductRenderer" />
+  <preference for="IntegerNet\Solr\Implementor\EventDispatcher" type="IntegerNet\Solr\Model\Bridge\EventDispatcher" />
   <type name="IntegerNet\Solr\Model\Bridge\Config" shared="false"/>
   <!--
   <preference for="Magento\Catalog\Model\ResourceModel\Layer\Filter\Attribute" type="IntegerNet\Solr\Model\Resource\Catalog\Layer\Filter\Attribute"/>
