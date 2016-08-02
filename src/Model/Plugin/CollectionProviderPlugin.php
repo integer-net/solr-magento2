@@ -10,6 +10,7 @@
 
 namespace IntegerNet\Solr\Model\Plugin;
 use Closure;
+use IntegerNet\Solr\Model\Config\CurrentStoreConfig;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Layer\ItemCollectionProviderInterface;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
@@ -26,15 +27,20 @@ class CollectionProviderPlugin
     /**
      * @var ResultCollectionFactory
      */
-    protected $_collectionFactory;
+    private $collectionFactory;
+    /**
+     * @var CurrentStoreConfig
+     */
+    private $currentStoreConfig;
 
     /**
      * CollectionProviderPlugin constructor.
      * @param ResultCollectionFactory $_collectionFactory
      */
-    public function __construct(ResultCollectionFactory $_collectionFactory)
+    public function __construct(ResultCollectionFactory $_collectionFactory, CurrentStoreConfig $currentStoreConfig)
     {
-        $this->_collectionFactory = $_collectionFactory;
+        $this->collectionFactory = $_collectionFactory;
+        $this->currentStoreConfig = $currentStoreConfig;
     }
 
     /**
@@ -46,8 +52,23 @@ class CollectionProviderPlugin
      */
     public function aroundGetCollection(ItemCollectionProviderInterface $subject, Closure $proceed, Category $category)
     {
-        //TODO if module disabled (<=> engine != integernet_solr) return normal fulltext collection
-        //TODO ping solr service, if unsuccessful return normal fulltext collection
-        return $this->_collectionFactory->create();
+        if (! $this->isModuleActive()) {
+            //TODO configure AdapterFactory to use MySQL adapter
+            return $proceed($category);
+        }
+        if ($this->currentStoreConfig->getResultsConfig()->isUseHtmlFromSolr()) {
+            return $this->collectionFactory->create();
+        }
+        return $proceed($category);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isModuleActive()
+    {
+        //TODO also check if licence is valid and engine is integernet_solr
+        //TODO if active, ping solr service, if unsuccessful return false
+        return $this->currentStoreConfig->getGeneralConfig()->isActive();
     }
 }

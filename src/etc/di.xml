@@ -11,7 +11,9 @@
   <!--
   <preference for="Magento\Catalog\Model\ResourceModel\Layer\Filter\Attribute" type="IntegerNet\Solr\Model\Resource\Catalog\Layer\Filter\Attribute"/>
   <preference for="Magento\Catalog\Model\ResourceModel\Layer\Filter\Price" type="IntegerNet\Solr\Model\Resource\Catalog\Layer\Filter\Price"/>
+
   <preference for="Magento\CatalogSearch\Model\Layer" type="IntegerNet\Solr\Model\CatalogSearch\Layer"/>
+
   <preference for="Magento\CatalogSearch\Model\Layer\Filter\Attribute" type="IntegerNet\Solr\Model\CatalogSearch\Layer\Filter\Attribute"/>
   <preference for="Magento\Catalog\Model\Layer" type="IntegerNet\Solr\Model\Catalog\Layer"/>
   <preference for="Magento\Catalog\Model\Layer\Filter\Price" type="IntegerNet\Solr\Model\Catalog\Layer\Filter\Price"/>
@@ -20,6 +22,16 @@
   <preference for="Magento\CatalogSearch\Helper\Data" type="IntegerNet\Solr\Helper\CatalogSearch\Data"/>
   <preference for="Magento\CatalogSearch\Block\Autocomplete" type="IntegerNet\Solr\Block\Autosuggest"/>
   -->
+
+
+  <type name="Magento\Search\Model\Adminhtml\System\Config\Source\Engine">
+    <arguments>
+      <argument name="engines" xsi:type="array">
+        <item name="integernet_solr" xsi:type="string">IntegerNet_Solr</item>
+      </argument>
+    </arguments>
+  </type>
+
 
   <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
     <plugin name="storeFilterFixer" type="IntegerNet\Solr\Model\Plugin\StoreFilterFixer" />
