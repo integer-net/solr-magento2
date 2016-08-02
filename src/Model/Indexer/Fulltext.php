@@ -33,7 +33,9 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeFull()
     {
-        // TODO: Implement executeFull() method.
+        //TODO make getStockItem() in product bridge work
+        //TODO update script to add "solr_" product attributes
+        $this->solrIndexer->reindex();
     }
 
     /**
@@ -44,7 +46,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeList(array $ids)
     {
-        // TODO: Implement executeList() method.
+        $this->solrIndexer->reindex($ids);
     }
 
     /**
@@ -55,7 +57,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeRow($id)
     {
-        // TODO: Implement executeRow() method.
+        $this->executeList([$id]);
     }
 
     /**
@@ -67,6 +69,6 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function execute($ids)
     {
-        // TODO: Implement execute() method.
+        $this->executeList($ids);
     }
 }
