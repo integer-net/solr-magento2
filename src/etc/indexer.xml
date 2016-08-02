@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Indexer/etc/indexer.xsd">
+    <indexer id="integernet_solr" view_id="integernet_solr" class="\IntegerNet\Solr\Model\Indexer\Fulltext">
+        <title translate="true">IntegerNet_Solr</title>
+        <description translate="true">Solr Search Index</description>
+    </indexer>
+</config>

@@ -17,6 +17,7 @@ use Magento\Framework\App\DeploymentConfig;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Component\ComponentRegistrar;
 use Magento\Framework\Module\ModuleList;
+use Magento\Indexer\Model\Indexer\Collection as IndexerCollection;
 use Magento\TestFramework\ObjectManager;
 
 class ModuleTest extends \PHPUnit_Framework_TestCase
@@ -83,4 +84,10 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceof(\IntegerNet\Solr\Model\Bridge\AttributeRepository::class, $this->objectManager->create(AttributeRepository::class));
     }
 
+    public function testIndexerIsRegistered()
+    {
+        /** @var IndexerCollection $indexerCollection */
+        $indexerCollection = $this->objectManager->create(IndexerCollection::class);
+        $this->assertContains('integernet_solr', $indexerCollection->getColumnValues('indexer_id'));
+    }
 }
