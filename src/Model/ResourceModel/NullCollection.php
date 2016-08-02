@@ -14,7 +14,6 @@ use Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection as ProductColl
 use Magento\Customer\Api\GroupManagementInterface;
 use Magento\Framework\Api\ExtensionAttribute\JoinDataInterface;
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
-use Magento\Framework\Api\Search\SearchResultFactory;
 use Magento\Framework\Data\Collection;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Data\Collection\EntityFactoryInterface;

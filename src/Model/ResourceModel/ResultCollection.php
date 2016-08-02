@@ -9,6 +9,8 @@
  */
 
 namespace IntegerNet\Solr\Model\ResourceModel;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Data\Collection;
 use Magento\Framework\Data\Collection\EntityFactoryInterface;
 use Magento\Framework\DB\Select;
 use Psr\Log\LoggerInterface;
@@ -24,8 +26,19 @@ class ResultCollection extends NullCollection
     public function __construct(EntityFactoryInterface $entityFactory, LoggerInterface $logger, NullSelect $select)
     {
         parent::__construct($entityFactory, $logger, $select);
-        $this->_select;
+        $this->setItemObjectClass(Product::class);
     }
+
+    /**
+     * @param bool|false $printQuery
+     * @param bool|false $logQuery
+     * @return $this
+     */
+    public function load($printQuery = false, $logQuery = false)
+    {
+        return Collection::load();
+    }
+
 
     /**
      * Load the data.
@@ -37,6 +50,13 @@ class ResultCollection extends NullCollection
     public function loadData($printQuery = false, $logQuery = false)
     {
         //TODO implement
+        $this->_items = [
+            $this->getNewEmptyItem()->setData([
+                'id' => 1337,
+                'name' => 'i do not exist',
+                'url_key' => 'well_that_will_be_404',
+            ]),
+        ];
         return $this;
     }
 
@@ -53,15 +73,8 @@ class ResultCollection extends NullCollection
         return [];
     }
 
-    /**
-     * Get \Magento\Framework\DB\Select instance
-     *
-     * @return Select
-     */
-    public function getSelect()
+    public function getSize()
     {
-        return $this->_select;
+        return Collection::getSize();
     }
-
-
 }

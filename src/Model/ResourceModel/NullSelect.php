@@ -12,6 +12,10 @@ namespace IntegerNet\Solr\Model\ResourceModel;
 use Magento\Framework\DB\Select;
 use Zend_Db_Select;
 
+/**
+ * Plugins expect to get a select object from the collection. To fulfill this, the NullCollection
+ * returns this dummy object
+ */
 class NullSelect extends Select
 {
     public function __construct()

@@ -46,6 +46,8 @@ class CollectionProviderPlugin
      */
     public function aroundGetCollection(ItemCollectionProviderInterface $subject, Closure $proceed, Category $category)
     {
+        //TODO if module disabled (<=> engine != integernet_solr) return normal fulltext collection
+        //TODO ping solr service, if unsuccessful return normal fulltext collection
         return $this->_collectionFactory->create();
     }
 }
