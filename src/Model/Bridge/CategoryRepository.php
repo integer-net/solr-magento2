@@ -135,6 +135,10 @@ class CategoryRepository implements IndexCategoryRepository
             ->addAttributeToFilter('solr_exclude_children', '1');
         $parentPaths = ArrayCollection::fromArray($parentsCollection->getColumnValues(MagentoCategory::KEY_PATH))->values();
 
+        if ($parentPaths->count() === 0) {
+            return $result;
+        }
+
         $pathFilter = $parentPaths->map(function($path) {
             return ['like' => $path . '/%'];
         })->getArrayCopy();

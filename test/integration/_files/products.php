@@ -1,4 +1,5 @@
 <?php
+use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\Product\Visibility;
@@ -43,8 +44,9 @@ use Magento\Catalog\Model\Product\Visibility;
         ->save();
 
 
+    /** @var Category $category */
     $category = $objectManager->create(
-        \Magento\Catalog\Model\Category::class
+        Category::class
     );
     $category->isObjectNew(true);
     $category->setId(
@@ -61,14 +63,16 @@ use Magento\Catalog\Model\Product\Visibility;
         2
     )->setAvailableSortBy(
         ['position', 'name']
-    )->setDefaultSortBy(
-        'name'
     )->setIsActive(
         true
     )->setPosition(
         1
+    )->setIncludeInMenu(
+        true
     )->setPostedProducts(
         [333 => 10]
+    )->setDefaultSortBy(
+        'name'
     )->save();
 
 });
