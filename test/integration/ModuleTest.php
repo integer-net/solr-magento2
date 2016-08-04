@@ -14,9 +14,9 @@ use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Model\SolrStatusMessages;
 use IntegerNet\Solr\Model\StatusMessages;
 use Magento\Catalog\Api\CategoryAttributeRepositoryInterface;
-use Magento\Catalog\Api\Data\CategoryAttributeInterface;
 use Magento\Catalog\Api\Data\ProductAttributeInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
+use Magento\Eav\Api\Data\AttributeInterface;
 use Magento\Framework\App\DeploymentConfig;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Component\ComponentRegistrar;
@@ -110,7 +110,7 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         /** @var CategoryAttributeRepositoryInterface $categoryAttributesRepository */
         $categoryAttributesRepository = $this->objectManager->get(CategoryAttributeRepositoryInterface::class);
         foreach ($categoryAttributes as $attributeCode) {
-            $this->assertInstanceOf(CategoryAttributeInterface::class, $categoryAttributesRepository->get($attributeCode));
+            $this->assertInstanceOf(AttributeInterface::class, $categoryAttributesRepository->get($attributeCode));
         }
     }
 }
