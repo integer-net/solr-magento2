@@ -30,7 +30,7 @@ class VarcharProductAttributeTest extends \PHPUnit_Framework_TestCase
             EavAttributeInterface::class);
     }
 
-        /**
+    /**
      * @dataProvider dataAttributes
      * @param array $dataAttributes
      */

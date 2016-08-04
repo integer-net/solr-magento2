@@ -13,6 +13,10 @@ namespace IntegerNet\Solr;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Model\SolrStatusMessages;
 use IntegerNet\Solr\Model\StatusMessages;
+use Magento\Catalog\Api\CategoryAttributeRepositoryInterface;
+use Magento\Catalog\Api\Data\CategoryAttributeInterface;
+use Magento\Catalog\Api\Data\ProductAttributeInterface;
+use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Framework\App\DeploymentConfig;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Component\ComponentRegistrar;
@@ -89,5 +93,24 @@ class ModuleTest extends \PHPUnit_Framework_TestCase
         /** @var IndexerCollection $indexerCollection */
         $indexerCollection = $this->objectManager->create(IndexerCollection::class);
         $this->assertContains('integernet_solr', $indexerCollection->getColumnValues('indexer_id'));
+    }
+
+    public function testProductAttributesAreCreated()
+    {
+        $productAttributes = ['solr_exclude', 'solr_boost'];
+        /** @var ProductAttributeRepositoryInterface $productAttributesRepository */
+        $productAttributesRepository = $this->objectManager->get(ProductAttributeRepositoryInterface::class);
+        foreach ($productAttributes as $attributeCode) {
+            $this->assertInstanceOf(ProductAttributeInterface::class, $productAttributesRepository->get($attributeCode));
+        }
+    }
+    public function testCategoryAttributesAreCreated()
+    {
+        $categoryAttributes = ['solr_exclude', 'solr_exclude_children', 'solr_remove_filters'];
+        /** @var CategoryAttributeRepositoryInterface $categoryAttributesRepository */
+        $categoryAttributesRepository = $this->objectManager->get(CategoryAttributeRepositoryInterface::class);
+        foreach ($categoryAttributes as $attributeCode) {
+            $this->assertInstanceOf(CategoryAttributeInterface::class, $categoryAttributesRepository->get($attributeCode));
+        }
     }
 }
