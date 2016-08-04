@@ -140,6 +140,19 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedSearchableValue, $productBridge->getSearchableAttributeValue($attributeStub));
     }
 
+    public function testEmptyCustomAttribute()
+    {
+        $storeId = 0;
+        $attributeCode = 'anything';
+
+        $this->magentoProductStub->method('getCustomAttribute')
+            ->with($attributeCode)
+            ->willReturn(null);
+
+        $productBridge = $this->makeProductBridge($storeId);
+        $this->assertNull($productBridge->getAttributeValue(AttributeStub::sortableString($attributeCode)));
+    }
+
     /**
      * @dataProvider dataIndexable
      * @param $storeAndWebsiteId

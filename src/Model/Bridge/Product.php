@@ -139,7 +139,11 @@ class Product implements ProductInterface
         if (\method_exists($product, $method)) {
             return $product->$method();
         }
-        return $this->getMagentoProduct()->getCustomAttribute($attributeCode)->getValue();
+        $magentoAttribute = $this->getMagentoProduct()->getCustomAttribute($attributeCode);
+        if ($magentoAttribute === null) {
+            return null;
+        }
+        return $magentoAttribute->getValue();
     }
 
     /**

@@ -150,7 +150,7 @@ class Config implements ConfigInterface
     public function getServerConfig()
     {
         if ($this->server === null) {
-            $prefix = 'integernet_solr/general/';
+            $prefix = 'integernet_solr/server/';
             $this->server = new ServerConfig(
                 $this->_getConfig($prefix . 'host'),
                 $this->_getConfig($prefix . 'port'),
