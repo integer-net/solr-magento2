@@ -34,7 +34,6 @@ class Fulltext implements ActionInterface, MviewActionInterface
     public function executeFull()
     {
         //TODO make getStockItem() in product bridge work
-        //TODO update script to add "solr_" product attributes
         $this->solrIndexer->reindex();
     }
 

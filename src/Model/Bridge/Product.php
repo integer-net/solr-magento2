@@ -14,6 +14,9 @@ use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\CatalogInventory\Api\StockItemRepositoryInterface;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Event\ManagerInterface;
 
 class Product implements ProductInterface

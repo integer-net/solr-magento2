@@ -10,26 +10,23 @@
 
 namespace IntegerNet\Solr\Model\Bridge;
 
+use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\PagedProductIterator as PagedProductIteratorInterface;
+use IntegerNet\Solr\Implementor\PagedProductIteratorFactory as PagedProductIteratorInterfaceFactory;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use IntegerNet\Solr\Implementor\ProductIterator as ProductIteratorInterface;
 use IntegerNet\Solr\Implementor\ProductIteratorFactory as ProductIteratorInterfaceFactory;
-use IntegerNet\Solr\Implementor\PagedProductIteratorFactory as PagedProductIteratorInterfaceFactory;
 use IntegerNet\Solr\Implementor\ProductRepository as ProductRepositoryInterface;
-use IntegerNet\Solr\Model\SearchCriteria\ProductSearchCriteriaBuilder;
 use Magento\Catalog\Api\ProductRepositoryInterface as MagentoProductRepository;
+use Magento\Catalog\Model\Config as CatalogConfig;
+use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Magento\CatalogInventory\Model\ResourceModel\Stock\Status as StockStatus;
+use Magento\CatalogInventory\Model\ResourceModel\Stock\StatusFactory as StockStatusFactory;
 use Magento\ConfigurableProduct\Api\LinkManagementInterface;
 
 class ProductRepository implements ProductRepositoryInterface
 {
-    /**
-     * @var MagentoProductRepository
-     */
-    private $productRepository;
-    /**
-     * @var ProductSearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
     /**
      * @var ProductIteratorInterfaceFactory
      */
@@ -46,25 +43,47 @@ class ProductRepository implements ProductRepositoryInterface
      * @var PagedProductIteratorInterfaceFactory
      */
     private $pagedIteratorFactory;
+    /**
+     * @var ProductCollectionFactory
+     */
+    private $collectionFactory;
+    /**
+     * @var StockStatusFactory
+     */
+    private $stockStatusFactory;
+    /**
+     * @var AttributeRepository
+     */
+    private $attributeRepository;
+    /**
+     * @var CatalogConfig
+     */
+    private $catalogConfig;
 
     /**
-     * @param MagentoProductRepository $productRepository
      * @param LinkManagementInterface $productLinkManagement
      * @param ProductIteratorInterfaceFactory $iteratorFactory
      * @param PagedProductIteratorInterfaceFactory $pagedIteratorFactory
-     * @param ProductSearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ProductCollectionFactory $collectionFactory
+     * @param StockStatusFactory $stockStatusFactory
+     * @param AttributeRepository $attributeRepository
+     * @param Config $catalogConfig
      */
-    public function __construct(MagentoProductRepository $productRepository,
-                                LinkManagementInterface $productLinkManagement,
+    public function __construct(LinkManagementInterface $productLinkManagement,
                                 ProductIteratorInterfaceFactory $iteratorFactory,
                                 PagedProductIteratorInterfaceFactory $pagedIteratorFactory,
-                                ProductSearchCriteriaBuilder $searchCriteriaBuilder)
+                                ProductCollectionFactory $collectionFactory,
+                                StockStatusFactory $stockStatusFactory,
+                                AttributeRepository $attributeRepository,
+                                CatalogConfig $catalogConfig)
     {
-        $this->productRepository = $productRepository;
         $this->productLinkManagement = $productLinkManagement;
         $this->iteratorFactory = $iteratorFactory;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->pagedIteratorFactory = $pagedIteratorFactory;
+        $this->collectionFactory = $collectionFactory;
+        $this->stockStatusFactory = $stockStatusFactory;
+        $this->attributeRepository = $attributeRepository;
+        $this->catalogConfig = $catalogConfig;
     }
 
     /**
@@ -88,12 +107,25 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function getProductsForIndex($storeId, $productIds = null)
     {
-        $searchCriteriaBuilder = $this->searchCriteriaBuilder->forStore($storeId);
+        $productAttributes = array_unique(array_merge(
+            $this->catalogConfig->getProductAttributes(),
+            array('visibility', 'status', 'url_key', 'solr_boost', 'solr_exclude'),
+            $this->attributeRepository->getAttributeCodesToIndex()
+        ));
+
+        $collection = $this->collectionFactory->create();
+        $collection->addStoreFilter($storeId);
+        $collection->addMinimalPrice();
+        $collection->addFinalPrice();
+        $collection->addTaxPercents();
+        $collection->addUrlRewrite();
+        $collection->addAttributeToSelect($productAttributes);
         if ($productIds !== null) {
-            $searchCriteriaBuilder = $searchCriteriaBuilder->withIds($productIds);
+            $collection->addIdFilter($productIds);
         }
-        $products = $this->productRepository->getList($searchCriteriaBuilder->create())->getItems();
-        return $this->createProductIterator($storeId, $products);
+        $this->addStockDataWithoutFilter($collection);
+
+        return $this->createProductIterator($storeId, $collection->getItems());
         //TODO use PagedProductIterator with lazy loading (at least if count($productIds)>$pageSize)
     }
 
@@ -101,7 +133,7 @@ class ProductRepository implements ProductRepositoryInterface
      * Return product iterator for child products
      *
      * @param ProductInterface|Product $parent The composite parent product. Child products will be returned that are visible in the same store and with store specific values
-     * @return ProductIterator
+     * @return ProductIteratorInterface
      */
     public function getChildProducts(ProductInterface $parent)
     {
@@ -122,5 +154,27 @@ class ProductRepository implements ProductRepositoryInterface
         ]);
     }
 
+    /**
+     * @return StockStatus
+     */
+    protected function getStockStatusResource()
+    {
+        if (empty($this->stockStatusResource)) {
+            $this->stockStatusResource = $this->stockStatusFactory->create();
+        }
+        return $this->stockStatusResource;
+    }
 
+    /**
+     * @param $collection
+     */
+    private function addStockDataWithoutFilter(ProductCollection $collection)
+    {
+        $stockFlag = 'has_stock_status_filter';
+        if (!$collection->hasFlag($stockFlag)) {
+            $resource = $this->getStockStatusResource();
+            $resource->addStockDataToCollection($collection, false);
+            $collection->setFlag($stockFlag, true);
+        }
+    }
 }
