@@ -85,7 +85,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($productData['price'], $productBridge->getPrice(), 'price');
         $this->assertEquals($productData['category_ids'], $productBridge->getCategoryIds(), 'category_ids');
 
-        $this->assertEquals($expectedHasSpecialPrice, $productBridge->hasSpecialPrice(), 'has_special_price');
+        $this->assertSame($expectedHasSpecialPrice, $productBridge->hasSpecialPrice(), 'has_special_price');
     }
     public static function dataCoreAttributes()
     {
@@ -98,7 +98,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
                     'solr_boost' => 1.5,
                     'category_ids' => [1,2,3]
                 ],
-                'expected_has_special_price' => false
+                'expected_has_special_price' => 0
             ],
             [
                 'store_id' => 1,
@@ -109,7 +109,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
                     'solr_boost' => 1.5,
                     'category_ids' => [1,2,3]
                 ],
-                'expected_has_special_price' => true
+                'expected_has_special_price' => 1
             ],
         ];
     }
@@ -174,14 +174,9 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
         $storeStub->method('getWebsiteId')->willReturn($storeAndWebsiteId);
 
-        $stockItemStub = $this->getMockBuilder(StockItemInterface::class)
-            ->setMethods(['getIsInStock'])
-            ->getMockForAbstractClass();
-        $stockItemStub->method('getIsInStock')->willReturn($inStock);
         $extensionAttributesStub = $this->getMockBuilder(ProductExtensionInterface::class)
             ->setMethods(['getStockItem', 'getSolrExclude'])
             ->getMockForAbstractClass();
-        $extensionAttributesStub->method('getStockItem')->willReturn($stockItemStub);
         $extensionAttributesStub->method('getSolrExclude')->willReturn($solrExclude);
 
         $this->magentoProductStub->method('getStatus')->willReturn($status);
@@ -189,6 +184,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->magentoProductStub->method('getStore')->willReturn($storeStub);
         $this->magentoProductStub->method('getWebsiteIds')->willReturn($websiteIds);
         $this->magentoProductStub->method('getExtensionAttributes')->willReturn($extensionAttributesStub);
+        $this->magentoProductStub->method('getData')->with('is_salable')->willReturn($inStock);
 
         $productBridge = $this->makeProductBridge($storeAndWebsiteId);
         $this->assertEquals($expectedResult, $productBridge->isIndexable());

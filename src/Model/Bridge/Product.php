@@ -89,7 +89,8 @@ class Product implements ProductInterface
         if (! \in_array($this->magentoProduct->getStore()->getWebsiteId(), $this->magentoProduct->getWebsiteIds())) {
             return false;
         }
-        if (! $this->getMagentoProduct()->getExtensionAttributes()->getStockItem()->getIsInStock()) {
+        // stock status joined on collection does not give stock item, just is_salable
+        if (! $this->magentoProduct->getData('is_salable')) {
             return false;
         }
         if ($this->getMagentoProduct()->getExtensionAttributes()->getSolrExclude()) {
@@ -169,7 +170,7 @@ class Product implements ProductInterface
 
     public function hasSpecialPrice()
     {
-        return $this->magentoProduct->getFinalPrice() < $this->getMagentoProduct()->getPrice();
+        return (int) ($this->magentoProduct->getFinalPrice() < $this->getMagentoProduct()->getPrice());
     }
 
     /**
