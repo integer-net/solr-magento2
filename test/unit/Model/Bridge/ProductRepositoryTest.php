@@ -1,19 +1,18 @@
 <?php
 namespace IntegerNet\Solr\Model\Bridge;
 
+use IntegerNet\Solr\Implementor\PagedProductIteratorFactory;
 use IntegerNet\Solr\Implementor\ProductFactory;
 use IntegerNet\Solr\Implementor\ProductIteratorFactory;
-use IntegerNet\Solr\Implementor\PagedProductIteratorFactory;
-use IntegerNet\Solr\Model\SearchCriteria\ProductSearchCriteriaBuilder;
-use IntegerNet\Solr\TestUtil\Traits\SearchCriteriaBuilderMock;
-use IntegerNet\Solr\TestUtil\Traits\SearchResultsMock;
 use Magento\Catalog\Api\ProductRepositoryInterface as MagentoProductRepository;
+use Magento\Catalog\Model\Config;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Magento\CatalogInventory\Model\ResourceModel\Stock\Status as StockStatus;
+use Magento\CatalogInventory\Model\ResourceModel\Stock\StatusFactory as StockStatusFactory;
 use Magento\ConfigurableProduct\Api\LinkManagementInterface;
-use Magento\Framework\Api\SearchCriteria;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Event\ManagerInterface;
 
 /**
@@ -21,21 +20,26 @@ use Magento\Framework\Event\ManagerInterface;
  */
 class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
 {
-    use SearchCriteriaBuilderMock;
-    use SearchResultsMock;
-
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|MagentoProductRepository
+     * @var \PHPUnit_Framework_MockObject_MockObject|StockStatus
      */
-    private $magentoProductRepositoryMock;
+    private $stockStatusMock;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ProductCollection\
+     */
+    private $collectionMock;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|AttributeRepository
+     */
+    private $attributeRepositoryStub;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|Config
+     */
+    private $catalogConfigStub;
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|LinkManagementInterface
      */
     private $linkManagementMock;
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilderMock;
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|ProductIteratorFactory
      */
@@ -45,35 +49,32 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     private $pagedProductIteratorFactoryMock;
     /**
-     * @var ProductSearchCriteriaBuilder
-     */
-    private $productSearchCriteriaBuilder;
-    /**
      * @var ProductRepository
      */
     private $productRepository;
 
     protected function setUp()
     {
-        $this->magentoProductRepositoryMock = $this->getMockBuilder(MagentoProductRepository::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getList'])
-            ->getMockForAbstractClass();
         $this->linkManagementMock = $this->getMockBuilder(LinkManagementInterface::class)
-            ->disableOriginalConstructor()
             ->setMethods(['getChildren'])
             ->getMockForAbstractClass();
-        $this->searchCriteriaBuilderMock = $this->getSearchCriteriaBuilderMock();
-        $this->productSearchCriteriaBuilder = new ProductSearchCriteriaBuilder($this->mockSearchCriteriaBuilderFactory($this->searchCriteriaBuilderMock));
-        $this->productIteratorFactoryMock = $this->mockProductIteratorFactory();
+        $this->productIteratorFactoryMock = $this->stubProductIteratorFactory();
         $this->pagedProductIteratorFactoryMock = $this->mockPagedProductIteratorFactory();
+        $this->attributeRepositoryStub = $this->getMockBuilder(AttributeRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->catalogConfigStub = $this->getMockBuilder(Config::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->productRepository = new ProductRepository(
-            $this->magentoProductRepositoryMock,
             $this->linkManagementMock,
             $this->productIteratorFactoryMock,
             $this->pagedProductIteratorFactoryMock,
-            $this->productSearchCriteriaBuilder
+            $this->stubProductCollectionFactory(),
+            $this->stubStockStatusFactory(),
+            $this->attributeRepositoryStub,
+            $this->catalogConfigStub
         );
 
     }
@@ -89,14 +90,13 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testProductsForIndex($storeId, $productIds)
     {
         $productsInSearchResult = $this->mockProducts($productIds);
-        $searchCriteriaDummy = new SearchCriteria();
-        $this->magentoProductRepositoryMock->expects($this->once())
-            ->method('getList')
-            ->with($this->identicalTo($searchCriteriaDummy))
-            ->willReturn($this->mockSearchResults($productsInSearchResult));
-        $this->searchCriteriaBuilderExpects(
-            $this->searchCriteriaBuilderMock,
-            [['store_id', $storeId], ['entity_id', $productIds, 'in']], null, $searchCriteriaDummy);
+        $this->catalogConfigStub->method('getProductAttributes')->willReturn(['name', 'description']);
+        $this->attributeRepositoryStub->method('getAttributeCodesToIndex')->willReturn(['meta_description']);
+        $this->collectionMock->expects($this->once())
+            ->method('addAttributeToSelect')
+            ->with(['name', 'description', 'visibility', 'status', 'url_key', 'solr_boost', 'solr_exclude', 'meta_description']);
+        $this->collectionMock->method('getItems')
+            ->willReturn($productsInSearchResult);
 
         $actualResult = $this->productRepository->getProductsForIndex($storeId, $productIds);
         $actualResult->setPageCallback($this->mockCallback(1));
@@ -145,19 +145,19 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ProductIteratorFactory
      */
-    protected function mockProductIteratorFactory()
+    protected function stubProductIteratorFactory()
     {
-        $productIteratorFactoryMock = $this->getMockBuilder(ProductIteratorFactory::class)
+        $productIteratorFactoryStub = $this->getMockBuilder(ProductIteratorFactory::class)
             ->setMethods(['create'])
             ->disableOriginalConstructor()
             ->getMock();
-        $productIteratorFactoryMock->method('create')->willReturnCallback(function($data) {
+        $productIteratorFactoryStub->method('create')->willReturnCallback(function($data) {
             return new ProductIterator(
                 $this->mockProductFactory(),
                 $data[ProductIterator::PARAM_MAGENTO_PRODUCTS],
                 $data[ProductIterator::PARAM_STORE_ID]);
         });
-        return $productIteratorFactoryMock;
+        return $productIteratorFactoryStub;
     }
 
     protected function mockPagedProductIteratorFactory()
@@ -168,7 +168,7 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $productIteratorFactoryMock->method('create')->willReturnCallback(function($data) {
             return new PagedProductIterator(
-                $this->mockCollectionFactory(),
+                $this->stubProductCollectionFactory(),
                 $this->mockProductFactory(),
                 $data[PagedProductIterator::PARAM_PRODUCT_ID_FILTER],
                 $data[PagedProductIterator::PARAM_PAGE_SIZE],
@@ -244,14 +244,17 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    private function mockCollectionFactory()
+    private function stubProductCollectionFactory()
     {
-        $collectionFactoryMock = $this->getMockBuilder(CollectionFactory::class)
+        $this->collectionMock = $this->getMockBuilder(ProductCollection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $productCollectionFactoryStub = $this->getMockBuilder(ProductCollectionFactory::class)
             ->setMethods(['create'])
             ->disableOriginalConstructor()
             ->getMock();
-        //TODO mock create() if needed
-        return $collectionFactoryMock;
+        $productCollectionFactoryStub->method('create')->willReturn($this->collectionMock);
+        return $productCollectionFactoryStub;
     }
 
     /**
@@ -265,6 +268,19 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $callbackMock->expects($this->exactly($callbackCount))->method('__invoke');
         return $callbackMock;
+    }
+
+    private function stubStockStatusFactory()
+    {
+        $this->stockStatusMock = $this->getMockBuilder(StockStatus::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stockStatusFactoryStub = $this->getMockBuilder(StockStatusFactory::class)
+            ->setMethods(['create'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stockStatusFactoryStub->method('create')->willReturn($this->stockStatusMock);
+        return $stockStatusFactoryStub;
     }
 
 }

@@ -10,7 +10,7 @@
 
 namespace IntegerNet\Solr\Model\Bridge;
 
-use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
 use IntegerNet\Solr\Implementor\PagedProductIterator as PagedProductIteratorInterface;
 use IntegerNet\Solr\Implementor\PagedProductIteratorFactory as PagedProductIteratorInterfaceFactory;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
@@ -52,7 +52,7 @@ class ProductRepository implements ProductRepositoryInterface
      */
     private $stockStatusFactory;
     /**
-     * @var AttributeRepository
+     * @var AttributeRepositoryInterface
      */
     private $attributeRepository;
     /**
@@ -66,7 +66,7 @@ class ProductRepository implements ProductRepositoryInterface
      * @param PagedProductIteratorInterfaceFactory $pagedIteratorFactory
      * @param ProductCollectionFactory $collectionFactory
      * @param StockStatusFactory $stockStatusFactory
-     * @param AttributeRepository $attributeRepository
+     * @param AttributeRepositoryInterface $attributeRepository
      * @param Config $catalogConfig
      */
     public function __construct(LinkManagementInterface $productLinkManagement,
@@ -74,7 +74,7 @@ class ProductRepository implements ProductRepositoryInterface
                                 PagedProductIteratorInterfaceFactory $pagedIteratorFactory,
                                 ProductCollectionFactory $collectionFactory,
                                 StockStatusFactory $stockStatusFactory,
-                                AttributeRepository $attributeRepository,
+                                AttributeRepositoryInterface $attributeRepository,
                                 CatalogConfig $catalogConfig)
     {
         $this->productLinkManagement = $productLinkManagement;
