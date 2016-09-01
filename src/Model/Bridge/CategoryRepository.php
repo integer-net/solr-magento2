@@ -12,7 +12,7 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 
 use IntegerNet\Solr\Implementor\IndexCategoryRepository;
-use IntegerNet\Solr\Implementor\Product;
+use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use IntegerNet\Solr\Indexer\Data\CategoryPositionCollection;
 use IntegerNet\Solr\Model\Data\ArrayCollection;
 use IntegerNet\Solr\Model\ResourceModel\CategoryPosition;
@@ -78,7 +78,7 @@ class CategoryRepository implements IndexCategoryRepository
     /**
      * Get category ids of assigned categories and all parents and without excluded categories
      *
-     * @param Product $product
+     * @param ProductInterface $product
      * @return int[]
      */
     public function getCategoryIds($product)
@@ -109,7 +109,7 @@ class CategoryRepository implements IndexCategoryRepository
     /**
      * Retrieve product category identifiers
      *
-     * @param Product $product
+     * @param ProductInterface $product
      * @return CategoryPositionCollection
      */
     public function getCategoryPositions($product)
