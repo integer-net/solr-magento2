@@ -26,7 +26,7 @@ build:
           echo memory_limit=-1 >> /usr/local/etc/php/php.ini
           git checkout -b tmp
           git add -A
-          git commit -m "tmp"
+          git commit --allow-empty -m "tmp"
           export MODULE_DIR=`pwd`
           export M2SETUP_DB_HOST=$MYSQL_PORT_3306_TCP_ADDR
           export M2SETUP_DB_USER=root
