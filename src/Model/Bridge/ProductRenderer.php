@@ -10,7 +10,7 @@
 
 namespace IntegerNet\Solr\Model\Bridge;
 
-use IntegerNet\Solr\Implementor\Product;
+use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use IntegerNet\Solr\Implementor\ProductRenderer as ProductRendererInterface;
 use IntegerNet\Solr\Indexer\IndexDocument;
 
@@ -22,11 +22,11 @@ class ProductRenderer implements ProductRendererInterface
      *  - result_html_list_nonindex - Block in list view (only if $useHtmlInResults is true)
      *  - result_html_grid_nonindex - Block in grid view (only if $useHtmlInResults is true)
      *
-     * @param Product $product
+     * @param ProductInterface $product
      * @param IndexDocument $productData
      * @param bool $useHtmlInResults
      */
-    public function addResultHtmlToProductData(Product $product, IndexDocument $productData, $useHtmlInResults)
+    public function addResultHtmlToProductData(ProductInterface $product, IndexDocument $productData, $useHtmlInResults)
     {
         // TODO: Implement addResultHtmlToProductData() method.
     }
