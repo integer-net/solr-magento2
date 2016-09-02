@@ -170,7 +170,7 @@
         </field>
         <field id="use_custom_price_intervals" translate="label,comment" sortOrder="50" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Use Custom Price Intervals</label>
-          <comment>Needs Solr 4.10+ and Magento CE 1.7+ / Magento EE 1.12+</comment>
+          <comment>Needs Solr 4.10+</comment>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
         <field id="custom_price_intervals" translate="label,comment" sortOrder="60" type="text" showInDefault="1" showInWebsite="1" showInStore="1">

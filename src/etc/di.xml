@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
   <preference for="IntegerNet\Solr\Model\StatusMessages" type="IntegerNet\Solr\Model\SolrStatusMessages" />
+  <preference for="IntegerNet\Solr\Implementor\SolrRequestFactory" type="IntegerNet\Solr\Model\Bridge\RequestFactory" />
   <preference for="IntegerNet\Solr\Implementor\AttributeRepository" type="IntegerNet\Solr\Model\Bridge\AttributeRepository" />
   <preference for="IntegerNet\Solr\Implementor\IndexCategoryRepository" type="IntegerNet\Solr\Model\Bridge\CategoryRepository" />
   <preference for="IntegerNet\Solr\Implementor\ProductRepository" type="IntegerNet\Solr\Model\Bridge\ProductRepository" />
@@ -35,6 +36,37 @@
     </arguments>
   </type>
 
+  <!-- IntegerNet_Solr search adapter, only used if HTML is not stored in solr (i.e. we only receive product ids from Solr) -->
+  <type name="Magento\Search\Model\AdapterFactory">
+    <arguments>
+      <argument name="adapters" xsi:type="array">
+        <item name="integernet_solr" xsi:type="string">IntegerNet\Solr\Model\Search\Adapter\SolrAdapter</item>
+      </argument>
+    </arguments>
+  </type>
+
+  <!-- for indexing, we do not use Magentos search engine provider, so this is the same class as for "mysql" -->
+  <type name="Magento\CatalogSearch\Model\ResourceModel\EngineProvider">
+    <arguments>
+      <argument name="engines" xsi:type="array">
+        <item name="integernet_solr" xsi:type="string">Magento\CatalogSearch\Model\ResourceModel\Engine</item>
+      </argument>
+    </arguments>
+  </type>
+  <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
+    <arguments>
+      <argument name="handlers" xsi:type="array">
+        <item name="integernet_solr" xsi:type="string">Magento\CatalogSearch\Model\Indexer\IndexerHandler</item>
+      </argument>
+    </arguments>
+  </type>
+  <type name="Magento\CatalogSearch\Model\Indexer\IndexStructureFactory">
+    <arguments>
+      <argument name="structures" xsi:type="array">
+        <item name="integernet_solr" xsi:type="string">Magento\CatalogSearch\Model\Indexer\IndexStructure</item>
+      </argument>
+    </arguments>
+  </type>
 
   <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
     <plugin name="storeFilterFixer" type="IntegerNet\Solr\Model\Plugin\StoreFilterFixer" />
