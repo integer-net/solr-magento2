@@ -14,6 +14,9 @@ use Magento\Framework\Search\AdapterInterface;
 use Magento\Framework\Search\RequestInterface;
 use Magento\Framework\Search\Response\QueryResponse;
 
+/**
+ * Custom search adapter, only used in non-HTML mode (fetch ids from solr, load products from Magento)
+ */
 class SolrAdapter implements AdapterInterface
 {
     /**
@@ -43,27 +46,19 @@ class SolrAdapter implements AdapterInterface
      */
     public function query(RequestInterface $request)
     {
-        //TODO transform response into (docs, aggregates) using SolrResponse interface and separate class
+        return $this->responseFactory->create(
+            Response::fromSolrResponse($this->doRequest())->toArray()
+        );
+    }
 
-        $solrResponse = $this->requestFactory->getSolrRequest(SolrRequestFactory::REQUEST_MODE_SEARCH)->doRequest();
-
-        $response = [
-            'documents' => [
-            ],
-            'aggregations' => [
-                'manufacturer_bucket' => [],
-                'category_bucket' => []
-            ],
-        ];
-        $count = count($solrResponse->response->docs);
-        foreach ($solrResponse->response->docs as $doc) {
-            $response['documents'][] =
-            [
-                'entity_id' => $doc->product_id,
-                'score' => new \Zend_Db_Expr("(@score := ifnull(@score, $count) - 1)"),
-            ];
-        }
-        return $this->responseFactory->create($response);
+    /**
+     * @return \IntegerNet\Solr\Resource\SolrResponse
+     */
+    private function doRequest()
+    {
+        return $this->requestFactory->getSolrRequest(
+            SolrRequestFactory::REQUEST_MODE_SEARCH
+        )->doRequest();
     }
 
 }
