@@ -52,7 +52,7 @@ class SolrAdapter implements AdapterInterface
     }
 
     /**
-     * @return \IntegerNet\Solr\Resource\SolrResponse
+     * @return \IntegerNet\Solr\Response\Response
      */
     private function doRequest()
     {

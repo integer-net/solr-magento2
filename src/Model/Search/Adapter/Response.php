@@ -9,12 +9,13 @@
  */
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
-use IntegerNet\Solr\Resource\SolrResponse;
+use IntegerNet\Solr\Response\Response as SolrResponse;
 
 /**
  * Converts response from Solr library to array format used by Magento
  *
  * @see \Magento\Framework\Search\Adapter\Mysql\ResponseFactory::create()
+ * @todo remove leaking abstraction from Apache_Solr_Resposne
  */
 class Response
 {
@@ -51,7 +52,7 @@ class Response
                 'category_bucket' => []
             ],
         ];
-        $score = $count = count($this->solrResponse->response->docs);
+        $score = $count = $this->solrResponse->getDocumentCount();
         foreach ($this->solrResponse->response->docs as $doc) {
             $response['documents'][] =
                 [

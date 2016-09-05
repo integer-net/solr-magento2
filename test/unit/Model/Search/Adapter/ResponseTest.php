@@ -12,8 +12,7 @@ namespace IntegerNet\Solr\Model\Search\Adapter;
 
 
 use IntegerNet\Solr\Request\FakeRequest;
-use IntegerNet\Solr\Resource\ResponseDecorator;
-use IntegerNet\Solr\Resource\SolrResponse;
+use IntegerNet\Solr\Response\Response as SolrResponse;
 
 class ResponseTest extends \PHPUnit_Framework_TestCase
 {
