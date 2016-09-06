@@ -47,8 +47,10 @@ class ResponseWithProductIds
             'documents' => [
             ],
             'aggregations' => [
+                //TODO read from solrResponse->facet_counts->facet_fields
+                'price_bucket' => [],
+                'category_bucket' => [],
                 'manufacturer_bucket' => [],
-                'category_bucket' => []
             ],
         ];
         $score = $count = $this->solrResponse->documents()->count();

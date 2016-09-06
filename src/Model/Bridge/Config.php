@@ -110,6 +110,14 @@ class Config implements ConfigInterface
     }
 
     /**
+     * @return int
+     */
+    public function getStoreId()
+    {
+        return $this->storeId;
+    }
+
+    /**
      * Returns required module independent store configuration
      *
      * @return StoreConfig

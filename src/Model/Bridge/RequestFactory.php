@@ -9,12 +9,57 @@
  */
 namespace IntegerNet\Solr\Model\Bridge;
 
+use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\Solr\Implementor\EventDispatcher;
+use IntegerNet\Solr\Implementor\HasUserQuery;
 use IntegerNet\Solr\Implementor\SolrRequestFactory;
+use IntegerNet\Solr\Model\Config\CurrentStoreConfig;
+use IntegerNet\Solr\Model\Config\FrontendStoresConfig;
+use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\Request;
+use IntegerNet\Solr\Request\SearchRequestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
+use Psr\Log\LoggerInterface;
 
 class RequestFactory implements SolrRequestFactory
 {
+    /**
+     * @var CurrentStoreConfig
+     */
+    private $storeConfig;
+    /**
+     * @var AttributeRepository
+     */
+    private $attributeRepository;
+    /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+    /**
+     * @var SearchRequest
+     */
+    private $searchRequest;
+
+    /**
+     * @param CurrentStoreConfig $storeConfig
+     * @param AttributeRepository $attributeRepository
+     * @param EventDispatcher $eventDispatcher
+     * @param LoggerInterface $logger
+     */
+    public function __construct(CurrentStoreConfig $storeConfig, AttributeRepository $attributeRepository,
+                                EventDispatcher $eventDispatcher, LoggerInterface $logger, SearchRequest $searchRequest)
+    {
+        $this->storeConfig = $storeConfig;
+        $this->attributeRepository = $attributeRepository;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->logger = $logger;
+        $this->searchRequest = $searchRequest;
+    }
+
     /**
      * Returns new configured Solr recource
      *
@@ -23,7 +68,7 @@ class RequestFactory implements SolrRequestFactory
      */
     public function getSolrResource()
     {
-        // TODO: Implement getSolrResource() method.
+        return new ResourceFacade([$this->storeConfig->getStoreId() => $this->storeConfig]);
     }
 
     /**
@@ -34,7 +79,23 @@ class RequestFactory implements SolrRequestFactory
      */
     public function getSolrRequest($requestMode = self::REQUEST_MODE_AUTODETECT)
     {
-        // TODO: Implement getSolrRequest() method.
+        //TODO implement different modes
+        //TODO possibly use Magentos DI with virtual types for ApplicationContext
+        $applicationContext = new ApplicationContext(
+            $this->attributeRepository,
+            $this->storeConfig->getResultsConfig(),
+            $this->storeConfig->getAutosuggestConfig(),
+            $this->eventDispatcher,
+            $this->logger
+        );
+        $applicationContext->setFuzzyConfig($this->storeConfig->getFuzzySearchConfig());
+        $applicationContext->setQuery($this->searchRequest);
+        $factory = new SearchRequestFactory(
+            $applicationContext,
+            $this->getSolrResource(),
+            $this->storeConfig->getStoreId()
+        );
+        return $factory->createRequest();
     }
 
 }

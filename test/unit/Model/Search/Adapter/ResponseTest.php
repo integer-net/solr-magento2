@@ -56,8 +56,9 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                     'aggregations' => [
+                        'price_bucket' => [],
+                        'category_bucket' => [],
                         'manufacturer_bucket' => [],
-                        'category_bucket' => []
                     ],
                 ]
             ]
