@@ -24,8 +24,8 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     public function testResponseAsArray($solrResponse, array $expectedArray)
     {
         $solrResponse = $this->fakeResponse($solrResponse);
-        $response = Response::fromSolrResponse($solrResponse);
-        $this->assertInstanceOf(Response::class, $response);
+        $response = ResponseWithProductIds::fromSolrResponse($solrResponse);
+        $this->assertInstanceOf(ResponseWithProductIds::class, $response);
         $this->assertEquals($expectedArray, $response->toArray());
     }
     public static function dataResponseAsArray()

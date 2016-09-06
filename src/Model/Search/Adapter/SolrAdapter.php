@@ -47,7 +47,7 @@ class SolrAdapter implements AdapterInterface
     public function query(RequestInterface $request)
     {
         return $this->responseFactory->create(
-            Response::fromSolrResponse($this->doRequest())->toArray()
+            ResponseWithProductIds::fromSolrResponse($this->doRequest())->toArray()
         );
     }
 
