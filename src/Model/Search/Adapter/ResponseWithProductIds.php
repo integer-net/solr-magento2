@@ -47,12 +47,32 @@ class ResponseWithProductIds
             'documents' => [
             ],
             'aggregations' => [
-                //TODO read from solrResponse->facet_counts->facet_fields
                 'price_bucket' => [],
-                'category_bucket' => [],
-                'manufacturer_bucket' => [],
             ],
         ];
+        foreach ($this->solrResponse->facet_counts->facet_intervals->price_f as $priceInterval => $count) {
+            if ($count == 0) {
+                continue;
+            }
+            preg_match('{[\(\[]([\d.*]+),([\d.*]+)[\)\]]}', $priceInterval, $matches);
+            list ( ,$priceFrom, $priceTo) = $matches;
+            $priceInterval = sprintf("%s_%s", $priceFrom == '*' ? $priceFrom : 1 * $priceFrom, $priceTo == '*' ? $priceTo : 1 * $priceTo);
+            $response['aggregations']['price_bucket'][$priceInterval] = [
+                'value' => $priceInterval,
+                'count' => $count,
+            ];
+        }
+        foreach ($this->solrResponse->facet_counts->facet_fields as $field => $counts) {
+            $field = preg_replace('{(_facet)?$}', '_bucket', $field, 1);
+            $response['aggregations'][$field] = [];
+            foreach ($counts as $value => $count) {
+                $response['aggregations'][$field][$value] = [
+                    'value' => $value,
+                    'count' => $count,
+                    ];
+            }
+        }
+
         $score = $count = $this->solrResponse->documents()->count();
         foreach ($this->solrResponse->documents() as $document) {
             $response['documents'][] =

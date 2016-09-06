@@ -39,8 +39,34 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
                                 'product_id' => 13,
                             ],
                             [
-                                'product_id' => 37,
+                                'product_id' => 3,
                             ],
+                            [
+                                'product_id' => 7,
+                            ],
+                        ]
+                    ],
+                    'facet_counts' => [
+                        'facet_fields' => [
+                            'category' => [
+                                3 => 3,
+                                31 => 1,
+                                32 => 2,
+                            ],
+                            'manufacturer_facet' => [
+                                100 => 1,
+                                101 => 1,
+                            ]
+                        ],
+                        'facet_intervals' => [
+                            'price_f' => [
+                                '(0.000000,10.000000]' => 0,
+                                '(10.000000,20.000000]' => 0,
+                                '(20.000000,30.000000]' => 0,
+                                '(30.000000,40.000000]' => 1,
+                                '(40.000000,50.000000]' => 0,
+                                '(50.000000,*]' => 2,
+                            ]
                         ]
                     ]
                 ]),
@@ -48,17 +74,52 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
                     'documents' => [
                         [
                             'entity_id' => 13,
+                            'score' => 3,
+                        ],
+                        [
+                            'entity_id' => 3,
                             'score' => 2,
                         ],
                         [
-                            'entity_id' => 37,
+                            'entity_id' => 7,
                             'score' => 1,
                         ],
                     ],
                     'aggregations' => [
-                        'price_bucket' => [],
-                        'category_bucket' => [],
-                        'manufacturer_bucket' => [],
+                        'price_bucket' => [
+                            '30_40' => [
+                                'value' => '30_40',
+                                'count' => '1',
+                            ],
+                            '50_*' => [
+                                'value' => '50_*',
+                                'count' => '2',
+                            ],
+                        ],
+                        'category_bucket' => [
+                            3 => [
+                                'value' => '3',
+                                'count' => '3',
+                            ],
+                            31 => [
+                                'value' => '31',
+                                'count' => '1',
+                            ],
+                            32 => [
+                                'value' => '32',
+                                'count' => '2',
+                            ],
+                        ],
+                        'manufacturer_bucket' => [
+                            100 => [
+                                'value' => '100',
+                                'count' => '1',
+                            ],
+                            101 => [
+                                'value' => '101',
+                                'count' => '1',
+                            ],
+                        ],
                     ],
                 ]
             ]
