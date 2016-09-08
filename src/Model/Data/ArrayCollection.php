@@ -17,10 +17,17 @@ namespace IntegerNet\Solr\Model\Data;
 class ArrayCollection extends \ArrayIterator
 {
     const FLAG_MAINTAIN_NUMERIC_KEYS = 1;
+
     public static function fromArray(array $array)
     {
         return new static($array);
     }
+
+    public static function fromTraversable(\Traversable $traversable)
+    {
+        return new static(\iterator_to_array($traversable));
+    }
+
     /**
      * @param callable $callback
      * @return static
@@ -110,4 +117,12 @@ class ArrayCollection extends \ArrayIterator
         return new static(\array_values($this->getArrayCopy()));
     }
 
+    /**
+     * @param ArrayCollection $other
+     * @return static
+     */
+    public function merge(ArrayCollection $other)
+    {
+        return new static(\array_merge($this->getArrayCopy(), $other->getArrayCopy()));
+    }
 }

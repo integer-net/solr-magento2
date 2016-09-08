@@ -11,6 +11,7 @@ namespace IntegerNet\Solr\Model\Search\Adapter;
 
 use IntegerNet\Solr\Model\Data\ArrayCollection;
 use IntegerNet\Solr\Response\ApacheSolrFacet;
+use IntegerNet\Solr\Response\Document;
 use IntegerNet\Solr\Response\Facet;
 use IntegerNet\Solr\Response\FacetCount;
 use IntegerNet\Solr\Response\Response as SolrResponse;
@@ -28,7 +29,6 @@ class ResponseWithProductIds
     private $solrResponse;
 
     /**
-     * Response constructor.
      * @param SolrResponse $solrResponse
      */
     private function __construct(SolrResponse $solrResponse)
@@ -48,43 +48,67 @@ class ResponseWithProductIds
     public function toArray()
     {
         $response = [
-            'documents' => [
-            ],
-            'aggregations' => [
-            ],
+            'aggregations' => $this->aggregationsFromSolrResponse(),
+            'documents' => $this->documentsFromSolrResponse(),
         ];
-        $response['aggregations']['price_bucket'] = ArrayCollection::fromArray(
-            $this->solrResponse->facets()->facetByName('price')->counts()
-        )->filter(function (FacetCount $facetCount) {
-            return $facetCount->count() > 0;
-        })->flatMap(function (FacetCount $facetCount) {
-            $facetCount = $facetCount
-                ->withModifiedValue(function ($priceInterval) {
-                    \preg_match('{[\(\[]([\d.*]+),([\d.*]+)[\)\]]}', $priceInterval, $matches);
-                    list (, $priceFrom, $priceTo) = $matches;
-                    return \sprintf("%s_%s", $priceFrom == '*' ? $priceFrom : 1 * $priceFrom, $priceTo == '*' ? $priceTo : 1 * $priceTo);
-                });
-            return [ $facetCount->value() => $facetCount->toArray() ];
-        })->getArrayCopy();
-
-        foreach ($this->solrResponse->facets()->exclude(['price']) as $facet) {
-            $response['aggregations'][$facet->name() . '_bucket'] = ArrayCollection::fromArray(
-                $facet->counts()
-            )
-            ->flatMap(function(FacetCount $facetCount) {
-                return [ $facetCount->value() => $facetCount->toArray() ];
-            }, ArrayCollection::FLAG_MAINTAIN_NUMERIC_KEYS
-            )->getArrayCopy();
-        }
-
-        $score = $count = $this->solrResponse->documents()->count();
-        foreach ($this->solrResponse->documents() as $document) {
-            $response['documents'][] =
-                [
-                    'entity_id' => $document->field('product_id')->value(),
-                    'score' => $score--,
-                ];
-        }
         return $response;
+    }
+
+    /**
+     * @return array
+     */
+    private function aggregationsFromSolrResponse()
+    {
+        return ArrayCollection::fromTraversable(
+            $this->solrResponse->facets()
+        )->flatMap(function (Facet $facet) {
+            return [
+                $facet->name() . '_bucket' => ArrayCollection::fromArray(
+                    $facet->counts()
+                )->filter(function (FacetCount $facetCount) {
+                    return $facetCount->count() > 0;
+                })->map(function (FacetCount $facetCount) use ($facet) {
+                    if ($facet->name() == 'price') {
+                        return $this->transformIntervalSyntax($facetCount);
+                    }
+                    return $facetCount;
+                })->flatMap(function (FacetCount $facetCount) {
+                    return [$facetCount->value() => $facetCount->toArray()];
+                }, ArrayCollection::FLAG_MAINTAIN_NUMERIC_KEYS
+                )->getArrayCopy()
+            ];
+        })->getArrayCopy();
+    }
+
+    /**
+     * @return array
+     */
+    private function documentsFromSolrResponse()
+    {
+        $count = $this->solrResponse->documents()->count();
+
+        return ArrayCollection::fromTraversable(
+            $this->solrResponse->documents()
+        )->values()->map(function (Document $document, $index) use ($count) {
+            return [
+                'entity_id' => $document->field('product_id')->value(),
+                'score' => $count - $index,
+            ];
+        })->getArrayCopy();
+    }
+
+    /**
+     * Transforms value of FacetCount from "[x.xx000,*)" to "x.xx_*"
+     *
+     * @param FacetCount $facetCount
+     * @return FacetCount
+     */
+    private function transformIntervalSyntax(FacetCount $facetCount)
+    {
+        return $facetCount->withModifiedValue(function ($priceInterval) {
+            \preg_match('{[\(\[]([\d.*]+),([\d.*]+)[\)\]]}', $priceInterval, $matches);
+            list (, $priceFrom, $priceTo) = $matches;
+            return \sprintf("%s_%s", $priceFrom == '*' ? $priceFrom : 1 * $priceFrom, $priceTo == '*' ? $priceTo : 1 * $priceTo);
+        });
     }
 }
