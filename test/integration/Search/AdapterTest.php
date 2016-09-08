@@ -39,6 +39,10 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
     {
         $fakeRequestFactory = new FakeRequestFactory();
         $fakeRequestFactory->setResponse(\json_encode([
+            "facet_counts" => [
+                "facet_fields" => [],
+                "facet_intervals" => ["price_f" => []],
+            ],
             "response" => [
                 "numFound" => 1,
                 "start" => 0,
