@@ -9,7 +9,7 @@
  */
 namespace IntegerNet\Solr\Model\Bridge;
 
-use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
 use IntegerNet\Solr\Implementor\EventDispatcher;
 use IntegerNet\Solr\Implementor\HasUserQuery;
 use IntegerNet\Solr\Implementor\SolrRequestFactory;
@@ -28,7 +28,7 @@ class RequestFactory implements SolrRequestFactory
      */
     private $storeConfig;
     /**
-     * @var AttributeRepository
+     * @var AttributeRepositoryInterface
      */
     private $attributeRepository;
     /**
@@ -46,11 +46,11 @@ class RequestFactory implements SolrRequestFactory
 
     /**
      * @param CurrentStoreConfig $storeConfig
-     * @param AttributeRepository $attributeRepository
+     * @param AttributeRepositoryInterface $attributeRepository
      * @param EventDispatcher $eventDispatcher
      * @param LoggerInterface $logger
      */
-    public function __construct(CurrentStoreConfig $storeConfig, AttributeRepository $attributeRepository,
+    public function __construct(CurrentStoreConfig $storeConfig, AttributeRepositoryInterface $attributeRepository,
                                 EventDispatcher $eventDispatcher, LoggerInterface $logger, SearchRequest $searchRequest)
     {
         $this->storeConfig = $storeConfig;
