@@ -9,6 +9,10 @@
  */
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
+use IntegerNet\Solr\Model\Data\ArrayCollection;
+use IntegerNet\Solr\Response\ApacheSolrFacet;
+use IntegerNet\Solr\Response\Facet;
+use IntegerNet\Solr\Response\FacetCount;
 use IntegerNet\Solr\Response\Response as SolrResponse;
 
 /**
@@ -47,30 +51,30 @@ class ResponseWithProductIds
             'documents' => [
             ],
             'aggregations' => [
-                'price_bucket' => [],
             ],
         ];
-        foreach ($this->solrResponse->facet_counts->facet_intervals->price_f as $priceInterval => $count) {
-            if ($count == 0) {
-                continue;
-            }
-            preg_match('{[\(\[]([\d.*]+),([\d.*]+)[\)\]]}', $priceInterval, $matches);
-            list ( ,$priceFrom, $priceTo) = $matches;
-            $priceInterval = sprintf("%s_%s", $priceFrom == '*' ? $priceFrom : 1 * $priceFrom, $priceTo == '*' ? $priceTo : 1 * $priceTo);
-            $response['aggregations']['price_bucket'][$priceInterval] = [
-                'value' => $priceInterval,
-                'count' => $count,
-            ];
-        }
-        foreach ($this->solrResponse->facet_counts->facet_fields as $field => $counts) {
-            $field = preg_replace('{(_facet)?$}', '_bucket', $field, 1);
-            $response['aggregations'][$field] = [];
-            foreach ($counts as $value => $count) {
-                $response['aggregations'][$field][$value] = [
-                    'value' => $value,
-                    'count' => $count,
-                    ];
-            }
+        $response['aggregations']['price_bucket'] = ArrayCollection::fromArray(
+            $this->solrResponse->facets()->facetByName('price')->counts()
+        )->filter(function (FacetCount $facetCount) {
+            return $facetCount->count() > 0;
+        })->flatMap(function (FacetCount $facetCount) {
+            $facetCount = $facetCount
+                ->withModifiedValue(function ($priceInterval) {
+                    \preg_match('{[\(\[]([\d.*]+),([\d.*]+)[\)\]]}', $priceInterval, $matches);
+                    list (, $priceFrom, $priceTo) = $matches;
+                    return \sprintf("%s_%s", $priceFrom == '*' ? $priceFrom : 1 * $priceFrom, $priceTo == '*' ? $priceTo : 1 * $priceTo);
+                });
+            return [ $facetCount->value() => $facetCount->toArray() ];
+        })->getArrayCopy();
+
+        foreach ($this->solrResponse->facets()->exclude(['price']) as $facet) {
+            $response['aggregations'][$facet->name() . '_bucket'] = ArrayCollection::fromArray(
+                $facet->counts()
+            )
+            ->flatMap(function(FacetCount $facetCount) {
+                return [ $facetCount->value() => $facetCount->toArray() ];
+            }, ArrayCollection::FLAG_MAINTAIN_NUMERIC_KEYS
+            )->getArrayCopy();
         }
 
         $score = $count = $this->solrResponse->documents()->count();

@@ -16,6 +16,7 @@ namespace IntegerNet\Solr\Model\Data;
  */
 class ArrayCollection extends \ArrayIterator
 {
+    const FLAG_MAINTAIN_NUMERIC_KEYS = 1;
     public static function fromArray(array $array)
     {
         return new static($array);
@@ -26,7 +27,18 @@ class ArrayCollection extends \ArrayIterator
      */
     public function map(callable $callback)
     {
-        return new static(\array_map($callback, $this->getArrayCopy()));
+        return new static(\array_map($callback, $this->getArrayCopy(), $this->keys()->getArrayCopy()));
+    }
+
+    /**
+     * Map and flatten the result by one level
+     *
+     * @param callable $callback
+     * @return static
+     */
+    public function flatMap(callable $callback, $flags = 0)
+    {
+        return $this->map($callback)->collapse($flags);
     }
 
     /**
@@ -64,13 +76,17 @@ class ArrayCollection extends \ArrayIterator
     /**
      * @return static
      */
-    public function collapse()
+    public function collapse($flags = 0)
     {
-        return $this->reduce(function($carry, $item) {
+        $merger = '\\array_merge';
+        if ($flags & self::FLAG_MAINTAIN_NUMERIC_KEYS) {
+            $merger = function($a, $b) { return $a + $b; };
+        }
+        return $this->reduce(function($carry, $item) use ($merger) {
             if (\is_array($item)) {
-                return \array_merge($carry, $item);
+                return $merger($carry, $item);
             } else {
-                return \array_merge($carry, [$item]);
+                return $merger($carry, [$item]);
             }
         }, []);
     }
