@@ -27,16 +27,22 @@ class SolrAdapter implements AdapterInterface
      * @var \IntegerNet\Solr\Implementor\SolrRequestFactory
      */
     private $requestFactory;
+    /**
+     * @var \Magento\Framework\Search\Adapter\Mysql\Adapter
+     */
+    private $mysqlAdapter;
 
     /**
      * @param \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory
      */
     public function __construct(
         \IntegerNet\Solr\Implementor\SolrRequestFactory $requestFactory,
-        \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory
+        \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory,
+        \Magento\Framework\Search\Adapter\Mysql\Adapter\Proxy $mysqlAdapter
     ) {
         $this->requestFactory = $requestFactory;
         $this->responseFactory = $responseFactory;
+        $this->mysqlAdapter = $mysqlAdapter;
     }
     /**
      * Process Search Request
@@ -46,6 +52,9 @@ class SolrAdapter implements AdapterInterface
      */
     public function query(RequestInterface $request)
     {
+        if ($request->getName() === 'catalog_view_container') {
+            return $this->mysqlAdapter->query($request);
+        }
         return $this->responseFactory->create(
             ResponseWithProductIds::fromSolrResponse($this->doRequest())->toArray()
         );
