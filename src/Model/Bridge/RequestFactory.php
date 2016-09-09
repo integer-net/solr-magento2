@@ -11,12 +11,14 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
 use IntegerNet\Solr\Implementor\EventDispatcher as EventDispatcherInterface;
+use IntegerNet\Solr\Implementor\Pagination;
 use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Model\Config\CurrentStoreConfig;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\Request;
 use IntegerNet\Solr\Request\SearchRequestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
+use IntegerNet\SolrCategories\Request\CategoryRequestFactory;
 use Psr\Log\LoggerInterface;
 
 class RequestFactory implements SolrRequestFactory
@@ -41,21 +43,29 @@ class RequestFactory implements SolrRequestFactory
      * @var SearchRequest
      */
     private $searchRequest;
+    /**
+     * @var Pagination
+     */
+    private $pagination;
 
     /**
      * @param CurrentStoreConfig $storeConfig
      * @param AttributeRepositoryInterface $attributeRepository
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
+     * @param SearchRequest $searchRequest
+     * @param Pagination $pagination
      */
     public function __construct(CurrentStoreConfig $storeConfig, AttributeRepositoryInterface $attributeRepository,
-                                EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, SearchRequest $searchRequest)
+                                EventDispatcherInterface $eventDispatcher, LoggerInterface $logger,
+                                SearchRequest $searchRequest, Pagination $pagination)
     {
         $this->storeConfig = $storeConfig;
         $this->attributeRepository = $attributeRepository;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
         $this->searchRequest = $searchRequest;
+        $this->pagination = $pagination;
     }
 
     /**
@@ -79,6 +89,7 @@ class RequestFactory implements SolrRequestFactory
     {
         //TODO implement different modes
         //TODO possibly use Magentos DI with virtual types for ApplicationContext
+        // (pagination is already a virtual type)
         $applicationContext = new ApplicationContext(
             $this->attributeRepository,
             $this->storeConfig->getResultsConfig(),
@@ -86,14 +97,28 @@ class RequestFactory implements SolrRequestFactory
             $this->eventDispatcher,
             $this->logger
         );
-        $applicationContext->setFuzzyConfig($this->storeConfig->getFuzzySearchConfig());
-        $applicationContext->setQuery($this->searchRequest);
-        $factory = new SearchRequestFactory(
-            $applicationContext,
-            $this->getSolrResource(),
-            $this->storeConfig->getStoreId()
-        );
-        return $factory->createRequest();
+        $applicationContext->setPagination($this->pagination);
+
+        if ($requestMode === self::REQUEST_MODE_SEARCH) {
+            $applicationContext->setFuzzyConfig($this->storeConfig->getFuzzySearchConfig());
+            $applicationContext->setQuery($this->searchRequest);
+            $factory = new SearchRequestFactory(
+                $applicationContext,
+                $this->getSolrResource(),
+                $this->storeConfig->getStoreId()
+            );
+            return $factory->createRequest();
+        }
+
+        if ($requestMode === self::REQUEST_MODE_CATEGORY) {
+            $factory = new CategoryRequestFactory(
+                $applicationContext,
+                $this->getSolrResource(),
+                $this->storeConfig->getStoreId(),
+                $this->searchRequest->getCategoryId()
+            );
+            return $factory->createRequest();
+        }
     }
 
 }

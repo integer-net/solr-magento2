@@ -21,6 +21,11 @@ class SearchRequest implements HasUserQuery
     private $queryFactory;
 
     /**
+     * @var int
+     */
+    private $categoryId;
+
+    /**
      * SearchRequest constructor.
      * @param QueryFactory $queryFactory
      */
@@ -37,6 +42,22 @@ class SearchRequest implements HasUserQuery
     public function getUserQueryText()
     {
         return $this->queryFactory->get()->getQueryText();
+    }
+
+    /**
+     * @return int
+     */
+    public function getCategoryId()
+    {
+        return $this->categoryId;
+    }
+
+    /**
+     * @param int $categoryId
+     */
+    public function setCategoryId($categoryId)
+    {
+        $this->categoryId = $categoryId;
     }
 
 }

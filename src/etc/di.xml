@@ -12,6 +12,18 @@
   <preference for="IntegerNet\Solr\Implementor\ProductRenderer" type="IntegerNet\Solr\Model\Bridge\ProductRenderer" />
   <preference for="IntegerNet\Solr\Implementor\EventDispatcher" type="IntegerNet\Solr\Model\Bridge\EventDispatcher" />
   <type name="IntegerNet\Solr\Model\Bridge\Config" shared="false"/>
+
+  <virtualType name="nopagination" type="IntegerNet\Solr\Request\SinglePage">
+    <arguments>
+      <argument name="pageSize" xsi:type="number">10000</argument>
+    </arguments>
+  </virtualType>
+  <!-- TODO multiple virtual types, this one is only used for the Magento2 adapter search (i.e. no html from solr) -->
+  <type name="IntegerNet\Solr\Model\Bridge\RequestFactory">
+    <arguments>
+      <argument name="pagination" xsi:type="object">nopagination</argument>
+    </arguments>
+  </type>
   <!--
   <preference for="Magento\Catalog\Model\ResourceModel\Layer\Filter\Attribute" type="IntegerNet\Solr\Model\Resource\Catalog\Layer\Filter\Attribute"/>
   <preference for="Magento\Catalog\Model\ResourceModel\Layer\Filter\Price" type="IntegerNet\Solr\Model\Resource\Catalog\Layer\Filter\Price"/>
