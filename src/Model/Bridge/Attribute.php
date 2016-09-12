@@ -75,7 +75,15 @@ class Attribute implements AttributeInterface
      */
     public function getFacetType()
     {
-        return $this->magentoAttribute->getFrontendInput();
+        switch ($this->magentoAttribute->getFrontendInput()) {
+            case 'select':
+            case 'boolean':
+                return 'select';
+            case 'multiselect':
+                return 'multiselect';
+            default:
+                return 'text';
+        }
     }
 
     /**

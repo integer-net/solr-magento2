@@ -52,6 +52,37 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider dataFacetTypes
+     * @param $frontendInput
+     * @param $expectedFacetType
+     */
+    public function testFacetTypeBasedOnFrontendInput($frontendInput, $expectedFacetType)
+    {
+        $storeId = 1;
+        $this->magentoAttributeStub->setFrontendInput($frontendInput);
+        $attributeBridge = new Attribute($this->magentoAttributeStub, $storeId);
+        $this->assertEquals($expectedFacetType, $attributeBridge->getFacetType());
+    }
+    public static function dataFacetTypes()
+    {
+        return [
+            ['select', 'select'],
+            ['boolean', 'select'],
+            ['multiselect', 'multiselect'],
+            ['date', 'text'],
+            ['gallery', 'text'],
+            ['hidden', 'text'],
+            ['image', 'text'],
+            ['media_image', 'text'],
+            ['multiline', 'text'],
+            ['price', 'text'],
+            ['text', 'text'],
+            ['textarea', 'text'],
+            ['weight', 'text'],
+        ];
+    }
+
+    /**
      * @dataProvider dataAttribute
      * @param $attributeCode
      * @param $backendType
@@ -156,7 +187,7 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
      * @param $solrBoost
      * @param $storeLabel
      * @param $usedForSortBy
-     * @param $attributeBridge
+     * @param Attribute $attributeBridge
      */
     protected function assertAttributeData($attributeCode, $backendType, $frontendInput, $isSearchable, $solrBoost, $storeLabel, $usedForSortBy, $attributeBridge)
     {
