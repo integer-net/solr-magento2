@@ -118,9 +118,7 @@ class AttributeSearchCriteriaBuilder implements SimpleBuilderInterface
                 new Filter([
                     Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE,
                     Filter::KEY_VALUE => '1'
-                ])
-            ]);
-            $builder->addFilters([
+                ]),
                 new Filter([
                     Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE_IN_SEARCH,
                     Filter::KEY_VALUE => '1'
