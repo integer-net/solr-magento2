@@ -83,6 +83,11 @@
   <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
     <plugin name="storeFilterFixer" type="IntegerNet\Solr\Model\Plugin\StoreFilterFixer" />
   </type>
+
+  <type name="Magento\Eav\Model\AttributeRepository">
+    <plugin name="attributeFilterFixer" type="IntegerNet\Solr\Model\Plugin\AttributeFilterFixer" />
+  </type>
+
   <type name="Magento\Catalog\Model\Layer\ItemCollectionProviderInterface">
     <plugin name="replaceCollections" type="IntegerNet\Solr\Model\Plugin\CollectionProviderPlugin" />
   </type>

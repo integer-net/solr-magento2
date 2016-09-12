@@ -314,18 +314,10 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
                         Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE,
                         Filter::KEY_VALUE => '1'
                     ]),
-                ]
-            ]),
-            new FilterGroup([
-                FilterGroup::FILTERS => [
                     new Filter([
                         Filter::KEY_FIELD => EavAttributeInterface::IS_FILTERABLE_IN_SEARCH,
                         Filter::KEY_VALUE => '1'
                     ]),
-                ]
-            ]),
-            new FilterGroup([
-                FilterGroup::FILTERS => [
                     new Filter([
                         Filter::KEY_FIELD => EavAttributeInterface::IS_SEARCHABLE,
                         Filter::KEY_VALUE => '1'
