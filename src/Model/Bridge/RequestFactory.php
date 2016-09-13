@@ -11,7 +11,7 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
 use IntegerNet\Solr\Implementor\EventDispatcher as EventDispatcherInterface;
-use IntegerNet\Solr\Implementor\Pagination;
+use IntegerNet\Solr\Implementor\Pagination as PaginationInterface;
 use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Model\Config\CurrentStoreConfig;
 use IntegerNet\Solr\Request\ApplicationContext;
@@ -44,7 +44,7 @@ class RequestFactory implements SolrRequestFactory
      */
     private $searchRequest;
     /**
-     * @var Pagination
+     * @var PaginationInterface
      */
     private $pagination;
 
@@ -54,11 +54,11 @@ class RequestFactory implements SolrRequestFactory
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface $logger
      * @param SearchRequest $searchRequest
-     * @param Pagination $pagination
+     * @param PaginationInterface $pagination
      */
     public function __construct(CurrentStoreConfig $storeConfig, AttributeRepositoryInterface $attributeRepository,
                                 EventDispatcherInterface $eventDispatcher, LoggerInterface $logger,
-                                SearchRequest $searchRequest, Pagination $pagination)
+                                SearchRequest $searchRequest, PaginationInterface $pagination)
     {
         $this->storeConfig = $storeConfig;
         $this->attributeRepository = $attributeRepository;
