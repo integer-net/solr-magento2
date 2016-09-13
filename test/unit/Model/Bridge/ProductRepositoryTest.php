@@ -20,6 +20,7 @@ use Magento\Framework\Event\ManagerInterface;
  */
 class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
 {
+    private $productCollectionFactory;
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|StockStatus
      */
@@ -70,11 +71,13 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->productRepository = new ProductRepository(
             $this->linkManagementMock,
             $this->productIteratorFactoryMock,
-            $this->pagedProductIteratorFactoryMock,
+            $this->pagedProductIteratorFactoryMock
+        );
+        $this->productCollectionFactory = new \IntegerNet\Solr\Model\Indexer\ProductCollectionFactory(
             $this->stubProductCollectionFactory(),
-            $this->stubStockStatusFactory(),
+            $this->catalogConfigStub,
             $this->attributeRepositoryStub,
-            $this->catalogConfigStub
+            $this->stubStockStatusFactory()
         );
 
     }
@@ -97,6 +100,8 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
             ->with(['name', 'description', 'visibility', 'status', 'url_key', 'solr_boost', 'solr_exclude', 'meta_description']);
         $this->collectionMock->method('getItems')
             ->willReturn($productsInSearchResult);
+        $this->collectionMock->method('getIterator')
+            ->willReturn(new \ArrayIterator($productsInSearchResult));
 
         $actualResult = $this->productRepository->getProductsForIndex($storeId, $productIds);
         $actualResult->setPageCallback($this->mockCallback(1));
@@ -168,7 +173,7 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $productIteratorFactoryMock->method('create')->willReturnCallback(function($data) {
             return new PagedProductIterator(
-                $this->stubProductCollectionFactory(),
+                $this->productCollectionFactory,
                 $this->mockProductFactory(),
                 $data[PagedProductIterator::PARAM_PRODUCT_ID_FILTER],
                 $data[PagedProductIterator::PARAM_PAGE_SIZE],
@@ -233,7 +238,6 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     private function assertIteratorContainsProducts($actualResult, $expectedProducts, $expectedStoreId)
     {
-        $this->assertInstanceOf(ProductIterator::class, $actualResult);
         $productsFromIterator = \iterator_to_array($actualResult);
         $this->assertCount(\count($expectedProducts), $productsFromIterator);
         foreach ($productsFromIterator as $actualProduct) {

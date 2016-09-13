@@ -10,7 +10,6 @@
 
 namespace IntegerNet\Solr\Model\Bridge;
 
-use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
 use IntegerNet\Solr\Implementor\PagedProductIterator as PagedProductIteratorInterface;
 use IntegerNet\Solr\Implementor\PagedProductIteratorFactory as PagedProductIteratorInterfaceFactory;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
@@ -18,11 +17,8 @@ use IntegerNet\Solr\Implementor\ProductIterator as ProductIteratorInterface;
 use IntegerNet\Solr\Implementor\ProductIteratorFactory as ProductIteratorInterfaceFactory;
 use IntegerNet\Solr\Implementor\ProductRepository as ProductRepositoryInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface as MagentoProductRepository;
-use Magento\Catalog\Model\Config as CatalogConfig;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\CatalogInventory\Model\ResourceModel\Stock\Status as StockStatus;
-use Magento\CatalogInventory\Model\ResourceModel\Stock\StatusFactory as StockStatusFactory;
 use Magento\ConfigurableProduct\Api\LinkManagementInterface;
 
 class ProductRepository implements ProductRepositoryInterface
@@ -43,47 +39,14 @@ class ProductRepository implements ProductRepositoryInterface
      * @var PagedProductIteratorInterfaceFactory
      */
     private $pagedIteratorFactory;
-    /**
-     * @var ProductCollectionFactory
-     */
-    private $collectionFactory;
-    /**
-     * @var StockStatusFactory
-     */
-    private $stockStatusFactory;
-    /**
-     * @var AttributeRepositoryInterface
-     */
-    private $attributeRepository;
-    /**
-     * @var CatalogConfig
-     */
-    private $catalogConfig;
 
-    /**
-     * @param LinkManagementInterface $productLinkManagement
-     * @param ProductIteratorInterfaceFactory $iteratorFactory
-     * @param PagedProductIteratorInterfaceFactory $pagedIteratorFactory
-     * @param ProductCollectionFactory $collectionFactory
-     * @param StockStatusFactory $stockStatusFactory
-     * @param AttributeRepositoryInterface $attributeRepository
-     * @param Config $catalogConfig
-     */
     public function __construct(LinkManagementInterface $productLinkManagement,
                                 ProductIteratorInterfaceFactory $iteratorFactory,
-                                PagedProductIteratorInterfaceFactory $pagedIteratorFactory,
-                                ProductCollectionFactory $collectionFactory,
-                                StockStatusFactory $stockStatusFactory,
-                                AttributeRepositoryInterface $attributeRepository,
-                                CatalogConfig $catalogConfig)
+                                PagedProductIteratorInterfaceFactory $pagedIteratorFactory)
     {
         $this->productLinkManagement = $productLinkManagement;
         $this->iteratorFactory = $iteratorFactory;
         $this->pagedIteratorFactory = $pagedIteratorFactory;
-        $this->collectionFactory = $collectionFactory;
-        $this->stockStatusFactory = $stockStatusFactory;
-        $this->attributeRepository = $attributeRepository;
-        $this->catalogConfig = $catalogConfig;
     }
 
     /**
@@ -107,26 +70,11 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function getProductsForIndex($storeId, $productIds = null)
     {
-        $productAttributes = array_unique(array_merge(
-            $this->catalogConfig->getProductAttributes(),
-            array('visibility', 'status', 'url_key', 'solr_boost', 'solr_exclude'),
-            $this->attributeRepository->getAttributeCodesToIndex()
-        ));
-
-        $collection = $this->collectionFactory->create();
-        $collection->addStoreFilter($storeId);
-        $collection->addMinimalPrice();
-        $collection->addFinalPrice();
-        $collection->addTaxPercents();
-        $collection->addUrlRewrite();
-        $collection->addAttributeToSelect($productAttributes);
-        if ($productIds !== null) {
-            $collection->addIdFilter($productIds);
-        }
-        $this->addStockDataWithoutFilter($collection);
-
-        return $this->createProductIterator($storeId, $collection->getItems());
-        //TODO use PagedProductIterator with lazy loading (at least if count($productIds)>$pageSize)
+        return $this->pagedIteratorFactory->create([
+            PagedProductIterator::PARAM_STORE_ID => $storeId,
+            PagedProductIterator::PARAM_PAGE_SIZE => $this->pageSize,
+            PagedProductIterator::PARAM_PRODUCT_ID_FILTER => $productIds,
+        ]);
     }
 
     /**
@@ -154,27 +102,4 @@ class ProductRepository implements ProductRepositoryInterface
         ]);
     }
 
-    /**
-     * @return StockStatus
-     */
-    protected function getStockStatusResource()
-    {
-        if (empty($this->stockStatusResource)) {
-            $this->stockStatusResource = $this->stockStatusFactory->create();
-        }
-        return $this->stockStatusResource;
-    }
-
-    /**
-     * @param $collection
-     */
-    private function addStockDataWithoutFilter(ProductCollection $collection)
-    {
-        $stockFlag = 'has_stock_status_filter';
-        if (!$collection->hasFlag($stockFlag)) {
-            $resource = $this->getStockStatusResource();
-            $resource->addStockDataToCollection($collection, false);
-            $collection->setFlag($stockFlag, true);
-        }
-    }
 }

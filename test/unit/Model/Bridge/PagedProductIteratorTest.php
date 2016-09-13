@@ -11,13 +11,13 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\ProductFactory;
-use Magento\Framework\Event\ManagerInterface;
+use IntegerNet\Solr\Model\Indexer\ProductCollectionFactory;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\Framework\Event\ManagerInterface;
 
 /**
- * @covers ProductIterator
+ * @covers PagedProductIterator
  */
 class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -142,16 +142,17 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
      * @param $expectedCalls
      * @param $productIds
      * @param $products
-     * @return \PHPUnit_Framework_MockObject_MockObject|CollectionFactory
+     * @return \PHPUnit_Framework_MockObject_MockObject|ProductCollectionFactory
      */
     private function mockCollectionFactory($storeId, $expectedCalls, $productIds, $products)
     {
-        $collectionFactory = $this->getMockBuilder(CollectionFactory::class)
+        $collectionFactory = $this->getMockBuilder(ProductCollectionFactory::class)
             ->disableOriginalConstructor()
             ->setMethods(['create'])
             ->getMock();
         $collectionFactory->expects($this->exactly($expectedCalls))
             ->method('create')
+            ->with($storeId, $productIds)
             ->willReturnCallback(function() use ($storeId, $productIds, $products) {
                 return $this->mockCollection($storeId, $productIds, $products);
             });
@@ -169,11 +170,9 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|Collection $collectionStub */
         $collectionStub = $this->getMockBuilder(Collection::class)
             ->disableOriginalConstructor()
-            ->setMethods(['setStoreId', 'addIdFilter', 'getIterator', 'load', 'getSize'])
+            ->setMethods(['getIterator', 'load', 'getSize'])
             ->getMock();
-        $collectionStub->expects($storeId === null ? $this->never() : $this->once())->method('setStoreId')->with($storeId);
         $collectionStub->method('getSize')->willReturn(count($products));
-        $collectionStub->expects($this->once())->method('addIdFilter')->with($productIds);
         $collectionStub->method('getIterator')
             ->willReturnCallback(function() use ($collectionStub, $productIds, $products) {
                 $offset = ($collectionStub->getCurPage() - 1) * $collectionStub->getPageSize();

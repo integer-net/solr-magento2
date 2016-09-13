@@ -12,7 +12,9 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 
 use IntegerNet\Solr\Implementor\PagedProductIterator as PagedProductIteratorInterface;
+use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use IntegerNet\Solr\Implementor\ProductFactory;
+use IntegerNet\Solr\Model\Indexer\ProductCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
@@ -55,18 +57,18 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
     const PARAM_PAGE_SIZE = 'pageSize';
     const PARAM_STORE_ID = 'storeId';
     /**
-     * @var CollectionFactory
+     * @var ProductCollectionFactory
      */
     private $collectionFactory;
 
     /**
-     * @param CollectionFactory $collectionFactory
+     * @param ProductCollectionFactory $collectionFactory
      * @param ProductFactory $productFactory
      * @param int[]|null $productIdFilter
      * @param int $pageSize
      * @param int $storeId
      */
-    public function __construct(CollectionFactory $collectionFactory, ProductFactory $productFactory, $productIdFilter = null, $pageSize = 1000, $storeId = null)
+    public function __construct(ProductCollectionFactory $collectionFactory, ProductFactory $productFactory, $productIdFilter = null, $pageSize = 1000, $storeId = null)
     {
         $this->productIdFilter = $productIdFilter;
         $this->pageSize = $pageSize;
@@ -80,18 +82,11 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
      */
     private function getProductCollection()
     {
-        $collection = $this->collectionFactory->create();
-        if ($this->storeId !== null) {
-            $collection->setStoreId($this->storeId);
-        }
-        if ($this->productIdFilter !== null) {
-            $collection->addIdFilter($this->productIdFilter);
-        }
+        $collection = $this->collectionFactory->create($this->storeId, $this->productIdFilter);
+
         $collection->setCurPage($this->currentPage);
         $collection->setPageSize($this->pageSize);
 
-        //TODO joins, attributes
-        //TODO events(?)
         $collection->load();
         return $collection;
     }
@@ -174,7 +169,7 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
     }
 
     /**
-     * @return Product
+     * @return ProductInterface
      */
     public function current()
     {
