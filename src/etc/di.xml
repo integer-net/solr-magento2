@@ -6,6 +6,7 @@
   <preference for="IntegerNet\Solr\Implementor\IndexCategoryRepository" type="IntegerNet\Solr\Model\Bridge\CategoryRepository" />
   <preference for="IntegerNet\Solr\Implementor\ProductRepository" type="IntegerNet\Solr\Model\Bridge\ProductRepository" />
   <preference for="IntegerNet\Solr\Implementor\ProductIterator" type="IntegerNet\Solr\Model\Bridge\ProductIterator" />
+  <preference for="IntegerNet\Solr\Implementor\PagedProductIterator" type="IntegerNet\Solr\Model\Bridge\PagedProductIterator" />
   <preference for="IntegerNet\Solr\Implementor\Product" type="IntegerNet\Solr\Model\Bridge\Product" />
   <preference for="IntegerNet\Solr\Implementor\Config" type="IntegerNet\Solr\Model\Bridge\Config"/>
   <preference for="IntegerNet\Solr\Implementor\StoreEmulation" type="IntegerNet\Solr\Model\Bridge\StoreEmulation" />
