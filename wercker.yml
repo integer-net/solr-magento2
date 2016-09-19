@@ -51,6 +51,8 @@ build:
           sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/test\/unit", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
           composer config minimum-stability dev
           composer require integer-net/solr-magento2 dev-tmp
+          composer require --dev phpunit/phpunit ^5.0 --no-update
+          composer update
           bin/magento module:enable IntegerNet_Solr
           bin/magento setup:upgrade
           cd vendor/integer-net/solr-magento2
