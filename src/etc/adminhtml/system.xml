@@ -252,18 +252,6 @@
           <source_model>IntegerNet\Solr\Model\Source\RobotOptions</source_model>
         </field>
       </group>
-      <group id="dev" translate="label,comment" sortOrder="110" showInDefault="1">
-        <label>Developer</label>
-        <field id="register_autoloader" sortOrder="10" type="select" showInDefault="1">
-          <label>Register Autoloader</label>
-          <comment>Disable if you are using an own PSR-4 autoloader, e.g. from composer</comment>
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-        </field>
-        <field id="autoloader_basepath" sortOrder="20" type="text" showInDefault="1">
-          <label>Autoloader Base Path</label>
-          <comment>Path to IntegerNet_Solr library. Absolute path or relative to Magento base dir.</comment>
-        </field>
-      </group>
     </section>
   </system>
 </config>
