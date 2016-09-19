@@ -32,8 +32,16 @@ class ArrayCollection extends \ArrayIterator
      * @param callable $callback
      * @return static
      */
-    public function map(callable $callback)
+    public function map(callable $callback, $flags = 0)
     {
+        if ($flags & self::FLAG_MAINTAIN_NUMERIC_KEYS) {
+            return new static(
+                \array_combine(
+                    $this->keys()->getArrayCopy(),
+                    $this->map($callback, $flags ^ self::FLAG_MAINTAIN_NUMERIC_KEYS)->getArrayCopy()
+                )
+            );
+        }
         return new static(\array_map($callback, $this->getArrayCopy(), $this->keys()->getArrayCopy()));
     }
 

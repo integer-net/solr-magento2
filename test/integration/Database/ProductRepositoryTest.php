@@ -11,6 +11,8 @@
 namespace IntegerNet\Solr\Database;
 
 use IntegerNet\Solr\Implementor\ProductRepository;
+use IntegerNet\Solr\Indexer\Data\ProductAssociation;
+use IntegerNet\Solr\Indexer\Data\ProductIdChunks;
 use IntegerNet\Solr\Model\Bridge\Attribute;
 use IntegerNet\Solr\Model\Bridge\AttributeRepository;
 use IntegerNet\Solr\Model\Bridge\Product;
@@ -28,7 +30,7 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @magentoDataFixture loadFixture
+     * @magentoDataFixture loadProductsFixture
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
      */
@@ -44,7 +46,7 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
         /** @var ProductRepository $productRepository */
         $productRepository = $this->objectManager->create(ProductRepository::class);
         $this->assertInstanceOf(\IntegerNet\Solr\Model\Bridge\ProductRepository::class, $productRepository);
-        $products = $productRepository->getProductsForIndex($storeId, $productIds);
+        $products = $productRepository->getProductsInChunks($storeId, ProductIdChunks::withAssociationsTogether($productIds, [], 1000));
 
         $products->rewind();
         $this->assertTrue($products->valid());
@@ -52,11 +54,46 @@ class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Product::class, $product);
         $this->assertEquals('Product name in store', $product->getAttributeValue($this->getAttribute('name')));
     }
-    public static function loadFixture()
+    /**
+     * @magentoDataFixture loadConfigurableProductsFixture
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation enabled
+     */
+    public function testItReturnsConfigurableProductAssociations()
+    {
+        /** @var ProductRepository $productRepository */
+        $productRepository = $this->objectManager->create(ProductRepository::class);
+        $actualAssociations = $productRepository->getProductAssociations([1]);
+        $this->assertEquals([
+            1 => new ProductAssociation(1, [10, 20])
+        ], $actualAssociations);
+    }
+    /**
+     * @magentoDataFixture loadGroupedProductsFixture
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation enabled
+     */
+    public function testItReturnsGroupedProductAssociations()
+    {
+        /** @var ProductRepository $productRepository */
+        $productRepository = $this->objectManager->create(ProductRepository::class);
+        $actualAssociations = $productRepository->getProductAssociations([22]);
+        $this->assertEquals([
+            22 => new ProductAssociation(22, [1, 21])
+        ], $actualAssociations);
+    }
+    public static function loadProductsFixture()
     {
         include __DIR__ . '/../_files/products.php';
     }
-
+    public static function loadConfigurableProductsFixture()
+    {
+        include __DIR__ . '/../_files/product_configurable.php';
+    }
+    public static function loadGroupedProductsFixture()
+    {
+        include __DIR__ . '/../_files/product_grouped.php';
+    }
     /**
      * @param $attributeCode
      * @return Attribute

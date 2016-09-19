@@ -56,9 +56,6 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
      */
     private $productFactory;
 
-    const PARAM_PRODUCT_ID_FILTER = 'productIdFilter';
-    const PARAM_PAGE_SIZE = 'pageSize';
-    const PARAM_STORE_ID = 'storeId';
     /**
      * @var ProductCollectionFactory
      */
@@ -68,6 +65,8 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
      */
     private $productIdChunks;
 
+    const PARAM_PRODUCT_ID_CHUNKS = 'productIdChunks';
+    const PARAM_STORE_ID = 'storeId';
     /**
      * @param ProductCollectionFactory $collectionFactory
      * @param ProductFactory $productFactory

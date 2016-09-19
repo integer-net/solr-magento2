@@ -12,7 +12,17 @@
   <preference for="IntegerNet\Solr\Implementor\StoreEmulation" type="IntegerNet\Solr\Model\Bridge\StoreEmulation" />
   <preference for="IntegerNet\Solr\Implementor\ProductRenderer" type="IntegerNet\Solr\Model\Bridge\ProductRenderer" />
   <preference for="IntegerNet\Solr\Implementor\EventDispatcher" type="IntegerNet\Solr\Model\Bridge\EventDispatcher" />
+
   <type name="IntegerNet\Solr\Model\Bridge\Config" shared="false"/>
+
+  <type name="IntegerNet\Solr\Model\ResourceModel\MergedProductAssociations">
+    <arguments>
+      <argument name="sources" xsi:type="array">
+        <item name="configurable" xsi:type="object">IntegerNet\Solr\Model\ResourceModel\ConfigurableProductAssociations</item>
+        <item name="grouped" xsi:type="object">IntegerNet\Solr\Model\ResourceModel\GroupedProductAssociations</item>
+      </argument>
+    </arguments>
+  </type>
 
   <virtualType name="nopagination" type="IntegerNet\Solr\Request\SinglePage">
     <arguments>

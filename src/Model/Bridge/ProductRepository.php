@@ -12,94 +12,74 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\PagedProductIterator as PagedProductIteratorInterface;
 use IntegerNet\Solr\Implementor\PagedProductIteratorFactory as PagedProductIteratorInterfaceFactory;
-use IntegerNet\Solr\Implementor\Product as ProductInterface;
-use IntegerNet\Solr\Implementor\ProductIterator as ProductIteratorInterface;
-use IntegerNet\Solr\Implementor\ProductIteratorFactory as ProductIteratorInterfaceFactory;
 use IntegerNet\Solr\Implementor\ProductRepository as ProductRepositoryInterface;
+use IntegerNet\Solr\Indexer\Data\ProductIdChunks;
+use IntegerNet\Solr\Model\ResourceModel\MergedProductAssociations;
 use Magento\Catalog\Api\ProductRepositoryInterface as MagentoProductRepository;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\CatalogInventory\Model\ResourceModel\Stock\Status as StockStatus;
-use Magento\ConfigurableProduct\Api\LinkManagementInterface;
+use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable as ConfigurableType;
 
 class ProductRepository implements ProductRepositoryInterface
 {
     /**
-     * @var ProductIteratorInterfaceFactory
-     */
-    private $iteratorFactory;
-    /**
-     * @var LinkManagementInterface
-     */
-    private $productLinkManagement;
-    /**
-     * @var int
-     */
-    private $pageSize;
-    /**
      * @var PagedProductIteratorInterfaceFactory
      */
     private $pagedIteratorFactory;
-
-    public function __construct(LinkManagementInterface $productLinkManagement,
-                                ProductIteratorInterfaceFactory $iteratorFactory,
-                                PagedProductIteratorInterfaceFactory $pagedIteratorFactory)
-    {
-        $this->productLinkManagement = $productLinkManagement;
-        $this->iteratorFactory = $iteratorFactory;
-        $this->pagedIteratorFactory = $pagedIteratorFactory;
-    }
-
     /**
-     * Set maximum number of products to load at once during index
-     *
-     * @param int $pageSize
-     * @return $this
+     * @var CollectionFactory
      */
-    public function setPageSizeForIndex($pageSize)
+    private $productCollectionFactory;
+    /**
+     * @var MergedProductAssociations
+     */
+    private $productAssociationsResource;
+
+    /**
+     * @param PagedProductIteratorInterfaceFactory $pagedIteratorFactory
+     * @param CollectionFactory $productCollectionFactory
+     * @param ConfigurableType $configurableType
+     */
+    public function __construct(PagedProductIteratorInterfaceFactory $pagedIteratorFactory,
+                                CollectionFactory $productCollectionFactory,
+                                MergedProductAssociations $mergedProductAssociations)
     {
-        $this->pageSize = $pageSize;
-        return $this;
+        $this->pagedIteratorFactory = $pagedIteratorFactory;
+        $this->productCollectionFactory = $productCollectionFactory;
+        $this->productAssociationsResource = $mergedProductAssociations;
     }
 
     /**
-     * Return product iterator, which should implement lazy loading and allows a callback for batch processing
+     * Return product iterator which may implement lazy loading but must ensure that given chunks are loaded together
      *
-     * @param int $storeId Products will be returned that are visible in this store and with store specific values
-     * @param null|int[] $productIds filter by product ids
+     * @param int $storeId
+     * @param ProductIdChunks $chunks
      * @return PagedProductIteratorInterface
      */
-    public function getProductsForIndex($storeId, $productIds = null)
+    public function getProductsInChunks($storeId, ProductIdChunks $chunks)
     {
         return $this->pagedIteratorFactory->create([
             PagedProductIterator::PARAM_STORE_ID => $storeId,
-            PagedProductIterator::PARAM_PAGE_SIZE => $this->pageSize,
-            PagedProductIterator::PARAM_PRODUCT_ID_FILTER => $productIds,
+            PagedProductIterator::PARAM_PRODUCT_ID_CHUNKS => $chunks,
         ]);
     }
 
     /**
-     * Return product iterator for child products
-     *
-     * @param ProductInterface|Product $parent The composite parent product. Child products will be returned that are visible in the same store and with store specific values
-     * @return ProductIteratorInterface
+     * @return int[]
      */
-    public function getChildProducts(ProductInterface $parent)
+    public function getAllProductIds()
     {
-        $products = $this->productLinkManagement->getChildren($parent->getSku());
-        return $this->createProductIterator($parent->getStoreId(), $products);
+        return $this->productCollectionFactory->create()->getAllIds();
     }
 
     /**
-     * @param $storeId
-     * @param $products
-     * @return ProductIteratorInterface
+     * @param null|int[] $productIds
+     * @return \IntegerNet\Solr\Indexer\Data\ProductAssociation[] An array with parent_id as key and association metadata as value
      */
-    private function createProductIterator($storeId, $products)
+    public function getProductAssociations($productIds)
     {
-        return $this->iteratorFactory->create([
-            ProductIterator::PARAM_STORE_ID => $storeId,
-            ProductIterator::PARAM_MAGENTO_PRODUCTS => $products
-        ]);
+        return $this->productAssociationsResource->getAssociations($productIds);
     }
 
 }
