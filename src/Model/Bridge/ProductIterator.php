@@ -20,7 +20,7 @@ use Magento\Catalog\Model\Product as MagentoProduct;
  *
  * i.e. it uses the callback but loads all products at once in one page
  */
-class ProductIterator extends \IteratorIterator implements ProductIteratorInterface, PagedProductIteratorInterface
+class ProductIterator extends \IteratorIterator implements ProductIteratorInterface
 {
     /**
      * @var int|null

@@ -11,6 +11,7 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\ProductFactory;
+use IntegerNet\Solr\Indexer\Data\ProductIdChunks;
 use IntegerNet\Solr\Model\Indexer\ProductCollectionFactory;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
@@ -30,21 +31,22 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
     public function testIterator($storeId, $productIds, $pageSize)
     {
         $expectedPageCount = (int)\ceil(\count($productIds) / $pageSize);
-        $productFactory = $this->mockProductFactory($productIds);
-        $products = $this->getProductStubs($productIds);
-        $collectionFactory = $this->mockCollectionFactory($storeId, $expectedPageCount, $productIds, $products);
-
-        $iterator = new PagedProductIterator($collectionFactory, $productFactory, $productIds, $pageSize, $storeId);
+        $productsById = $this->getProductStubs($productIds);
+        $chunks = ProductIdChunks::withAssociationsTogether($productIds, [], $pageSize);
+        $iterator = new PagedProductIterator(
+            $this->mockCollectionFactory($storeId, $expectedPageCount, $chunks, $productsById),
+            $this->mockProductFactory($productIds),
+            $chunks,
+            $storeId
+        );
         $iterator->setPageCallback($this->mockCallback($expectedPageCount));
         /** @var Product[] $productsFromIterator */
         $productsFromIterator = \iterator_to_array($iterator);
 
-        $this->assertEquals(\count($products), \count($productsFromIterator));
+        $this->assertEquals(\count($productsById), \count($productsFromIterator));
         foreach ($productsFromIterator as $actualProduct) {
-            $this->assertInstanceOf(Product::class, $actualProduct, 'Should be instance of product bridge');
-            $this->assertEquals(current($products)->getId(), $actualProduct->getId(), 'Product ID');
-            $this->assertEquals($storeId, $actualProduct->getStoreId(), 'Store ID');
-            next($products);
+            $this->assertProductBridgeFor(current($productsById), $storeId, $actualProduct);
+            next($productsById);
         }
     }
     public static function dataIterator()
@@ -68,6 +70,89 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @dataProvider dataSubset
+     */
+    public function testSubset($storeId, $allIds, $chunkIds, $chunkSize, $subsetIds, $currentChunkId, $expectedException = null)
+    {
+        $expectedCollectionCreateCalls = $currentChunkId + 1;
+        $iterator = new PagedProductIterator(
+            $this->mockCollectionFactory(
+                $storeId,
+                $expectedCollectionCreateCalls,
+                ProductIdChunks::withAssociationsTogether($allIds, [], $chunkSize),
+                $this->getProductStubs($allIds)
+            ),
+            $this->mockProductFactory($expectedException ? [] : $subsetIds),
+            ProductIdChunks::withAssociationsTogether($allIds, [], $chunkSize),
+            $storeId
+        );
+        $iterator->setPageCallback($this->mockCallback($currentChunkId));
+        $iterator->rewind();
+        for ($i = 0; $i < $currentChunkId * $chunkSize; ++$i) {
+            $iterator->next();
+            $iterator->valid();
+        }
+
+        if ($expectedException) {
+            $this->setExpectedExceptionRegExp($expectedException);
+        }
+        $subset = $iterator->subset($subsetIds);
+        $this->assertInstanceOf(ProductIterator::class, $subset);
+        $productsById = $this->getProductStubs($subsetIds);
+        $this->assertSameSize($productsById, $subset);
+        foreach ($subset as $actualProduct) {
+            $this->assertProductBridgeFor(current($productsById), $storeId, $actualProduct);
+            next($productsById);
+        }
+    }
+    public static function dataSubset()
+    {
+        return [
+            [
+                'store_id' => 1,
+                'all_ids' => [1, 2, 3, 5, 8, 13],
+                'chunk_ids' => [1, 2, 3],
+                'chunk_size' => 3,
+                'subset_ids' => [1, 2],
+                'current_chunk_id' => 0,
+            ],
+            [
+                'store_id' => 1,
+                'all_ids' => [1, 2, 3, 5, 8, 13],
+                'chunk_ids' => [1, 2, 3],
+                'chunk_size' => 3,
+                'subset_ids' => [1, 3],
+                'current_chunk_id' => 0,
+            ],
+            [
+                'store_id' => 1,
+                'all_ids' => [1, 2, 3, 5, 8, 13],
+                'chunk_ids' => [5, 8, 13],
+                'chunk_size' => 3,
+                'subset_ids' => [8, 13],
+                'current_chunk_id' => 1,
+            ],
+            [
+                'store_id' => 1,
+                'all_ids' => [1, 2, 3, 5, 8, 13],
+                'chunk_ids' => [1, 2, 3],
+                'chunk_size' => 3,
+                'subset_ids' => [1, 3, 21],
+                'current_chunk_id' => 0,
+                'expected_exception' => \OutOfBoundsException::class,
+            ],
+            [
+                'store_id' => 1,
+                'all_ids' => [1, 2, 3, 5, 8, 13],
+                'chunk_ids' => [5, 8, 13],
+                'chunk_size' => 3,
+                'subset_ids' => [3, 13],
+                'current_chunk_id' => 1,
+                'expected_exception' => \OutOfBoundsException::class,
+            ],
+        ];
+    }
     /**
      * @param $productId
      * @return \PHPUnit_Framework_MockObject_MockObject
@@ -134,27 +219,31 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
         $products = \array_map(function ($productId) {
             return $this->getProductStub($productId);
         }, $productIds);
-        return $products;
+        return \array_combine($productIds, $products);
     }
 
     /**
      * @param $storeId
      * @param $expectedCalls
-     * @param $productIds
+     * @param ProductIdChunks $chunks
      * @param $products
-     * @return \PHPUnit_Framework_MockObject_MockObject|ProductCollectionFactory
+     * @return ProductCollectionFactory|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function mockCollectionFactory($storeId, $expectedCalls, $productIds, $products)
+    private function mockCollectionFactory($storeId, $expectedCalls, ProductIdChunks $chunks, $products)
     {
+        $arguments = [];
+        foreach ($chunks as $chunk) {
+            $arguments[] = [$storeId, $chunk->getAllIds()];
+        }
         $collectionFactory = $this->getMockBuilder(ProductCollectionFactory::class)
             ->disableOriginalConstructor()
             ->setMethods(['create'])
             ->getMock();
         $collectionFactory->expects($this->exactly($expectedCalls))
             ->method('create')
-            ->with($storeId, $productIds)
-            ->willReturnCallback(function() use ($storeId, $productIds, $products) {
-                return $this->mockCollection($storeId, $productIds, $products);
+            ->withConsecutive(...$arguments)
+            ->willReturnCallback(function($storeId, $productIds) use ($products) {
+                return $this->mockCollection($storeId, $productIds, \array_intersect_key($products, \array_flip($productIds)));
             });
         return $collectionFactory;
     }
@@ -170,7 +259,7 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|Collection $collectionStub */
         $collectionStub = $this->getMockBuilder(Collection::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getIterator', 'load', 'getSize'])
+            ->setMethods(['getIterator', 'load', 'getSize', 'getItemById'])
             ->getMock();
         $collectionStub->method('getSize')->willReturn(count($products));
         $collectionStub->method('getIterator')
@@ -183,6 +272,10 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
                         \array_slice($products, $offset, $limit)
                     )
                 );
+            });
+        $collectionStub->method('getItemById')
+            ->willReturnCallback(function($id) use ($products) {
+                return isset($products[$id]) ? $products[$id] : null;
             });
         return $collectionStub;
     }
@@ -197,5 +290,17 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
         $callbackMock->expects($this->exactly($expectedCallCount))
             ->method('__invoke');
         return $callbackMock;
+    }
+
+    /**
+     * @param $magentoProductStub
+     * @param $storeId
+     * @param $actualProduct
+     */
+    private function assertProductBridgeFor($magentoProductStub, $storeId, $actualProduct)
+    {
+        $this->assertInstanceOf(Product::class, $actualProduct, 'Should be instance of product bridge');
+        $this->assertEquals($magentoProductStub->getId(), $actualProduct->getId(), 'Product ID');
+        $this->assertEquals($storeId, $actualProduct->getStoreId(), 'Store ID');
     }
 }
