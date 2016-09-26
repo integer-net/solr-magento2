@@ -24,6 +24,14 @@
     </arguments>
   </type>
 
+  <type name="IntegerNet\Solr\Block\Autosuggest\Item">
+    <arguments>
+      <argument name="data" xsi:type="array">
+        <item name="template" xsi:type="string">IntegerNet_Solr::autosuggest/item.phtml</item>
+      </argument>
+    </arguments>
+  </type>
+
   <virtualType name="nopagination" type="IntegerNet\Solr\Request\SinglePage">
     <arguments>
       <argument name="pageSize" xsi:type="number">10000</argument>

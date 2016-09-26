@@ -178,7 +178,7 @@ class Product implements ProductInterface
      *
      * @return MagentoProductInterface
      */
-    private function getMagentoProduct()
+    public function getMagentoProduct()
     {
         return $this->magentoProduct;
     }
