@@ -12,7 +12,9 @@
   <preference for="IntegerNet\Solr\Implementor\StoreEmulation" type="IntegerNet\Solr\Model\Bridge\StoreEmulation" />
   <preference for="IntegerNet\Solr\Implementor\ProductRenderer" type="IntegerNet\Solr\Model\Bridge\ProductRenderer" />
   <preference for="IntegerNet\Solr\Implementor\EventDispatcher" type="IntegerNet\Solr\Model\Bridge\EventDispatcher" />
-
+  <preference for="IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository"
+              type="IntegerNet\Solr\Model\Bridge\SerializableCategoryRepository" />
+  
   <type name="IntegerNet\Solr\Model\Bridge\Config" shared="false"/>
 
   <type name="IntegerNet\Solr\Model\ResourceModel\MergedProductAssociations">

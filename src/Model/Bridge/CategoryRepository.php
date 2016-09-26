@@ -93,7 +93,7 @@ class CategoryRepository implements IndexCategoryRepository
             ->addIdFilter($product->getCategoryIds())
             ->addAttributeToSelect([MagentoCategory::KEY_IS_ACTIVE, MagentoCategory::KEY_INCLUDE_IN_MENU]);
 
-        $result = CategoryCollection::fromMagentoCollection($collection)
+        $result = \IntegerNet\Solr\Model\Data\CategoryCollection::fromMagentoCollection($collection)
             ->filterVisibleInMenu()
             ->filterInRoot($rootCategoryId)
             ->idsWithParents()
@@ -150,57 +150,4 @@ class CategoryRepository implements IndexCategoryRepository
         return $result;
     }
 
-}
-
-
-/**
- * @internal
- */
-class CategoryCollection extends ArrayCollection
-{
-    /**
-     * @param Collection $magentoCollection
-     * @return static
-     */
-    public static function fromMagentoCollection(Collection $magentoCollection)
-    {
-        return new static($magentoCollection->getIterator()->getArrayCopy());
-    }
-
-    /**
-     * @return static
-     */
-    public function filterVisibleInMenu()
-    {
-        return $this->filter(function(MagentoCategoryInterface $category) {
-            return $category->getIsActive() && $category->getIncludeInMenu();
-        });
-    }
-
-    /**
-     * @param $rootCategoryId
-     * @return static
-     */
-    public function filterInRoot($rootCategoryId)
-    {
-        return $this->filter(function(MagentoCategoryInterface $category) use ($rootCategoryId) {
-            $parentIds = \explode('/', $category->getPath());
-            return \in_array($rootCategoryId, $parentIds);
-        });
-    }
-
-    /**
-     * @return ArrayCollection
-     */
-    public function idsWithParents()
-    {
-        return new ArrayCollection(
-            $this
-                ->map(function(MagentoCategoryInterface $category) {
-                    return \explode('/', $category->getPath());
-                })
-                ->collapse()
-                ->getArrayCopy()
-        );
-    }
 }

@@ -10,15 +10,11 @@
 
 namespace IntegerNet\Solr\Database;
 
-use IntegerNet\Solr\Implementor\ProductRepository;
-use IntegerNet\Solr\Implementor\Stub\AttributeStub;
-use IntegerNet\Solr\Model\Bridge\Attribute;
 use IntegerNet\Solr\Model\Bridge\CategoryRepository;
 use IntegerNet\Solr\Model\Bridge\Product;
-use IntegerNet\Solr\Model\Bridge\AttributeRepository;
 use IntegerNet\Solr\Model\Bridge\ProductFactory;
-use Magento\TestFramework\ObjectManager;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\TestFramework\ObjectManager;
 
 class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
 {
