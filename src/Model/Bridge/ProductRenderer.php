@@ -14,7 +14,6 @@ use IntegerNet\Solr\Block\Autosuggest\Item;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use IntegerNet\Solr\Implementor\ProductRenderer as ProductRendererInterface;
 use IntegerNet\Solr\Indexer\IndexDocument;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\State as AppState;
 use Magento\Framework\View\LayoutInterface;
 

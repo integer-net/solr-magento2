@@ -10,12 +10,18 @@
 
 namespace IntegerNet\Solr\Database;
 
-use Magento\TestFramework\ObjectManager;
 use IntegerNet\Solr\Model\Bridge\SerializableCategoryRepository;
 use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository as SerializableCategoryRepositoryInterface;
+use Magento\Framework\Session\SidResolverInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\TestFramework\ObjectManager;
 
 class SerializableCategoryRepositoryTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var ObjectManager
+     */
+    private $objectManager;
     /**
      * @var SerializableCategoryRepository
      */
@@ -23,33 +29,35 @@ class SerializableCategoryRepositoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $objectManager = ObjectManager::getInstance();
-        $this->serializableCategoryRepository = $objectManager->create(SerializableCategoryRepositoryInterface::class);
-    }
-
-    public function testInstantiation()
-    {
-        $this->assertInstanceOf(SerializableCategoryRepository::class, $this->serializableCategoryRepository);
+        $this->objectManager = ObjectManager::getInstance();
+        $this->serializableCategoryRepository = $this->objectManager->create(SerializableCategoryRepositoryInterface::class);
     }
 
     /**
      * @magentoDataFixture loadFixture
+     * @magentoAppArea adminhtml
+     * @magentoConfigFixture admin_store web/unsecure/base_link_url http://admin.example.com/
+     * @magentoConfigFixture current_store web/unsecure/base_link_url http://frontend.example.com/
+     * @magentoConfigFixture fixture_second_store_store web/unsecure/base_link_url http://frontend2.example.com/
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
+     * @dataProvider dataFindActiveCategories
      */
-    public function testFindActiveCategories()
+    public function testFindActiveCategories($storeId)
     {
-        $storeId = 1;
+        /** @var StoreManagerInterface $storeManager */
+        $storeManager = $this->objectManager->create(StoreManagerInterface::class);
+        $baseUrl = $storeManager->getStore($storeId)->getBaseUrl();
         $expectedCategories = [
             new \IntegerNet\SolrSuggest\Plain\Bridge\Category(
                 '333',
                 'Category 1',
-                'http://localhost/index.php/category-1.html'
+                $baseUrl .'category-1.html'
             ),
             new \IntegerNet\SolrSuggest\Plain\Bridge\Category(
                 '444',
                 'Category 2',
-                'http://localhost/index.php/category-2.html'
+                $baseUrl .'category-2.html'
             ),
         ];
 
@@ -59,6 +67,24 @@ class SerializableCategoryRepositoryTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(current($expectedCategories), $actualCategory);
             next($expectedCategories);
         }
+    }
+    public static function dataFindActiveCategories()
+    {
+        return [
+            [
+                'store_id' => 2,
+            ],
+            [
+                'store_id' => 1,
+            ]
+        ];
+    }
+
+    public static function setUpBeforeClass()
+    {
+        // store has to be created first, otherwise @magentoConfigFixture does not work
+        // http://magento.stackexchange.com/questions/93902/magento-2-integration-tests-load-data-fixtures-before-config-fixtures/93961
+        include __DIR__ . '/../_files/second_store.php';
     }
 
     public static function loadFixture()

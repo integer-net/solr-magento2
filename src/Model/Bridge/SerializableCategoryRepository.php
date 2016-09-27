@@ -14,6 +14,7 @@ use IntegerNet\Solr\Model\Data\CategoryCollection;
 use IntegerNet\SolrSuggest\Implementor\SerializableSuggestCategory;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use Magento\Framework\Session\SidResolverInterface;
 
 class SerializableCategoryRepository implements \IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository
 {
@@ -21,10 +22,15 @@ class SerializableCategoryRepository implements \IntegerNet\SolrSuggest\Implemen
      * @var CategoryCollectionFactory
      */
     private $categoryCollectionFactory;
+    /**
+     * @var SidResolverInterface
+     */
+    private $sidResolver;
 
-    public function __construct(CategoryCollectionFactory $categoryCollectionFactory)
+    public function __construct(CategoryCollectionFactory $categoryCollectionFactory, SidResolverInterface $sidResolver)
     {
         $this->categoryCollectionFactory = $categoryCollectionFactory;
+        $this->sidResolver = $sidResolver;
     }
 
     /**
@@ -33,7 +39,10 @@ class SerializableCategoryRepository implements \IntegerNet\SolrSuggest\Implemen
      */
     public function findActiveCategories($storeId)
     {
-        return CategoryCollection::fromMagentoCollection(
+        $origUseSessionInUrl = $this->sidResolver->getUseSessionInUrl();
+        $this->sidResolver->setUseSessionInUrl(false);
+        try {
+            return CategoryCollection::fromMagentoCollection(
                 $this->categoryCollectionFactory->create()
                     ->setStoreId($storeId)
                     ->addAttributeToSelect(['name', 'url_key'])
@@ -41,12 +50,16 @@ class SerializableCategoryRepository implements \IntegerNet\SolrSuggest\Implemen
                     ->addAttributeToFilter('include_in_menu', 1)
                     ->addAttributeToFilter('level', ['gt' => 1])
             )->map(
-                function(Category $category) {
+                function (Category $category) use ($storeId) {
+                    $category->setStoreId($storeId);
                     return new \IntegerNet\SolrSuggest\Plain\Bridge\Category(
                         $category->getId(), $category->getName(), $category->getUrl()
                     );
                 }
             )->getArrayCopy();
+        } finally {
+            $this->sidResolver->setUseSessionInUrl($origUseSessionInUrl);
+        }
     }
 
 }

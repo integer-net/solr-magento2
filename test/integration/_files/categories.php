@@ -38,6 +38,7 @@ use Magento\Catalog\Model\Category;
     )->setIncludeInMenu(
         true
     )->save();
+    $category->setStoreId(2)->save();
 
     $category = $objectManager->create(
         Category::class
@@ -60,6 +61,7 @@ use Magento\Catalog\Model\Category;
     )->setIncludeInMenu(
         true
     )->save();
+    $category->setStoreId(2)->save();
 
     $category = $objectManager->create(
         Category::class
@@ -82,6 +84,7 @@ use Magento\Catalog\Model\Category;
     )->setIncludeInMenu(
         true
     )->save();
+    $category->setStoreId(2)->save();
 
     $category = $objectManager->create(
         Category::class
@@ -104,4 +107,5 @@ use Magento\Catalog\Model\Category;
     )->setIncludeInMenu(
         false
     )->save();
+    $category->setStoreId(2)->save();
 });
