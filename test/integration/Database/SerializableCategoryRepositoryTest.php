@@ -72,11 +72,26 @@ class SerializableCategoryRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'store_id' => 2,
-            ],
-            [
                 'store_id' => 1,
-            ]
+            ],
+            /*
+             * URLs for non-default store views only work with two bugfixes in the core:
+             *
+             * 1. Magento\Catalog\Model\Category
+             *
+             * @617
+             * --- $this->setData('url', $this->getUrlInstance()->getDirectUrl($rewrite->getRequestPath()));
+             * +++ $this->setData('url', $this->getUrlInstance()->getDirectUrl($rewrite->getRequestPath(), ['_scope' => $this->getStoreId()]));
+             *
+             * 2. Magento\Framework\Url
+             *
+             * @718
+             * --- return $this->getBaseUrl() . $routeParams['_direct'];
+             * +++ return $this->getBaseUrl($routeParams) . $routeParams['_direct'];
+             */
+//            [
+//                'store_id' => 2,
+//            ]
         ];
     }
 
