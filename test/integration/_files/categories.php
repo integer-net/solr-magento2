@@ -4,6 +4,9 @@ use Magento\Catalog\Model\Category;
 \call_user_func(function() {
     $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
 
+    $store = $objectManager->create('Magento\Store\Model\Store');
+    $secondStoreId = $store->load('fixture_second_store', 'code')->getId();
+
     /** @var \Magento\Framework\Registry $registry */
     $registry = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get('Magento\Framework\Registry');
     $registry->unregister('isSecureArea');
@@ -38,7 +41,7 @@ use Magento\Catalog\Model\Category;
     )->setIncludeInMenu(
         true
     )->save();
-    $category->setStoreId(2)->save();
+    $category->setStoreId($secondStoreId)->save();
 
     $category = $objectManager->create(
         Category::class
@@ -61,7 +64,7 @@ use Magento\Catalog\Model\Category;
     )->setIncludeInMenu(
         true
     )->save();
-    $category->setStoreId(2)->save();
+    $category->setStoreId($secondStoreId)->save();
 
     $category = $objectManager->create(
         Category::class
@@ -84,7 +87,7 @@ use Magento\Catalog\Model\Category;
     )->setIncludeInMenu(
         true
     )->save();
-    $category->setStoreId(2)->save();
+    $category->setStoreId($secondStoreId)->save();
 
     $category = $objectManager->create(
         Category::class
@@ -107,5 +110,5 @@ use Magento\Catalog\Model\Category;
     )->setIncludeInMenu(
         false
     )->save();
-    $category->setStoreId(2)->save();
+    $category->setStoreId($secondStoreId)->save();
 });

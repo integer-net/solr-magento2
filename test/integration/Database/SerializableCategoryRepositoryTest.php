@@ -101,6 +101,10 @@ class SerializableCategoryRepositoryTest extends \PHPUnit_Framework_TestCase
         // http://magento.stackexchange.com/questions/93902/magento-2-integration-tests-load-data-fixtures-before-config-fixtures/93961
         include __DIR__ . '/../_files/second_store.php';
     }
+    public static function tearDownAfterClass()
+    {
+        include __DIR__ . '/../_files/second_store_rollback.php';
+    }
 
     public static function loadFixture()
     {
