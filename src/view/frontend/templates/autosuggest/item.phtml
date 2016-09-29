@@ -9,13 +9,13 @@
  */
 /** @var $this \IntegerNet\Solr\Block\Autosuggest\Item */
 
-$image = $this->getImage($this->getProduct(), 'integernet_solr_autosuggest_image');
+$image = $this->getAutosuggestImage();
 
 ?>
 <div class="product-image">
     <a href="<?php echo $this->getProduct()->getProductUrl() ?>"
-       title="<?php echo $this->escapeHtml($this->stripTags($image->getLabel(), null, true)) ?>"
-       class="product-image"><?php echo $image->toHtml() ?></a>
+       title="<?php echo $this->escapeHtml($this->stripTags($image->title(), null, true)) ?>"
+       class="product-image"><?php echo $image->imgHtml() ?></a>
 </div>
 <div class="product-name">
     <a href="<?php echo $this->getProduct()->getProductUrl() ?>" title="<?php echo $this->escapeHtml($this->stripTags($this->getProduct()->getName(), null, true)); ?>">

@@ -9,13 +9,30 @@
  */
 namespace IntegerNet\Solr\Block\Autosuggest;
 
-use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Block\Product\AbstractProduct;
+use Magento\Catalog\Block\Product\Context;
+use Magento\Catalog\Model\Product;
 
 class Item extends AbstractProduct
 {
-    public function setProduct(ProductInterface $product)
+    /**
+     * @var ProductImageFactory
+     */
+    private $productImageFactory;
+
+    public function __construct(Context $context, ProductImageFactory $productImageFactory, array $data)
     {
+        $this->productImageFactory = $productImageFactory;
+        parent::__construct($context, $data);
+    }
+
+    /**
+     * @param Product $product
+     * @return void
+     */
+    public function setProduct(Product $product)
+    {
+        // ImageBuilder::setProduct() expects Magento product model, not ProductInterface
         $this->setData('product', $product);
     }
 
@@ -29,6 +46,16 @@ class Item extends AbstractProduct
     {
         //TODO remove. Using App Emulation now
         return 'frontend';
+    }
+
+    /**
+     * @return ProductImage
+     */
+    public function getAutosuggestImage()
+    {
+        return $this->productImageFactory->create(
+            [ProductImage::PARAM_PRODUCT => $this->getProduct()]
+        );
     }
 
 }
