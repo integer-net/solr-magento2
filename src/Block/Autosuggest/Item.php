@@ -9,6 +9,7 @@
  */
 namespace IntegerNet\Solr\Block\Autosuggest;
 
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Block\Product\AbstractProduct;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Model\Product;
@@ -27,12 +28,11 @@ class Item extends AbstractProduct
     }
 
     /**
-     * @param Product $product
+     * @param ProductInterface $product
      * @return void
      */
-    public function setProduct(Product $product)
+    public function setProduct(ProductInterface $product)
     {
-        // ImageBuilder::setProduct() expects Magento product model, not ProductInterface
         $this->setData('product', $product);
     }
 

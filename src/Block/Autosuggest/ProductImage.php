@@ -40,6 +40,9 @@ class ProductImage
      */
     const PARAM_PRODUCT = 'product';
 
+    /**
+     * /!\ ImageBuilder::setProduct() expects Magento product model, not ProductInterface
+     */
     public function __construct(ImageBuilder $imageBuilder, Product $product)
     {
         $this->imageBuilder = $imageBuilder;
