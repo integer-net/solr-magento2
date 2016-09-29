@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
   <preference for="IntegerNet\Solr\Model\StatusMessages" type="IntegerNet\Solr\Model\SolrStatusMessages" />
+  
+  <!-- Bridge implementations -->
+
   <preference for="IntegerNet\Solr\Implementor\SolrRequestFactory" type="IntegerNet\Solr\Model\Bridge\RequestFactory" />
   <preference for="IntegerNet\Solr\Implementor\AttributeRepository" type="IntegerNet\Solr\Model\Bridge\AttributeRepository" />
   <preference for="IntegerNet\Solr\Implementor\IndexCategoryRepository" type="IntegerNet\Solr\Model\Bridge\CategoryRepository" />
@@ -14,9 +17,14 @@
   <preference for="IntegerNet\Solr\Implementor\EventDispatcher" type="IntegerNet\Solr\Model\Bridge\EventDispatcher" />
   <preference for="IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository"
               type="IntegerNet\Solr\Model\Bridge\SerializableCategoryRepository" />
+  <preference for="IntegerNet\SolrSuggest\Implementor\TemplateRepository"
+              type="IntegerNet\Solr\Model\Bridge\TemplateRepository" />
+  <preference for="IntegerNet\SolrSuggest\Implementor\CustomHelper"
+              type="IntegerNet\SolrSuggest\Block\DefaultCustomHelper" />
   
-  <type name="IntegerNet\Solr\Model\Bridge\Config" shared="false"/>
+  <!-- Module types -->
 
+  <type name="IntegerNet\Solr\Model\Bridge\Config" shared="false"/>
   <type name="IntegerNet\Solr\Model\ResourceModel\MergedProductAssociations">
     <arguments>
       <argument name="sources" xsi:type="array">
@@ -25,7 +33,6 @@
       </argument>
     </arguments>
   </type>
-
   <type name="IntegerNet\Solr\Block\Autosuggest\Item">
     <arguments>
       <argument name="data" xsi:type="array">
@@ -33,7 +40,6 @@
       </argument>
     </arguments>
   </type>
-
   <virtualType name="nopagination" type="IntegerNet\Solr\Request\SinglePage">
     <arguments>
       <argument name="pageSize" xsi:type="number">10000</argument>
@@ -45,6 +51,13 @@
       <argument name="pagination" xsi:type="object">nopagination</argument>
     </arguments>
   </type>
+
+  <!-- Plugins -->
+
+  <type name="Magento\Catalog\Model\Layer\ItemCollectionProviderInterface">
+    <plugin name="replaceCollections" type="IntegerNet\Solr\Model\Plugin\CollectionProviderPlugin" />
+  </type>
+
   <!--
   <preference for="Magento\Catalog\Model\ResourceModel\Layer\Filter\Attribute" type="IntegerNet\Solr\Model\Resource\Catalog\Layer\Filter\Attribute"/>
   <preference for="Magento\Catalog\Model\ResourceModel\Layer\Filter\Price" type="IntegerNet\Solr\Model\Resource\Catalog\Layer\Filter\Price"/>
@@ -60,6 +73,7 @@
   <preference for="Magento\CatalogSearch\Block\Autocomplete" type="IntegerNet\Solr\Block\Autosuggest"/>
   -->
 
+  <!-- Search engine -->
 
   <type name="Magento\Search\Model\Adminhtml\System\Config\Source\Engine">
     <arguments>
@@ -101,6 +115,9 @@
     </arguments>
   </type>
 
+
+  <!-- Magento bugfixes -->
+
   <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
     <plugin name="storeFilterFixer" type="IntegerNet\Solr\Model\Plugin\StoreFilterFixer" />
   </type>
@@ -109,9 +126,6 @@
     <plugin name="attributeFilterFixer" type="IntegerNet\Solr\Model\Plugin\AttributeFilterFixer" />
   </type>
 
-  <type name="Magento\Catalog\Model\Layer\ItemCollectionProviderInterface">
-    <plugin name="replaceCollections" type="IntegerNet\Solr\Model\Plugin\CollectionProviderPlugin" />
-  </type>
 
 
 </config>

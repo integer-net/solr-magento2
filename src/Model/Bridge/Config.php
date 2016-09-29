@@ -280,7 +280,12 @@ class Config implements ConfigInterface
         if ($this->cms === null) {
             $prefix = 'integernet_solr/cms/';
             $this->cms = new CmsConfig(
-                $this->_getConfigFlag($prefix . 'is_active')
+                $this->_getConfigFlag($prefix . 'is_active'),
+                //TODO create system configuration for the following:
+                $this->_getConfigFlag($prefix . 'use_in_search_results'),
+                $this->_getConfig($prefix . 'max_number_results'),
+                $this->_getConfigFlag($prefix . 'is_fuzzy_active'),
+                $this->_getConfig($prefix . 'fuzzy_sensitivity')
             );
         }
         return $this->cms;
@@ -298,7 +303,12 @@ class Config implements ConfigInterface
             $this->category = new CategoryConfig(
                 $this->_getConfigFlag($prefix . 'is_active'),
                 $this->_getConfig($prefix . 'filter_position'),
-                $this->_getConfigFlag($prefix . 'is_indexer_active')
+                $this->_getConfigFlag($prefix . 'is_indexer_active'),
+                //TODO create system configuration for the following:
+                $this->_getConfigFlag($prefix . 'use_in_search_results'),
+                $this->_getConfig($prefix . 'max_number_results'),
+                $this->_getConfigFlag($prefix . 'is_fuzzy_active'),
+                $this->_getConfig($prefix . 'fuzzy_sensitivity')
             );
         }
         return $this->category;
