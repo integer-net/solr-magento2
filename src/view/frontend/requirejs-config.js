@@ -1,7 +1,7 @@
 var config = {
     map: {
         '*': {
-            solrQuickSearch: 'IntegerNet_Solr/form-mini'
+            quickSearch: 'IntegerNet_Solr/form-mini'
         }
     }
 };
