@@ -6,11 +6,10 @@
 define([
     'jquery',
     'underscore',
-    'mage/template',
     "matchMedia",
     'jquery/ui',
     'mage/translate'
-], function ($, _, mageTemplate, mediaCheck) {
+], function ($, _, mediaCheck) {
     'use strict';
 
     /**
@@ -29,15 +28,6 @@ define([
             minSearchLength: 2,
             responseFieldElements: 'ul li',
             selectClass: 'selected',
-            template:
-                '<li class="<%- data.row_class %>" id="qs-option-<%- data.index %>" role="option">' +
-                    '<span class="qs-option-name">' +
-                       ' <%- data.title %>' +
-                    '</span>' +
-                    '<span aria-hidden="true" class="amount">' +
-                        '<%- data.num_results %>' +
-                    '</span>' +
-                '</li>',
             submitBtn: 'button[type="submit"]',
             searchLabel: '[data-role=minisearch-label]',
             isExpandable: null
@@ -259,8 +249,6 @@ define([
                     // top: searchField.offset().top + searchField.outerHeight(),
                     width: searchField.outerWidth()
                 },
-                source = this.options.template,
-                template = mageTemplate(source),
                 dropdown = $('<ul role="listbox"></ul>'),
                 value = this.element.val();
 
@@ -268,13 +256,7 @@ define([
 
             if (value.length >= parseInt(this.options.minSearchLength, 10)) {
                 $.get(this.options.url, {q: value}, $.proxy(function (data) {
-                    $.each(data, function(index, element) {
-                        element.index = index;
-                        var html = template({
-                            data: element
-                        });
-                        dropdown.append(html);
-                    });
+                    dropdown.append(data);
                     this.responseList.indexList = this.autoComplete.html(dropdown)
                         .css(clonePosition)
                         .show()
