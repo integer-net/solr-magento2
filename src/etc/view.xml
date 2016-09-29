@@ -4,8 +4,8 @@
         <images module="Magento_Catalog">
             <!-- To generate the cached images, run bin/magento catalog:image:resize after module has been installed-->
             <image id="integernet_solr_autosuggest_image" type="small_image">
-                <width>110</width>
-                <height>160</height>
+                <width>75</width>
+                <height>75</height>
             </image>
         </images>
     </media>
