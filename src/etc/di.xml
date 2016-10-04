@@ -40,6 +40,28 @@
       </argument>
     </arguments>
   </type>
+
+  <type name="IntegerNet\Solr\Model\Indexer\ProductCollectionFactory">
+    <arguments>
+      <argument name="collectionFactory" xsi:type="object">disabledFlatStateProductCollectionFactory</argument>
+    </arguments>
+  </type>
+  <virtualType name="disabledFlatStateProductCollectionFactory" type="Magento\Catalog\Model\ResourceModel\Product\CollectionFactory">
+    <arguments>
+      <argument name="instanceName" xsi:type="string">disabledFlatStateProductCollection</argument>
+    </arguments>
+  </virtualType>
+  <virtualType name="disabledFlatStateProductCollection" type="Magento\Catalog\Model\ResourceModel\Product\Collection">
+    <arguments>
+      <argument name="catalogProductFlatState" xsi:type="object">disabledFlatState</argument>
+    </arguments>
+  </virtualType>
+  <virtualType name="disabledFlatState" type="Magento\Catalog\Model\Indexer\Product\Flat\State">
+    <arguments>
+      <argument name="isAvailable" xsi:type="boolean">false</argument>
+    </arguments>
+  </virtualType>
+
   <virtualType name="nopagination" type="IntegerNet\Solr\Request\SinglePage">
     <arguments>
       <argument name="pageSize" xsi:type="number">10000</argument>
