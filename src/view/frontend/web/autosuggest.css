@@ -24,7 +24,7 @@
     position: static;
 }
 
-#search_autocomplete ul.searchwords {
+#search_autocomplete ul.integernet_solr-searchwords {
     background: #efefef;
     float: right;
     width: 210px;
@@ -32,13 +32,13 @@
     padding: 15px;
 }
 
-#search_autocomplete ul.searchwords li {
+#search_autocomplete ul.integernet_solr-searchwords li {
     background: none;
     line-height: 25px;
     cursor: auto;
 }
 
-#search_autocomplete ul.searchwords li a {
+#search_autocomplete ul.integernet_solr-searchwords li a {
     font-size: 14px;
     color: #404040;
 }
@@ -48,14 +48,14 @@
     text-decoration: underline;
 }
 
-#search_autocomplete .products-box {
+#search_autocomplete .integernet_solr-products-box {
     border-right: 1px solid #dbdbdb;
     border-bottom: 1px solid #dbdbdb;
     background: #ffffff;
     width: 740px;
 }
 
-#search_autocomplete .products-box  h3 {
+#search_autocomplete .integernet_solr-products-box  h3 {
     padding: 25px 15px;
     margin: 0;
     font-weight: normal;
@@ -63,11 +63,11 @@
     color: #3399cc;
 }
 
-#search_autocomplete ul.products {
+#search_autocomplete ul.integernet_solr-products {
     border: 0;
 }
 
-#search_autocomplete ul.products li {
+#search_autocomplete ul.integernet_solr-products li {
     float: left;
     width: 200px;
     background: #ffffff;
@@ -80,13 +80,13 @@
     cursor: auto;
 }
 
-#search_autocomplete ul.products li:first-child {
+#search_autocomplete ul.integernet_solr-products li:first-child {
     border: 0;
     margin-left: 0;
     padding-left: 15px;
 }
 
-#search_autocomplete ul.products li.last {
+#search_autocomplete ul.integernet_solr-products li.last {
     clear: both;
     float: none;
     visibility: hidden;
@@ -97,74 +97,74 @@
     padding: 0;
 }
 
-#search_autocomplete ul.products li div.product-image {
+#search_autocomplete ul.integernet_solr-products li div.integernet_solr-product-image {
     float: left;
     margin-right: 10px;
     border: 0;
 }
 
 
-.product-image {
+.integernet_solr-product-image {
     border: 0 !Important;
 }
 
-#search_autocomplete ul.products li .product-name a {
+#search_autocomplete ul.integernet_solr-products li .integernet_solr-product-name a {
     color: #414141;
 }
 
-#search_autocomplete ul.products li .product-price {
+#search_autocomplete ul.integernet_solr-products li .integernet_solr-product-price {
     margin-left: 85px;
 }
 
-#search_autocomplete ul.products li .product-price .price-box {
+#search_autocomplete ul.integernet_solr-products li .integernet_solr-product-price .price-box {
     margin-bottom: 0;
     line-height: 15px;
 }
 
-#search_autocomplete ul.products li .product-price .price-label {
+#search_autocomplete ul.integernet_solr-products li .integernet_solr-product-price .price-label {
     font-size: 11px;
     font-weight: normal;
 }
 
-#search_autocomplete ul.products li .product-price span.price {
+#search_autocomplete ul.integernet_solr-products li .integernet_solr-product-price span.price {
     color: #414141;
     font-weight: bold;
 }
 
-#search_autocomplete ul.products li .product-price .minimal-price-link {
+#search_autocomplete ul.integernet_solr-products li .integernet_solr-product-price .minimal-price-link {
     text-decoration: none;
     font-size: 11px;
 }
 
-#search_autocomplete ul.products li .product-price .minimal-price-link span.price {
+#search_autocomplete ul.integernet_solr-products li .integernet_solr-product-price .minimal-price-link span.price {
     font-size: 11px;
 }
 
-#search_autocomplete ul.products li .tax-details {
+#search_autocomplete ul.integernet_solr-products li .tax-details {
     display: none;
 }
 
-#search_autocomplete .additional-box,
-#search_autocomplete .cms-pages-box {
+#search_autocomplete .integernet_solr-additional-box,
+#search_autocomplete .integernet_solr-cms-pages-box {
     border-right: 1px solid #dbdbdb;
     background: #f6f6f6;
     width: 740px;
 }
 
-#search_autocomplete .categories-box,
-#search_autocomplete .cms-pages-box,
-#search_autocomplete .attributes-box {
+#search_autocomplete .integernet_solr-categories-box,
+#search_autocomplete .integernet_solr-cms-pages-box,
+#search_autocomplete .integernet_solr-attributes-box {
     width: 365px;
     padding-bottom: 20px;
     float: left;
 }
 
-#search_autocomplete .attributes-box {
+#search_autocomplete .integernet_solr-attributes-box {
 }
 
-#search_autocomplete .categories-box  h3,
-#search_autocomplete .cms-pages-box  h3,
-#search_autocomplete .attributes-box  h3 {
+#search_autocomplete .integernet_solr-categories-box  h3,
+#search_autocomplete .integernet_solr-cms-pages-box  h3,
+#search_autocomplete .integernet_solr-attributes-box  h3 {
     padding: 25px 15px 5px 15px;
     margin: 0;
     font-weight: normal;
@@ -172,16 +172,16 @@
     color: #3399cc;
 }
 
-#search_autocomplete ul.categories,
-#search_autocomplete ul.cms-pages,
-#search_autocomplete ul.attributes {
+#search_autocomplete ul.integernet_solr-categories,
+#search_autocomplete ul.integernet_solr-cms-pages,
+#search_autocomplete ul.integernet_solr-attributes {
     border: 0;
     width: 370px;
 }
 
-#search_autocomplete ul.categories li,
-#search_autocomplete ul.cms-pages li,
-#search_autocomplete ul.attributes li {
+#search_autocomplete ul.integernet_solr-categories li,
+#search_autocomplete ul.integernet_solr-cms-pages li,
+#search_autocomplete ul.integernet_solr-attributes li {
     float: left;
     width: 158px;
     padding: 0 0 0 15px;
@@ -189,26 +189,26 @@
     cursor: auto;
 }
 
-#search_autocomplete ul.cms-pages li {
+#search_autocomplete ul.integernet_solr-cms-pages li {
     width: 331px;
     padding-bottom: 10px;
 }
 
-#search_autocomplete ul.attributes li {
+#search_autocomplete ul.integernet_solr-attributes li {
     width: 331px;
 }
 
-#search_autocomplete ul.cms-pages li a,
-#search_autocomplete ul.categories li a {
+#search_autocomplete ul.integernet_solr-cms-pages li a,
+#search_autocomplete ul.integernet_solr-categories li a {
     color: #414141;
 }
 
-#search_autocomplete ul.attributes li a {
+#search_autocomplete ul.integernet_solr-attributes li a {
     color: #414141;
     text-decoration: underline;
 }
 
-#search_autocomplete .additional-box .last {
+#search_autocomplete .integernet_solr-additional-box .last {
     clear: both;
     float: none;
     visibility: hidden;
@@ -228,20 +228,20 @@
         width: 458px !important;
     }
 
-    #search_autocomplete .products-box {
+    #search_autocomplete .integernet_solr-products-box {
         border-right: 1px solid #dbdbdb;
         border-bottom: 1px solid #dbdbdb;
         background: #ffffff;
         width: 240px;
     }
 
-    #search_autocomplete ul.products li {
+    #search_autocomplete ul.integernet_solr-products li {
         width: 200px;
         margin-left: 0;
         border: 0;
     }
 
-    #search_autocomplete .additional-box {
+    #search_autocomplete .integernet_solr-additional-box {
         display: none;
     }
 }
@@ -260,7 +260,7 @@
         width: 240px !important;
     }
 
-    #search_autocomplete ul.searchwords {
+    #search_autocomplete ul.integernet_solr-searchwords {
         float: none;
         width: 238px;
         border: 0;

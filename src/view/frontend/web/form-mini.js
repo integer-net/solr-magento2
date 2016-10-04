@@ -249,7 +249,7 @@ define([
                     // top: searchField.offset().top + searchField.outerHeight(),
                     width: searchField.outerWidth()
                 },
-                dropdown = $('<ul role="listbox"></ul>'),
+                dropdown = $('<div></div>'),
                 value = this.element.val();
 
             this.submitBtn.disabled = isEmpty(value);

@@ -20,7 +20,7 @@
 
 <?php if ($searchwordSuggestions = $this->getResult()->getSearchTermSuggestions()): ?>
 
-    <ul class="searchwords">
+    <ul class="integernet_solr-searchwords">
 
         <?php foreach ($searchwordSuggestions as $index => $item): ?>
             <li>
@@ -35,14 +35,14 @@
 <?php $productSuggestions = $this->getResult()->getProductSuggestions() ?>
 <?php if (sizeof($productSuggestions)): ?>
 
-    <div class="products-box">
+    <div class="integernet_solr-products-box">
 
         <h3>
             <strong><?php echo $this->__('Product Suggestions') ?></strong>
             <?php echo $this->__('for your Search') ?>
         </h3>
 
-        <ul class="products">
+        <ul class="integernet_solr-products">
 
             <?php foreach ($productSuggestions as $index => $item): ?>
                 <li>
@@ -63,17 +63,17 @@
 
 <?php if (sizeof($categorySuggestions) || sizeof($cmsPageSuggestions) || sizeof($attributeSuggestions)): ?>
 
-    <div class="additional-box">
+    <div class="integernet_solr-additional-box">
         <?php if (sizeof($categorySuggestions)): ?>
 
-            <div class="categories-box">
+            <div class="integernet_solr-categories-box">
 
                 <h3>
                     <strong><?php echo $this->__('Categories') ?></strong>
                     <?php echo $this->__('for your Search') ?>
                 </h3>
 
-                <ul class="categories">
+                <ul class="integernet_solr-categories">
 
                     <?php foreach ($categorySuggestions as $index => $item): ?>
                         <li>
@@ -87,12 +87,12 @@
 
         <?php if (sizeof($cmsPageSuggestions)): ?>
 
-            <div class="cms-pages-box">
+            <div class="integernet_solr-cms-pages-box">
                 <h3>
                     <strong><?php echo $this->__('Contents') ?></strong>
                     <?php echo $this->__('for your Search') ?>
                 </h3>
-                <ul class="cms-pages">
+                <ul class="integernet_solr-cms-pages">
 
                     <?php foreach ($cmsPageSuggestions as $index => $item): ?>
                         <li>
@@ -107,13 +107,13 @@
 
         <?php foreach($attributeSuggestions as $attributeSuggestion): ?>
 
-            <div class="attributes-box">
+            <div class="integernet_solr-attributes-box">
 
                 <h3>
                     <strong><?php echo $attributeSuggestion->getLabel() ?></strong>
                 </h3>
 
-                <ul class="attributes">
+                <ul class="integernet_solr-attributes">
                     <li>
                         <?php $items = array() ?>
                         <?php foreach ($attributeSuggestion->getOptions() as $item): ?>

@@ -12,16 +12,16 @@
 $image = $this->getAutosuggestImage();
 
 ?>
-<div class="product-image">
+<div class="integernet_solr-product-image">
     <a href="<?php echo $this->getProduct()->getProductUrl() ?>"
        title="<?php echo $this->escapeHtml($this->stripTags($image->title(), null, true)) ?>"
-       class="product-image"><?php echo $image->imgHtml() ?></a>
+       class="integernet_solr-product-image"><?php echo $image->imgHtml() ?></a>
 </div>
-<div class="product-name">
+<div class="integernet_solr-product-name">
     <a href="<?php echo $this->getProduct()->getProductUrl() ?>" title="<?php echo $this->escapeHtml($this->stripTags($this->getProduct()->getName(), null, true)); ?>">
         <?php echo $this->escapeHtml($this->getProduct()->getName()) ?>
     </a>
 </div>
-<div class="product-price">
+<div class="integernet_solr-product-price">
     <?php echo $this->getProductPrice($this->getProduct()) ?>
 </div>
