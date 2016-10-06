@@ -70,11 +70,11 @@ class ConfigTest extends  AbstractBackendController
     {
         $descriptionHtml = $dom->saveXml($dom->getElementById('row_integernet_solr_general_description'));
         $expectedDescriptionFragments = [
-            'Status messages container' => '<ul class="messages integernet_solr_messages">',
-            'Error messages' => '<li class="error-msg">',
-            'Success messages' => '<li class="success-msg">',
-            'Warning messages' => '<li class="warning-msg">',
-            'Notice messages' => '<li class="notice-msg">',
+            'Status messages container' => '<div class="messages integernet_solr_messages">',
+            'Error messages' => '<div class="message message-error error">',
+            'Success messages' => '<div class="message message-success success">',
+            'Warning messages' => '<div class="message message-warning warning">',
+            'Notice messages' => '<div class="message message-notice notice">',
             'First success message' => '<li><span>Success 1</span></li>',
             'Second success message' => '<li><span>Success 2</span></li>',
             'Error message' => '<li><span>Error 1</span></li>',
