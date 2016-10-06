@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!-- Configuration for features which are not implemented yet are commented out -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
   <system>
     <section id="integernet_solr" translate="label" sortOrder="28" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -15,10 +16,12 @@
           <label>Is active</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
+        <!--
         <field id="license_key" translate="label,comment" sortOrder="20" type="text" showInDefault="1">
           <label>License Key</label>
           <comment>Example: AAAAA-BBBBB. Will be necessary two weeks after install.</comment>
         </field>
+        -->
         <field id="log" translate="label,comment" sortOrder="30" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Activate Logging</label>
           <comment>The logs can be found at var/log/solr.log. Make sure to have logging activated.</comment>
@@ -63,6 +66,7 @@
           <label>HTTP Basic Authentication: Password</label>
         </field>
       </group>
+      <!--
       <group id="connection_check" translate="label" sortOrder="25" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Connection Check</label>
         <field id="is_active" translate="label,comment" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -87,6 +91,7 @@
           <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
         </field>
       </group>
+      -->
       <group id="indexing" translate="label" sortOrder="30" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Indexing</label>
         <field id="pagesize" translate="label,comment" sortOrder="10" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -188,6 +193,7 @@
           <source_model>IntegerNet\Solr\Model\Source\VarcharCategoryAttribute</source_model>
         </field>
       </group>
+      <!--
       <group id="category" translate="label" sortOrder="60" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Category Pages</label>
         <field id="is_active" translate="label" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -199,17 +205,20 @@
           <source_model>IntegerNet\Solr\Model\Source\FilterPosition</source_model>
         </field>
       </group>
+      -->
       <group id="autosuggest" translate="label" sortOrder="80" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Autosuggest Box</label>
         <field id="is_active" translate="label" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Is active</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
+        <!--
         <field id="use_php_file_in_home_dir" translate="label,comment" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Method to retrieve autosuggest information</label>
           <comment>Please see manual for information about the different methods.</comment>
           <source_model>IntegerNet\Solr\Model\Source\AutosuggestMethod</source_model>
         </field>
+        -->
         <field id="max_number_searchword_suggestions" translate="label" sortOrder="30" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Maximum number of searchword suggestions</label>
           <validate>validate-number validate-zero-or-greater</validate>
@@ -244,6 +253,7 @@
           <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
         </field>
       </group>
+      <!--
       <group id="seo" translate="label,comment" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>SEO</label>
         <field id="hide_from_robots" sortOrder="10" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -252,6 +262,7 @@
           <source_model>IntegerNet\Solr\Model\Source\RobotOptions</source_model>
         </field>
       </group>
+      -->
     </section>
   </system>
 </config>
