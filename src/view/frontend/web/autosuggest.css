@@ -29,7 +29,7 @@
     float: right;
     width: 210px;
     border: 0;
-    padding: 15px;
+    padding: 15px 0;
 }
 
 #search_autocomplete ul.integernet_solr-searchwords li {
