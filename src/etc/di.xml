@@ -21,6 +21,7 @@
               type="IntegerNet\Solr\Model\Bridge\TemplateRepository" />
   <preference for="IntegerNet\SolrSuggest\Implementor\CustomHelper"
               type="IntegerNet\SolrSuggest\Block\DefaultCustomHelper" />
+  <preference for="IntegerNet\SolrSuggest\Implementor\Factory\AppFactory" type="IntegerNet\Solr\Model\Bridge\AppFactory" />
   
   <!-- Module types -->
 

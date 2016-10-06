@@ -1,0 +1,18 @@
+<?php
+/**
+ * integer_net Magento Module
+ *
+ * @category   IntegerNet
+ * @package    IntegerNet
+ * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
+ * @author     Fabian Schmengler <fs@integer-net.de>
+ */
+/** @var \IntegerNet\Solr\Block\System\CacheControl $block */
+?>
+<p class="integernet_solr-cache">
+    <button onclick="setLocation('<?php /* @escapeNotVerified */ echo $block->getFlushConfigCacheUrl() ?>')" type="button">
+        <?php /* @escapeNotVerified */ echo __('Flush IntegerNet_Solr Cache') ?>
+    </button>
+    <span><?php /* @escapeNotVerified */ echo __('Configuration cache used by Solr autosuggest to bypass Magento application') ?></span>
+
+</p>

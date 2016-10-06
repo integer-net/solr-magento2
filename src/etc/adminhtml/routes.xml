@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
   <router id="admin">
-    <route id="IntegerNet_Solr" frontName="IntegerNet_Solr">
-      <module name="IntegerNet_Solr_Adminhtml" after="Magento_Backend"/>
+    <route id="integernet_solr" frontName="integernet_solr">
+      <module name="IntegerNet_Solr"/>
     </route>
   </router>
 </config>
