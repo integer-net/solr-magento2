@@ -46,6 +46,7 @@ build:
           cd /srv/www
           composer config http-basic.repo.magento.com $MAGENTO_REPO_PUBLIC_KEY $MAGENTO_REPO_PRIVATE_KEY
           composer config repositories.solr-module vcs $MODULE_DIR
+          composer config repositories.solr-autosuggest vcs git@github.com:integer-net/solr-magento2-autosuggest.git
           composer config repositories.solr-base vcs git@github.com:integer-net/solr-base.git
           composer config repositories.solr-pro vcs git@github.com:integer-net/solr-pro.git
           sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/test\/unit", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
