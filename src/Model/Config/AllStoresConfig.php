@@ -14,6 +14,9 @@ use IntegerNet\Solr\Model\Bridge\Config;
 use IntegerNet\Solr\Model\Bridge\ConfigFactory;
 use Magento\Store\Model\StoreManagerInterface;
 
+/**
+ * @method Config current()
+ */
 class AllStoresConfig extends \ArrayIterator
 {
     public function __construct(StoreManagerInterface $storeManager, ConfigFactory $configFactory)

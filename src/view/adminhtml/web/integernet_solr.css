@@ -1,0 +1,21 @@
+.integernet_solr_messages li {
+    list-style-type: none;
+}
+.integernet_solr_messages li:before {
+    display:inline-block;
+    content:'\27a1';
+    padding:0 6px 0 0;
+}
+.integernet_solr_messages .message-success li:before {
+    color:green;
+}
+.integernet_solr_messages .message-notice li:before {
+    color:blue;
+}
+.integernet_solr_messages .message-warning li:before,
+.integernet_solr_messages .message-error li:before {
+    color:red;
+}
+.integernet_solr_messages .version {
+    font-weight: bold;
+}

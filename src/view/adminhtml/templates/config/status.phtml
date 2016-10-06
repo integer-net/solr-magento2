@@ -1,40 +1,40 @@
 <?php /** @var \IntegerNet\Solr\Block\Config\Status $this */ ?>
-<ul class="messages integernet_solr_messages">
-    <?php if (sizeof($this->getWarningMessages())): ?>
-        <li class="warning-msg">
-            <ul>
-                <?php foreach ($this->getWarningMessages() as $message): ?>
-                    <li><span><?php echo $message ?></span></li>
-                <?php endforeach ?>
-            </ul>
-        </li>
-    <?php endif ?>
-    <?php if (sizeof($this->getSuccessMessages())): ?>
-        <li class="success-msg">
-            <ul>
-                <?php foreach ($this->getSuccessMessages() as $message): ?>
-                    <li><span><?php echo $message ?></span></li>
-                <?php endforeach ?>
-            </ul>
-        </li>
-    <?php endif ?>
+<div class="messages integernet_solr_messages">
     <?php if (sizeof($this->getErrorMessages())): ?>
-        <li class="error-msg">
+        <div class="message message-error error">
             <ul>
                 <?php foreach ($this->getErrorMessages() as $message): ?>
                     <li><span><?php echo $message ?></span></li>
                 <?php endforeach ?>
             </ul>
-        </li>
+        </div>
+    <?php endif ?>
+    <?php if (sizeof($this->getWarningMessages())): ?>
+        <div class="message message-warning warning">
+            <ul>
+                <?php foreach ($this->getWarningMessages() as $message): ?>
+                    <li><span><?php echo $message ?></span></li>
+                <?php endforeach ?>
+            </ul>
+        </div>
+    <?php endif ?>
+    <?php if (sizeof($this->getSuccessMessages())): ?>
+        <div class="message message-success success">
+            <ul>
+                <?php foreach ($this->getSuccessMessages() as $message): ?>
+                    <li><span><?php echo $message ?></span></li>
+                <?php endforeach ?>
+            </ul>
+        </div>
     <?php endif ?>
     <?php if (sizeof($this->getNoticeMessages())): ?>
-        <li class="notice-msg">
+        <div class="message message-notice notice">
             <ul>
                 <?php foreach ($this->getNoticeMessages() as $message): ?>
                     <li><span><?php echo $message ?></span></li>
                 <?php endforeach ?>
             </ul>
-        </li>
+        </div>
     <?php endif ?>
 
-</ul>
+</div>

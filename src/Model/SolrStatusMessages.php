@@ -10,9 +10,48 @@
  */
 namespace IntegerNet\Solr\Model;
 
+use IntegerNet\Solr\Model\Config\AllStoresConfig;
+use IntegerNet\Solr\Resource\ResourceFacade;
+use Magento\Backend\Model\Url;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Module\ModuleListInterface;
+
 class SolrStatusMessages implements StatusMessages
 {
     protected $_messages = [];
+    private $solrResource;
+    /**
+     * @var ModuleListInterface
+     */
+    private $moduleList;
+    /**
+     * @var ProductMetadataInterface
+     */
+    private $productMetadata;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+    /**
+     * @var Url
+     */
+    private $urlBuilder;
+    /**
+     * @var AllStoresConfig
+     */
+    private $moduleConfig;
+
+    public function __construct(ProductMetadataInterface $productMetadata, ModuleListInterface $moduleList,
+                                ScopeConfigInterface $scopeConfig, Url $urlBuilder, AllStoresConfig $moduleConfig)
+    {
+        $this->moduleList = $moduleList;
+        $this->productMetadata = $productMetadata;
+        $this->scopeConfig = $scopeConfig;
+        $this->urlBuilder = $urlBuilder;
+        $this->moduleConfig = $moduleConfig;
+        $this->solrResource = new ResourceFacade($this->moduleConfig->getArrayCopy());
+    }
 
     /**
      * @param int|null $storeId
@@ -20,7 +59,6 @@ class SolrStatusMessages implements StatusMessages
      */
     public function getMessages($storeId = null)
     {
-        return []; //TODO implement
         $this->_checkConfiguration($storeId);
         return $this->_messages;
     }
@@ -30,8 +68,8 @@ class SolrStatusMessages implements StatusMessages
      */
     protected function _checkConfiguration($storeId = null)
     {
-        $this->_createGeneralInfoMessages($storeId);
-        
+        $this->_createGeneralInfoMessages();
+
         if (!$this->_isModuleActive($storeId)) {
             return;
         }
@@ -51,8 +89,7 @@ class SolrStatusMessages implements StatusMessages
         if (!$this->_canIssueSearchRequest($storeId)) {
             return;
         }
-
-        if ($this->_configScopeConfigInterface->isSetFlag('integernet_solr/indexing/swap_cores', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId)) {
+        if ($this->moduleConfig[(int)$storeId]->getIndexingConfig()->isSwapCores()) {
             if (!$this->_isSwapcoreConfigurationComplete($storeId)) {
                 return;
             }
@@ -67,29 +104,14 @@ class SolrStatusMessages implements StatusMessages
         }
     }
 
-    /**
-     * @param int $storeId
-     * @return boolean
-     */
-    protected function _createGeneralInfoMessages($storeId)
+    protected function _createGeneralInfoMessages()
     {
         $this->_addNoticeMessage(
-            __('Module version: %1', Mage::getConfig()->getModuleConfig('IntegerNet_Solr')->version)
+            __('Module version: <span class="version">%1</span>', $this->moduleList->getOne('IntegerNet_Solr')['setup_version'])
         );
-        if (method_exists('Mage', 'getEdition')) {
-            $this->_addNoticeMessage(
-                __('Magento version: %1 (%2 Edition)', $this->_appProductMetadataInterface->getVersion(), Mage::getEdition())
-            );
-        } else {
-            $this->_addNoticeMessage(
-                __('Magento version: %1', $this->_appProductMetadataInterface->getVersion())
-            );
-        }
-        if (!$this->_helperData->isModuleEnabled('Aoe_LayoutConditions')) {
-            $this->_addWarningMessage(
-                __('The module Aoe_LayoutConditions is not installed. Please get it from <a href="%1" target="_blank">%2</a>.', 'https://github.com/aoepeople/Aoe_LayoutConditions', 'https://github.com/aoepeople/Aoe_LayoutConditions')
-            );
-        }
+        $this->_addNoticeMessage(
+            __('Magento version: <span class="version">%1</span> (%2 Edition)', $this->productMetadata->getVersion(), $this->productMetadata->getEdition())
+        );
     }
 
     /**
@@ -98,15 +120,26 @@ class SolrStatusMessages implements StatusMessages
      */
     protected function _isModuleActive($storeId)
     {
-        if (!$this->_configScopeConfigInterface->isSetFlag('integernet_solr/general/is_active', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId)) {
-            $this->_addNoticeMessage(
-                __('Solr Module is not activated.')
+        //TODO set search engine via plugin based on module activation, so that it can be activated per store and does not require double activation
+        $searchEngine = $this->scopeConfig->getValue(\Magento\CatalogSearch\Model\ResourceModel\EngineInterface::CONFIG_ENGINE_PATH);
+        if ('integernet_solr' !== $searchEngine) {
+            $this->_addWarningMessage(
+                __(
+                    'Solr search engine is not activated (Current search engine: <strong>%1</strong>). <a href="%2">Click here to change search engine configuration</a>',
+                    $searchEngine, $this->urlBuilder->getUrl('integernet_solr/system/configureSearchEngine')
+                )
+            );
+            return false;
+        }
+        if (! $this->moduleConfig[(int)$storeId]->getGeneralConfig()->isActive()) {
+            $this->_addErrorMessage(
+                __('Solr search engine is activated but module is not active. Activate the module below.')
             );
             return false;
         }
 
         $this->_addSuccessMessage(
-            __('Solr Module is activated.')
+            __('Solr search engine is activated and module is active.')
         );
         return true;
     }
@@ -116,53 +149,7 @@ class SolrStatusMessages implements StatusMessages
      */
     protected function _isModuleLicensed()
     {
-        if (!trim($this->_configScopeConfigInterface->getValue('integernet_solr/general/license_key', \Magento\Store\Model\ScopeInterface::SCOPE_STORE))) {
-
-            if ($installTimestamp = $this->_configScopeConfigInterface->getValue('integernet_solr/general/install_date', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
-
-                $diff = time() - $installTimestamp;
-                if (($diff < 0) || ($diff > 2419200)) {
-
-                    $this->_addErrorMessage(
-                        __('You haven\'t entered your license key yet.')
-                    );
-                    return false;
-
-                } else {
-
-                    $this->_addNoticeMessage(
-                        __('You haven\'t entered your license key yet.')
-                    );
-                }
-            }
-
-        } else {
-            if (!$this->_helperData->isKeyValid($this->_configScopeConfigInterface->getValue('integernet_solr/general/license_key', \Magento\Store\Model\ScopeInterface::SCOPE_STORE))) {
-    
-                if ($installTimestamp = $this->_configScopeConfigInterface->getValue('integernet_solr/general/install_date', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
-
-                    $diff = time() - $installTimestamp;
-                    if (($diff < 0) || ($diff > 2419200)) {
-
-                        $this->_addErrorMessage(
-                            __('The license key you have entered is incorrect.')
-                        );
-                        return false;
-
-                    } else {
-
-                        $this->_addNoticeMessage(
-                            __('The license key you have entered is incorrect.')
-                        );
-                    }
-                }
-            } else {
-                $this->_addSuccessMessage(
-                    __('Your license key is valid.')
-                );
-            }
-        }
-
+        //TODO extract licensing from M1 module to solr-pro package, reuse
         return true;
     }
 
@@ -172,9 +159,12 @@ class SolrStatusMessages implements StatusMessages
      */
     protected function _isServerConfigurationComplete($storeId)
     {
-        if (!$this->_configScopeConfigInterface->getValue('integernet_solr/server/host', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId)
-            || !$this->_configScopeConfigInterface->getValue('integernet_solr/server/port', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId)
-            || !$this->_configScopeConfigInterface->getValue('integernet_solr/server/path', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId)
+        $serverConfig = $this->moduleConfig[(int) $storeId]->getServerConfig();
+        if (
+            ! $serverConfig->getHost()
+            || ! $serverConfig->getPort()
+            || ! $serverConfig->getPath()
+            || ! $serverConfig->getCore()
         ) {
             $this->_addErrorMessage(
                 __('Solr server configuration is incomplete.')
@@ -194,7 +184,7 @@ class SolrStatusMessages implements StatusMessages
      */
     protected function _canPingSolrServer($storeId)
     {
-        $solr = $this->_helperFactory->getSolrResource()->getSolrService($storeId);
+        $solr = $this->solrResource->getSolrService($storeId);
 
         if (!$solr->ping()) {
             $this->_addErrorMessage(
@@ -207,12 +197,12 @@ class SolrStatusMessages implements StatusMessages
             __('Connection to Solr server established successfully.')
         );
 
-        $info = $this->_helperFactory->getSolrResource()->getInfo($storeId);
-        if ($info instanceof \Apache\Solr\Response) {
+        $info = $this->solrResource->getInfo($storeId);
+        if ($info instanceof \Apache_Solr_Response) {
             if (isset($info->lucene->{'solr-spec-version'})) {
                 $solrVersion = $info->lucene->{'solr-spec-version'};
                 $this->_addNoticeMessage(
-                    __('Solr version: %1', $solrVersion)
+                    __('Solr version: <span class="version">%1</span>', $solrVersion)
                 );
             }
         }
@@ -226,7 +216,7 @@ class SolrStatusMessages implements StatusMessages
      */
     protected function _canIssueSearchRequest($storeId)
     {
-        $solr = $this->_helperFactory->getSolrResource()->getSolrService($storeId);
+        $solr = $this->solrResource->getSolrService($storeId);
 
         try {
             $solr->search('text_autocomplete:test');
@@ -257,7 +247,10 @@ class SolrStatusMessages implements StatusMessages
      */
     protected function _isSwapcoreConfigurationComplete($storeId)
     {
-        if (!$this->_configScopeConfigInterface->getValue('integernet_solr/server/core', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId) || !$this->_configScopeConfigInterface->getValue('integernet_solr/indexing/swap_core', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId)) {
+        if (
+            ! $this->moduleConfig[(int)$storeId]->getServerConfig()->getCore() ||
+            ! $this->moduleConfig[(int)$storeId]->getServerConfig()->getSwapCore()
+        ) {
             $this->_addErrorMessage(
                 __('Please enter name of core and swap core.')
             );
@@ -273,7 +266,7 @@ class SolrStatusMessages implements StatusMessages
      */
     protected function _canPingSwapCore($storeId)
     {
-        $solr = $this->_helperFactory->getSolrResource()->setUseSwapIndex()->getSolrService($storeId);
+        $solr = $this->solrResource->setUseSwapIndex()->getSolrService($storeId);
 
         if (!$solr->ping()) {
             $this->_addErrorMessage(
@@ -294,8 +287,7 @@ class SolrStatusMessages implements StatusMessages
      */
     protected function _canIssueSearchRequestToSwapCore($storeId)
     {
-        $solr = $this->_helperFactory->getSolrResource()->
-        setUseSwapIndex()->getSolrService($storeId);
+        $solr = $this->solrResource->setUseSwapIndex()->getSolrService($storeId);
 
         try {
             $solr->search('text_autocomplete:test');

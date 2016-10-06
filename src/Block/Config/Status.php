@@ -11,7 +11,6 @@ namespace IntegerNet\Solr\Block\Config;
 
 use IntegerNet\Solr\Model\StatusMessages;
 use Magento\Framework\View\Element\Template;
-use Magento\Store\Model\StoreManagerInterface;
 
 class Status extends Template
 {
