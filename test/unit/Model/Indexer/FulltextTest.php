@@ -40,7 +40,7 @@ class FulltextTest extends \PHPUnit_Framework_TestCase
     {
         $this->solrIndexerMock->expects($this->once())
             ->method('reindex')
-            ->with(null, false, null);
+            ->with(null, true, null);
         $this->fulltext->executeFull();
     }
     public function testExecuteList()
