@@ -33,7 +33,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeFull()
     {
-        $this->solrIndexer->reindex();
+        $this->solrIndexer->reindex(null, true);
     }
 
     /**
