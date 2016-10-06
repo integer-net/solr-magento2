@@ -27,13 +27,26 @@ class ProductRenderer implements ProductRendererInterface
      * @var AppState
      */
     private $appState;
+    private $isLayoutLoaded = false;
 
-    public function __construct(LayoutInterface $layout, AppState $appState)
+    public function __construct(LayoutInterface\Proxy $layout, AppState $appState)
     {
         $this->layout = $layout;
         $this->appState = $appState;
     }
 
+    /**
+     * Frontend layout has to be loaded during store emulation, so it is deferred
+     */
+    private function loadDefaultLayout()
+    {
+        if (! $this->isLayoutLoaded) {
+            $this->layout->getUpdate()->load(['default']);
+            $this->layout->generateXml();
+            $this->layout->generateElements();
+            $this->isLayoutLoaded = true;
+        }
+    }
 
     /**
      * Render product block and add HTML to index document:
@@ -47,6 +60,7 @@ class ProductRenderer implements ProductRendererInterface
      */
     public function addResultHtmlToProductData(ProductInterface $product, IndexDocument $productData, $useHtmlInResults)
     {
+        $this->loadDefaultLayout();
         if (! $product instanceof Product) {
             // We need direct access to the Magento product
             throw new \InvalidArgumentException('Magento 2 product bridge expected, '. get_class($product) .' received.');
