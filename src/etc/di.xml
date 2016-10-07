@@ -22,7 +22,12 @@
   <preference for="IntegerNet\SolrSuggest\Implementor\CustomHelper"
               type="IntegerNet\SolrSuggest\Block\DefaultCustomHelper" />
   <preference for="IntegerNet\SolrSuggest\Implementor\Factory\AppFactory" type="IntegerNet\Solr\Model\Bridge\AppFactory" />
-  
+  <preference for="IntegerNet\SolrSuggest\Plain\Entity\SerializableAttributeRepository"
+              type="IntegerNet\SolrSuggest\Plain\Cache\Convert\AttributesToSerializableAttributes"/>
+  <preference for="IntegerNet\SolrSuggest\Plain\Cache\CacheStorage" type="IntegerNet\SolrSuggest\Plain\Cache\PsrCache" />
+  <preference for="IntegerNet\Solr\Model\Cache\CacheStorageFactory"
+              type="IntegerNet\Solr\Model\Cache\PsrFileCacheStorageFactory"/>
+
   <!-- Module types -->
 
   <type name="IntegerNet\Solr\Model\Bridge\Config" shared="false"/>

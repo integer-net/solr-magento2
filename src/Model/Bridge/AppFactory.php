@@ -11,22 +11,18 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 
-use IntegerNet\Solr\Implementor\Config as ConfigInterface;
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
+use IntegerNet\Solr\Implementor\Config as ConfigInterface;
 use IntegerNet\Solr\Implementor\EventDispatcher as EventDispatcherInterface;
+use IntegerNet\Solr\Model\Cache\CacheStorageFactory;
 use IntegerNet\Solr\Model\Config\FrontendStoresConfig;
 use IntegerNet\Solr\Model\Data\ArrayCollection;
-use IntegerNet\SolrSuggest\Block\DefaultCustomHelper;
 use IntegerNet\SolrSuggest\Implementor\CustomHelper;
 use IntegerNet\SolrSuggest\Implementor\Factory\AppFactory as AppFactoryInterface;
-use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository as SerializableCategoryRepositoryInterface;
-use IntegerNet\SolrSuggest\Implementor\TemplateRepository as TemplateRepositoryInterface;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
+use IntegerNet\SolrSuggest\Plain\Cache\CacheWriterFactory;
 use IntegerNet\SolrSuggest\Plain\Cache\Convert\AttributesToSerializableAttributes;
-use IntegerNet\SolrSuggest\Plain\Cache\PsrCache;
-use IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool as FileCacheBackend;
-use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\ObjectManager\ConfigInterface as ObjectManagerConfigInterface;
 
 class AppFactory implements AppFactoryInterface
@@ -36,14 +32,6 @@ class AppFactory implements AppFactoryInterface
      */
     private $attributeRepository;
     /**
-     * @var SerializableCategoryRepositoryInterface
-     */
-    private $serializableCategoryRepository;
-    /**
-     * @var TemplateRepositoryInterface
-     */
-    private $templateRepository;
-    /**
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
@@ -52,29 +40,31 @@ class AppFactory implements AppFactoryInterface
      */
     private $storesConfig;
     /**
-     * @var DirectoryList
-     */
-    private $directoryList;
-    /**
      * @var ObjectManagerConfigInterface
      */
     private $objectManagerConfig;
+    /**
+     * @var CacheWriterFactory
+     */
+    private $cacheWriterFactory;
+    /**
+     * @var CacheStorageFactory
+     */
+    private $cacheStorageFactory;
 
     public function __construct(AttributeRepositoryInterface $attributeRepository,
-                                SerializableCategoryRepositoryInterface $serializableCategoryRepository,
-                                TemplateRepositoryInterface $templateRepository,
                                 EventDispatcherInterface $eventDispatcher,
                                 FrontendStoresConfig $storesConfig,
-                                DirectoryList $directoryList,
-                                ObjectManagerConfigInterface $objectManagerConfig)
+                                ObjectManagerConfigInterface $objectManagerConfig,
+                                CacheWriterFactory $cacheWriterFactory,
+                                CacheStorageFactory $cacheStorageFactory)
     {
         $this->attributeRepository = $attributeRepository;
-        $this->serializableCategoryRepository = $serializableCategoryRepository;
-        $this->templateRepository = $templateRepository;
         $this->eventDispatcher = $eventDispatcher;
         $this->storesConfig = $storesConfig;
-        $this->directoryList = $directoryList;
         $this->objectManagerConfig = $objectManagerConfig;
+        $this->cacheWriterFactory = $cacheWriterFactory;
+        $this->cacheStorageFactory = $cacheStorageFactory;
     }
 
     /**
@@ -85,22 +75,19 @@ class AppFactory implements AppFactoryInterface
         $customHelperClass = new \ReflectionClass(
             $this->objectManagerConfig->getPreference(CustomHelper::class)
         );
-        //TODO at least the cache backend should come from DI preferences for easier replacement
-        return new CacheWriter(
-            new PsrCache(
-                new FileCacheBackend(
-                    $this->directoryList->getPath(DirectoryList::CACHE) . '/integernet_solr'
+        return $this->cacheWriterFactory->create(
+            [
+                'cache' => $this->cacheStorageFactory->create(),
+                'customHelperFactory' => new CustomHelperFactory(
+                    $customHelperClass->getFileName(),
+                    $customHelperClass->getName()
+                ),
+                'attributeRepository' => new AttributesToSerializableAttributes(
+                    $this->attributeRepository,
+                    $this->eventDispatcher,
+                    $this->autosuggestConfigByStore()
                 )
-            ),
-            new AttributesToSerializableAttributes(
-                $this->attributeRepository,
-                $this->eventDispatcher,
-                $this->autosuggestConfigByStore()
-            ),
-            $this->serializableCategoryRepository,
-            new CustomHelperFactory($customHelperClass->getFileName(), $customHelperClass->getName()),
-            $this->eventDispatcher,
-            $this->templateRepository
+            ]
         );
     }
 
