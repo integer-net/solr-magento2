@@ -1,3 +1,22 @@
+.integernet-solr-tab
+{
+    position: relative;
+}
+.integernet-solr-tab._active span {
+    color: #9cc21b;
+}
+.integernet-solr-tab span:after
+{
+    top: 18px;
+    right: 12px;
+    position: absolute;
+    content: " ";
+    display: block;
+    background: url(integer_net_logo.png) no-repeat;
+    width: 22px;
+    height: 23px;
+}
+
 .integernet_solr_messages li {
     list-style-type: none;
 }

@@ -264,5 +264,12 @@
       </group>
       -->
     </section>
+    <section id="catalog">
+      <group id="search">
+        <field id="engine" translate="comment">
+          <comment><![CDATA[The IntegerNet_Solr engine will automatically be selected if and only if the module is activated, setting it here will not have any effect. Click on <strong>IntegerNet_Solr</strong> under the <strong>Services</strong> tab to the left, to activate and configure it. The module can be activated per store view.]]></comment>
+        </field>
+      </group>
+    </section>
   </system>
 </config>
