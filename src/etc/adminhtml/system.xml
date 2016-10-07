@@ -154,10 +154,12 @@
           <label>Search Operator</label>
           <source_model>IntegerNet\Solr\Model\Source\SearchOperator</source_model>
         </field>
+        <!--
         <field id="filter_position" translate="label" sortOrder="23" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Position of Filters</label>
           <source_model>IntegerNet\Solr\Model\Source\FilterPosition</source_model>
         </field>
+        -->
         <field id="priority_categories" translate="label,comment" sortOrder="25" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Solr Priority of Category Names</label>
           <comment>1 is default, use higher numbers for higher priority.</comment>
@@ -182,6 +184,7 @@
           <label>Custom Price Intervals</label>
           <comment>Divide steps by comma, i.e. 10,20,50,100,200,300,400,500</comment>
         </field>
+        <!--
         <field id="product_attributes_redirect" translate="label,comment" sortOrder="70" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Redirect to product page on direct match in one of these attributes</label>
           <comment>If the exact name / sku / ... is entered in the search field, the customer will be redirected to the product view page.</comment>
@@ -192,6 +195,7 @@
           <comment>If the exact name / ... is entered in the search field, the customer will be redirected to the category view page.</comment>
           <source_model>IntegerNet\Solr\Model\Source\VarcharCategoryAttribute</source_model>
         </field>
+        -->
       </group>
       <!--
       <group id="category" translate="label" sortOrder="60" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -233,11 +237,13 @@
           <comment>0 = don't show</comment>
           <validate>validate-number validate-zero-or-greater</validate>
         </field>
+        <!--
         <field id="max_number_cms_page_suggestions" translate="label,comment" sortOrder="50" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Maximum number of CMS page suggestions</label>
           <comment>0 = don't show&lt;br /&gt;Indexing of CMS pages must be active.&lt;br /&gt;Attention: This will affect the performance of the autosuggest!</comment>
           <validate>validate-number validate-zero-or-greater</validate>
         </field>
+        -->
         <field id="show_complete_category_path" translate="label" sortOrder="60" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Show complete category path</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
