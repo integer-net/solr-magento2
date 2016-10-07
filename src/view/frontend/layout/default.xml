@@ -3,12 +3,4 @@
     <head>
         <css src="IntegerNet_Solr::autosuggest.css"/>
     </head>
-    <body>
-        <referenceBlock name="top.search">
-            <action method="setTemplate">
-                <!-- TODO conditional template -->
-                <argument name="template" xsi:type="string">IntegerNet_Solr::form.mini.phtml</argument>
-            </action>
-        </referenceBlock>
-    </body>
 </page>
