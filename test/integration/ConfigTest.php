@@ -91,13 +91,14 @@ class ConfigTest extends  AbstractBackendController
      */
     private function assertDropdowns(DOMDocument $dom)
     {
+        $this->markTestSkipped('Product and category redirect configuration is hidden as long as it is not implemented yet');
         $xpath = new DOMXPath($dom);
         $categoryRedirectDropdown = $xpath->query('//select[@id="integernet_solr_results_category_attributes_redirect"]');
         $this->assertEquals(1, $categoryRedirectDropdown->length, 'Category redirect');
         $this->assertContains('Name [name]', $dom->saveXML($categoryRedirectDropdown->item(0)));
 
         $productRedirectDropdown = $xpath->query('//select[@id="integernet_solr_results_product_attributes_redirect"]');
-        $this->assertEquals(1, $productRedirectDropdown->length, 'Category redirect');
+        $this->assertEquals(1, $productRedirectDropdown->length, 'Product redirect');
         $this->assertContains('Name [name]', $dom->saveXML($productRedirectDropdown->item(0)));
     }
 
