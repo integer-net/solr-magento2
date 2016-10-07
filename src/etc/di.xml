@@ -77,11 +77,11 @@
 
   <!-- Plugins -->
 
+  <type name="Magento\Framework\App\Config\ScopeConfigInterface">
+    <plugin name="changeSearchEngine" type="IntegerNet\Solr\Model\Plugin\SearchEnginePlugin" />
+  </type>
   <type name="Magento\Catalog\Model\Layer\ItemCollectionProviderInterface">
     <plugin name="replaceCollections" type="IntegerNet\Solr\Model\Plugin\CollectionProviderPlugin" />
-  </type>
-  <type name="Magento\CatalogSearch\Helper\Data">
-    <plugin name="changeSuggestUrl" type="IntegerNet\Solr\Model\Plugin\SearchHelperPlugin" />
   </type>
 
   <!--

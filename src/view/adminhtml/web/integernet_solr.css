@@ -16,6 +16,8 @@
 .integernet_solr_messages .message-error li:before {
     color:red;
 }
-.integernet_solr_messages .version {
+.integernet_solr_messages .version,
+.integernet_solr_messages .engine
+{
     font-weight: bold;
 }

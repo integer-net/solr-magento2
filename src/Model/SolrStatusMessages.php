@@ -11,11 +11,15 @@
 namespace IntegerNet\Solr\Model;
 
 use IntegerNet\Solr\Model\Config\AllStoresConfig;
+use IntegerNet\Solr\Model\Plugin\SearchEnginePlugin;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use Magento\Backend\Model\Url;
+use Magento\CatalogSearch\Model\ResourceModel\EngineInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\ScopePool;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Module\ModuleListInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class SolrStatusMessages implements StatusMessages
 {
@@ -30,9 +34,9 @@ class SolrStatusMessages implements StatusMessages
      */
     private $productMetadata;
     /**
-     * @var ScopeConfigInterface
+     * @var ScopePool
      */
-    private $scopeConfig;
+    private $scopePool;
     /**
      * @var Url
      */
@@ -43,14 +47,14 @@ class SolrStatusMessages implements StatusMessages
     private $moduleConfig;
 
     public function __construct(ProductMetadataInterface $productMetadata, ModuleListInterface $moduleList,
-                                ScopeConfigInterface $scopeConfig, Url $urlBuilder, AllStoresConfig $moduleConfig)
+                                ScopePool $scopePool, Url $urlBuilder, AllStoresConfig $moduleConfig)
     {
         $this->moduleList = $moduleList;
         $this->productMetadata = $productMetadata;
-        $this->scopeConfig = $scopeConfig;
         $this->urlBuilder = $urlBuilder;
         $this->moduleConfig = $moduleConfig;
         $this->solrResource = new ResourceFacade($this->moduleConfig->getArrayCopy());
+        $this->scopePool = $scopePool;
     }
 
     /**
@@ -120,26 +124,30 @@ class SolrStatusMessages implements StatusMessages
      */
     protected function _isModuleActive($storeId)
     {
-        //TODO set search engine via plugin based on module activation, so that it can be activated per store and does not require double activation
-        $searchEngine = $this->scopeConfig->getValue(\Magento\CatalogSearch\Model\ResourceModel\EngineInterface::CONFIG_ENGINE_PATH);
-        if ('integernet_solr' !== $searchEngine) {
-            $this->_addWarningMessage(
-                __(
-                    'Solr search engine is not activated (Current search engine: <strong>%1</strong>). <a href="%2">Click here to change search engine configuration</a>',
-                    $searchEngine, $this->urlBuilder->getUrl('integernet_solr/system/configureSearchEngine')
-                )
-            );
-            return false;
-        }
+        $configuredSearchEngine = $this->scopePool
+            ->getScope(ScopeInterface::SCOPE_STORE, $storeId)
+            ->getValue(EngineInterface::CONFIG_ENGINE_PATH);
+        $fallbackSearchEngine = $configuredSearchEngine === SearchEnginePlugin::ENGINE_INTEGERNET_SOLR ? SearchEnginePlugin::ENGINE_DEFAULT : $configuredSearchEngine;
+
         if (! $this->moduleConfig[(int)$storeId]->getGeneralConfig()->isActive()) {
-            $this->_addErrorMessage(
-                __('Solr search engine is activated but module is not active. Activate the module below.')
+            $this->_addWarningMessage(
+                __('Module is not active. Activate the module below.')
+            );
+            $this->_addNoticeMessage(
+                __('Used fallback search engine: <span class="engine">%1</span>', $fallbackSearchEngine)
             );
             return false;
         }
 
         $this->_addSuccessMessage(
-            __('Solr search engine is activated and module is active.')
+            __('Module is active.')
+        );
+
+        $this->_addNoticeMessage(
+            __(
+                'Fallback search engine: <span class="engine">%1</span>',
+                $fallbackSearchEngine
+            )
         );
         return true;
     }

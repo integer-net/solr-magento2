@@ -67,7 +67,7 @@ class CollectionProviderPlugin
      */
     private function isModuleActive()
     {
-        //TODO also check if licence is valid and engine is integernet_solr
+        //TODO in config bridge, also check if licence is valid
         //TODO if active, ping solr service, if unsuccessful return false
         return $this->currentStoreConfig->getGeneralConfig()->isActive();
     }
