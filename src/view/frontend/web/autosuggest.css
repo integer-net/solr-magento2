@@ -69,10 +69,12 @@
 
 #search_autocomplete ul.integernet_solr-products li {
     float: left;
-    width: 200px;
+    width: 180px;
     background: #ffffff;
-    padding-left: 20px;
-    margin-left: 20px;
+    padding-right: 0;
+    padding-left: 10px;
+    margin-left: 10px;
+    margin-right: 0;
     border: 0;
     border-left: 1px solid #d9d9d9;
     margin-bottom: 25px;
