@@ -15,7 +15,7 @@ use IntegerNet\SolrSuggest\Plain\Cache\PsrCache;
 use IntegerNet\SolrSuggest\CacheBackend\File\CacheItemPool as FileCacheBackend;
 use Magento\Framework\App\Filesystem\DirectoryList;
 
-class PsrFileCacheStorageFactory implements CacheStorageFactory
+class PsrFileCacheStorageFactory implements CacheStorageFactoryInterface
 {
     /**
      * @var DirectoryList

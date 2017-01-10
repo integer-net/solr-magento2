@@ -12,7 +12,7 @@ namespace IntegerNet\Solr\Model\Bridge;
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
 use IntegerNet\Solr\Implementor\EventDispatcher as EventDispatcherInterface;
 use IntegerNet\Solr\Implementor\Pagination as PaginationInterface;
-use IntegerNet\Solr\Implementor\SolrRequestFactory;
+use IntegerNet\Solr\Implementor\SolrRequestFactoryInterface;
 use IntegerNet\Solr\Model\Config\CurrentStoreConfig;
 use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\Request;
@@ -21,7 +21,7 @@ use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrCategories\Request\CategoryRequestFactory;
 use Psr\Log\LoggerInterface;
 
-class RequestFactory implements SolrRequestFactory
+class RequestFactory implements SolrRequestFactoryInterface
 {
     /**
      * @var CurrentStoreConfig

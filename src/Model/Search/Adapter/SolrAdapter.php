@@ -9,7 +9,7 @@
  */
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
-use IntegerNet\Solr\Implementor\SolrRequestFactory;
+use IntegerNet\Solr\Implementor\SolrRequestFactoryInterface;
 use IntegerNet\Solr\Model\Bridge\SearchRequest;
 use IntegerNet\SolrCategories\Request\CategoryRequest;
 use Magento\Framework\Search\AdapterInterface;
@@ -29,7 +29,7 @@ class SolrAdapter implements AdapterInterface
      */
     protected $responseFactory;
     /**
-     * @var \IntegerNet\Solr\Implementor\SolrRequestFactory
+     * @var \IntegerNet\Solr\Implementor\SolrRequestFactoryInterface
      */
     private $requestFactory;
     /**
@@ -38,12 +38,12 @@ class SolrAdapter implements AdapterInterface
     private $searchRequest;
 
     /**
-     * @param SolrRequestFactory $requestFactory
+     * @param SolrRequestFactoryInterface $requestFactory
      * @param \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory
      * @param SearchRequest $searchRequest
      */
     public function __construct(
-        \IntegerNet\Solr\Implementor\SolrRequestFactory $requestFactory,
+        \IntegerNet\Solr\Implementor\SolrRequestFactoryInterface $requestFactory,
         \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory,
         SearchRequest $searchRequest
     ) {
@@ -82,7 +82,7 @@ class SolrAdapter implements AdapterInterface
     private function searchRequest()
     {
         return $this->requestFactory->getSolrRequest(
-            SolrRequestFactory::REQUEST_MODE_SEARCH
+            SolrRequestFactoryInterface::REQUEST_MODE_SEARCH
         )->doRequest();
     }
 
@@ -94,7 +94,7 @@ class SolrAdapter implements AdapterInterface
     {
         $this->searchRequest->setCategoryId($categoryId);
         return $this->requestFactory->getSolrRequest(
-            SolrRequestFactory::REQUEST_MODE_CATEGORY
+            SolrRequestFactoryInterface::REQUEST_MODE_CATEGORY
         )->doRequest();
     }
 
