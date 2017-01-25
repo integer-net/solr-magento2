@@ -21,12 +21,6 @@ namespace IntegerNet\SolrSuggest\Implementor\Factory
 
 namespace IntegerNet\Solr\Implementor
 {
-    class_alias(
-        SolrRequestFactory::class,
-        SolrRequestFactoryInterface::class);
-
-    if (! \interface_exists(SolrRequestFactory::class)) {
-        /** @deprecated this is an alias for SolrRequestFactory due to limitations of the Magento 2 object manager */
-        interface SolrRequestFactoryInterface extends SolrRequestFactory {}
-    }
+    /** @deprecated this is an alias for SolrRequestFactory due to limitations of the Magento 2 object manager */
+    interface SolrRequestFactoryInterface extends SolrRequestFactory {}
 }
