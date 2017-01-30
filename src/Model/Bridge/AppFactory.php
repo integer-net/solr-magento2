@@ -14,15 +14,18 @@ namespace IntegerNet\Solr\Model\Bridge;
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
 use IntegerNet\Solr\Implementor\Config as ConfigInterface;
 use IntegerNet\Solr\Implementor\EventDispatcher as EventDispatcherInterface;
-use IntegerNet\Solr\Model\Cache\CacheStorageFactory;
+use IntegerNet\Solr\Model\Cache\CacheStorageFactoryInterface;
 use IntegerNet\Solr\Model\Config\FrontendStoresConfig;
 use IntegerNet\Solr\Model\Data\ArrayCollection;
 use IntegerNet\SolrSuggest\Implementor\CustomHelper;
-use IntegerNet\SolrSuggest\Implementor\Factory\AppFactory as AppFactoryInterface;
+use IntegerNet\SolrSuggest\Implementor\Factory\AppFactoryInterface;
+use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository as SerializableCategoryRepositoryInterface;
+use IntegerNet\SolrSuggest\Implementor\TemplateRepository as TemplateRepositoryInterface;
 use IntegerNet\SolrSuggest\Plain\Block\CustomHelperFactory;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheWriterFactory;
 use IntegerNet\SolrSuggest\Plain\Cache\Convert\AttributesToSerializableAttributes;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\ObjectManager\ConfigInterface as ObjectManagerConfigInterface;
 
 class AppFactory implements AppFactoryInterface
@@ -44,11 +47,7 @@ class AppFactory implements AppFactoryInterface
      */
     private $objectManagerConfig;
     /**
-     * @var CacheWriterFactory
-     */
-    private $cacheWriterFactory;
-    /**
-     * @var CacheStorageFactory
+     * @var CacheStorageFactoryInterface
      */
     private $cacheStorageFactory;
 
@@ -56,14 +55,12 @@ class AppFactory implements AppFactoryInterface
                                 EventDispatcherInterface $eventDispatcher,
                                 FrontendStoresConfig $storesConfig,
                                 ObjectManagerConfigInterface $objectManagerConfig,
-                                CacheWriterFactory $cacheWriterFactory,
-                                CacheStorageFactory $cacheStorageFactory)
+                                CacheStorageFactoryInterface $cacheStorageFactory)
     {
         $this->attributeRepository = $attributeRepository;
         $this->eventDispatcher = $eventDispatcher;
         $this->storesConfig = $storesConfig;
         $this->objectManagerConfig = $objectManagerConfig;
-        $this->cacheWriterFactory = $cacheWriterFactory;
         $this->cacheStorageFactory = $cacheStorageFactory;
     }
 
@@ -75,19 +72,20 @@ class AppFactory implements AppFactoryInterface
         $customHelperClass = new \ReflectionClass(
             $this->objectManagerConfig->getPreference(CustomHelper::class)
         );
-        return $this->cacheWriterFactory->create(
-            [
-                'cache' => $this->cacheStorageFactory->create(),
-                'customHelperFactory' => new CustomHelperFactory(
-                    $customHelperClass->getFileName(),
-                    $customHelperClass->getName()
-                ),
-                'attributeRepository' => new AttributesToSerializableAttributes(
-                    $this->attributeRepository,
-                    $this->eventDispatcher,
-                    $this->autosuggestConfigByStore()
-                )
-            ]
+        return new CacheWriter(
+            $this->cacheStorageFactory->create(),
+            new AttributesToSerializableAttributes(
+                $this->attributeRepository,
+                $this->eventDispatcher,
+                $this->autosuggestConfigByStore()
+            ),
+            ObjectManager::getInstance()->get(SerializableCategoryRepositoryInterface::class),
+            new CustomHelperFactory(
+                $customHelperClass->getFileName(),
+                $customHelperClass->getName()
+            ),
+            ObjectManager::getInstance()->get(EventDispatcherInterface::class),
+            ObjectManager::getInstance()->get(TemplateRepositoryInterface::class)
         );
     }
 
