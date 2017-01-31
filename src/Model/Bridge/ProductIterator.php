@@ -10,9 +10,8 @@
 
 namespace IntegerNet\Solr\Model\Bridge;
 
-use IntegerNet\Solr\Implementor\PagedProductIterator as PagedProductIteratorInterface;
 use IntegerNet\Solr\Implementor\ProductIterator as ProductIteratorInterface;
-use IntegerNet\Solr\Implementor\ProductFactory;
+use IntegerNet\Solr\Implementor\ProductFactory as ProductFactoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 
 /**
@@ -27,7 +26,7 @@ class ProductIterator extends \IteratorIterator implements ProductIteratorInterf
      */
     private $storeId;
     /**
-     * @var ProductFactory
+     * @var ProductFactoryInterface
      */
     private $productFactory;
     /**
@@ -42,11 +41,11 @@ class ProductIterator extends \IteratorIterator implements ProductIteratorInterf
     const PARAM_STORE_ID = 'storeId';
     /**#@-*/
     /**
-     * @param ProductFactory $productFactory
+     * @param ProductFactoryInterface $productFactory
      * @param MagentoProduct[] $magentoProducts
      * @param int|null $storeId
      */
-    public function __construct(ProductFactory $productFactory, array $magentoProducts, $storeId = null)
+    public function __construct(ProductFactoryInterface $productFactory, array $magentoProducts, $storeId = null)
     {
         parent::__construct(new \ArrayIterator($magentoProducts));
         $this->storeId = $storeId;

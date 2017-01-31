@@ -13,7 +13,7 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\PagedProductIterator as PagedProductIteratorInterface;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
-use IntegerNet\Solr\Implementor\ProductFactory;
+use IntegerNet\Solr\Implementor\ProductFactory as ProductFactoryInterface;
 use IntegerNet\Solr\Implementor\ProductIterator as ProductIteratorInterface;
 use IntegerNet\Solr\Indexer\Data\ProductIdChunks;
 use IntegerNet\Solr\Model\Data\ArrayCollection;
@@ -52,7 +52,7 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
      */
     private $collectionIterator;
     /**
-     * @var ProductFactory
+     * @var ProductFactoryInterface
      */
     private $productFactory;
 
@@ -69,11 +69,11 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
     const PARAM_STORE_ID = 'storeId';
     /**
      * @param ProductCollectionFactory $collectionFactory
-     * @param ProductFactory $productFactory
+     * @param ProductFactoryInterface $productFactory
      * @param ProductIdChunks $productIdChunks parent and children product ids to be loaded
      * @param int $storeId
      */
-    public function __construct(ProductCollectionFactory $collectionFactory, ProductFactory $productFactory, ProductIdChunks $productIdChunks, $storeId = null)
+    public function __construct(ProductCollectionFactory $collectionFactory, ProductFactoryInterface $productFactory, ProductIdChunks $productIdChunks, $storeId = null)
     {
         $this->productFactory = $productFactory;
         $this->storeId = $storeId;
