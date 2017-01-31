@@ -68,7 +68,7 @@ class StoreEmulation implements StoreEmulationInterface
         // Saving the original store code to ensure that store is reset correctly
         // Magento uses the store id, but setCurrentStore(0) does not work, while setCurrentStore('admin') works
         $this->originalStoreCode = $this->storeManager->getStore()->getCode();
-        $this->appEmulation->startEnvironmentEmulation($storeId);
+        $this->appEmulation->startEnvironmentEmulation($storeId, \Magento\Framework\App\Area::AREA_FRONTEND, true);
         // App\Emulation cannot use setLocale() if Backend\LocaleResolver is used, so we have to emulate locale explicitly
         $this->localeResolver->emulate($storeId);
         $this->isEmulated = true;
