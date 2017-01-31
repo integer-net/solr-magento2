@@ -10,6 +10,7 @@
 namespace IntegerNet\Solr\Search;
 
 use IntegerNet\Solr\Implementor\SolrRequestFactory;
+use IntegerNet\Solr\Implementor\SolrRequestFactoryInterface;
 use IntegerNet\Solr\Model\Bridge\RequestFactory;
 use IntegerNet\Solr\Request\Request;
 use IntegerNet\Solr\Resource\ResourceFacade;
@@ -75,7 +76,7 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
 /**
  * @internal
  */
-class FakeRequestFactory implements SolrRequestFactory
+class FakeRequestFactory implements SolrRequestFactoryInterface 
 {
     private $factory;
     public function __construct()

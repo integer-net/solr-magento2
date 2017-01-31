@@ -12,7 +12,7 @@ namespace IntegerNet\Solr\Model\Cache;
 
 use IntegerNet\SolrSuggest\Plain\Cache\CacheStorage;
 
-interface CacheStorageFactory
+interface CacheStorageFactoryInterface
 {
     /**
      * @return CacheStorage

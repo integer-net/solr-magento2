@@ -4,7 +4,7 @@
   
   <!-- Bridge implementations -->
 
-  <preference for="IntegerNet\Solr\Implementor\SolrRequestFactory" type="IntegerNet\Solr\Model\Bridge\RequestFactory" />
+  <preference for="IntegerNet\Solr\Implementor\SolrRequestFactoryInterface" type="IntegerNet\Solr\Model\Bridge\RequestFactory" />
   <preference for="IntegerNet\Solr\Implementor\AttributeRepository" type="IntegerNet\Solr\Model\Bridge\AttributeRepository" />
   <preference for="IntegerNet\Solr\Implementor\IndexCategoryRepository" type="IntegerNet\Solr\Model\Bridge\CategoryRepository" />
   <preference for="IntegerNet\Solr\Implementor\ProductRepository" type="IntegerNet\Solr\Model\Bridge\ProductRepository" />
@@ -25,7 +25,7 @@
   <preference for="IntegerNet\SolrSuggest\Plain\Entity\SerializableAttributeRepository"
               type="IntegerNet\SolrSuggest\Plain\Cache\Convert\AttributesToSerializableAttributes"/>
   <preference for="IntegerNet\SolrSuggest\Plain\Cache\CacheStorage" type="IntegerNet\SolrSuggest\Plain\Cache\PsrCache" />
-  <preference for="IntegerNet\Solr\Model\Cache\CacheStorageFactory"
+  <preference for="IntegerNet\Solr\Model\Cache\CacheStorageFactoryInterface"
               type="IntegerNet\Solr\Model\Cache\PsrFileCacheStorageFactory"/>
 
   <!-- Module types -->

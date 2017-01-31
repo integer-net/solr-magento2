@@ -10,16 +10,16 @@
 
 namespace IntegerNet\Solr\Model;
 
-use IntegerNet\SolrSuggest\Implementor\Factory\AppFactory;
+use IntegerNet\SolrSuggest\Implementor\Factory\AppFactoryInterface;
 
 class Cache
 {
     /**
-     * @var AppFactory
+     * @var AppFactoryInterface
      */
     private $appFactory;
 
-    public function __construct(AppFactory $appFactory)
+    public function __construct(AppFactoryInterface $appFactory)
     {
         $this->appFactory = $appFactory;
     }
