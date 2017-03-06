@@ -21,12 +21,14 @@
       "registration.php"
     ],
     "psr-4": {
-      "IntegerNet\\Solr\\": "src"
+      "IntegerNet\\Solr\\": "main/src",
+      "IntegerNet\\SolrCategories\\": "categories/src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "IntegerNet\\Solr\\": "test/unit"
+      "IntegerNet\\Solr\\": "main/test/unit",
+      "IntegerNet\\SolrCategories\\": "categories/test/unit"
     }
   },
   "repositories": [

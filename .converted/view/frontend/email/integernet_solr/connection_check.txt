@@ -1,5 +1,0 @@
-<!--@subject IntegerNet_Solr Connection Check @-->
-Shop: {{var base_url}}
-
-
-{{var notification_text}}
