@@ -304,7 +304,6 @@ class Config implements ConfigInterface
                 $this->_getConfigFlag($prefix . 'is_active'),
                 $this->_getConfig($prefix . 'filter_position'),
                 $this->_getConfigFlag($prefix . 'is_indexer_active'),
-                //TODO create system configuration for the following:
                 $this->_getConfigFlag($prefix . 'use_in_search_results'),
                 $this->_getConfig($prefix . 'max_number_results'),
                 $this->_getConfigFlag($prefix . 'is_fuzzy_active'),

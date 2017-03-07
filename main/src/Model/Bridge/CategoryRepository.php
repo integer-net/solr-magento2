@@ -47,6 +47,10 @@ class CategoryRepository implements IndexCategoryRepository
      * @var CategoryResource
      */
     private $categoryResource;
+    /**
+     * @var string[]
+     */
+    private $categoryNames = [];
 
     /**
      * CategoryRepository constructor.
@@ -79,7 +83,10 @@ class CategoryRepository implements IndexCategoryRepository
     {
         $names = [];
         foreach ($categoryIds as $categoryId) {
-            $names[] = $this->categoryResource->getAttributeRawValue($categoryId, 'name', $storeId);
+            if (!isset($this->categoryNames[$storeId][$categoryId])) {
+                $this->categoryNames[$storeId][$categoryId] = $this->categoryResource->getAttributeRawValue($categoryId, 'name', $storeId);
+            }
+            $names[] = $this->categoryNames[$storeId][$categoryId];
         }
         return $names;
     }
