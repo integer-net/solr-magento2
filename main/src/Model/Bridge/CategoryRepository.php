@@ -19,6 +19,7 @@ use IntegerNet\Solr\Model\ResourceModel\CategoryPosition;
 use Magento\Catalog\Api\CategoryRepositoryInterface as MagentoCategoryRepository;
 use Magento\Catalog\Api\Data\CategoryInterface as MagentoCategoryInterface;
 use Magento\Catalog\Model\Category as MagentoCategory;
+use Magento\Catalog\Model\ResourceModel\Category as CategoryResource;
 use Magento\Catalog\Model\ResourceModel\Category\Collection;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\Store\Model\Store;
@@ -42,6 +43,10 @@ class CategoryRepository implements IndexCategoryRepository
      * @var CategoryPosition
      */
     private $categoryPositionResource;
+    /**
+     * @var CategoryResource
+     */
+    private $categoryResource;
 
     /**
      * CategoryRepository constructor.
@@ -49,13 +54,20 @@ class CategoryRepository implements IndexCategoryRepository
      * @param CollectionFactory $collectionFactory
      * @param CategoryPosition $categoryPositionResource
      * @param StoreManagerInterface $storeManager
+     * @param CategoryResource $categoryResource
      */
-    public function __construct(MagentoCategoryRepository $categoryRepository, CollectionFactory $collectionFactory, CategoryPosition $categoryPositionResource, StoreManagerInterface $storeManager)
-    {
+    public function __construct(
+        MagentoCategoryRepository $categoryRepository,
+        CollectionFactory $collectionFactory,
+        CategoryPosition $categoryPositionResource,
+        StoreManagerInterface $storeManager,
+        CategoryResource $categoryResource
+    ) {
         $this->categoryRepository = $categoryRepository;
         $this->collectionFactory = $collectionFactory;
         $this->storeManager = $storeManager;
         $this->categoryPositionResource = $categoryPositionResource;
+        $this->categoryResource = $categoryResource;
     }
 
     /**
@@ -65,12 +77,9 @@ class CategoryRepository implements IndexCategoryRepository
      */
     public function getCategoryNames($categoryIds, $storeId)
     {
-        // This code loads each category separately (from instance cache or db) and will make the indexer slow and
-        // memory hungry, but it is the only way to get category data from the API interfaces as of Magento 2.0
-        //TODO optimize
         $names = [];
         foreach ($categoryIds as $categoryId) {
-            $names[] = $this->categoryRepository->get($categoryId, $storeId)->getName();
+            $names[] = $this->categoryResource->getAttributeRawValue($categoryId, 'name', $storeId);
         }
         return $names;
     }
