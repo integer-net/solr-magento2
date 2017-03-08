@@ -13,7 +13,7 @@ use IntegerNet\SolrCategories\Indexer\CategoryIndexer;
 use Magento\Framework\Indexer\ActionInterface;
 use Magento\Framework\Mview\ActionInterface as MviewActionInterface;
 
-class Fulltext implements ActionInterface/*, MviewActionInterface*/
+class Fulltext implements ActionInterface, MviewActionInterface
 {
     /** @var CategoryIndexer */
     private $solrIndexer;
