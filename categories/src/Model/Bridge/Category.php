@@ -151,12 +151,14 @@ class Category implements CategoryInterface
     public function getImageUrl()
     {
         if ($imageUrl = $this->magentoCategory->getImageUrl()) {
-            return $imageUrl;
+            // base media URL contains /pub/ if Magento is bootstrapped from CLI, needs to be removed
+            return \str_replace('/pub/', '/', $imageUrl);
         }
         $content = $this->getDescription();
         preg_match('/<img.+src=\"(.*)\"/U', $content, $results);
         if (isset($results[1])) {
-            return $results[1];
+            // base media URL contains /pub/ if Magento is bootstrapped from CLI, needs to be removed
+            return \str_replace('/pub/', '/', $results[1]);
         }
         return '';
     }
