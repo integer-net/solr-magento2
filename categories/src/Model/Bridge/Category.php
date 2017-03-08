@@ -14,7 +14,7 @@ use IntegerNet\SolrCategories\Implementor\Attribute as AttributeInterface;
 use IntegerNet\SolrCategories\Implementor\Category as CategoryInterface;
 use Magento\Catalog\Api\Data\CategoryInterface as MagentoCategoryInterface;
 use Magento\Catalog\Model\Category as MagentoCategory;
-use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Event\ManagerInterface as EventManagerInterface;
 
 class Category implements CategoryInterface
 {
@@ -40,15 +40,21 @@ class Category implements CategoryInterface
      * @var null|string
      */
     private $description = null;
+    /**
+     * @var EventManagerInterface
+     */
+    private $eventManager;
 
     /**
      * @param MagentoCategory $magentoCategory
      * @param null|string[] $categoryPathNames
      */
-    public function __construct(MagentoCategory $magentoCategory, $categoryPathNames = null)
+    public function __construct(MagentoCategory $magentoCategory, EventManagerInterface $eventManager,
+                                $categoryPathNames = null)
     {
         $this->magentoCategory = $magentoCategory;
         $this->categoryPathNames = $categoryPathNames;
+        $this->eventManager = $eventManager;
     }
 
     public function getId()
@@ -129,6 +135,9 @@ class Category implements CategoryInterface
         return 'category_' . $this->getId() . '_' . $this->getStoreId();
     }
 
+    /**
+     * @return float
+     */
     public function getSolrBoost()
     {
         return $this->magentoCategory->getData('solr_boost');
@@ -158,7 +167,7 @@ class Category implements CategoryInterface
      */
     public function isIndexable($storeId)
     {
-        //Mage::dispatchEvent('integernet_solr_can_index_category', array('category' => $this->_category));
+        $this->eventManager->dispatch(self::EVENT_CAN_INDEX_CATEGORY, ['category' => $this->magentoCategory]);
 
         if ($this->magentoCategory->getData('solr_exclude')) {
             return false;

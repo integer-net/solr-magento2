@@ -17,9 +17,15 @@ use IntegerNet\SolrCategories\Implementor\CategoryFactory as CategoryFactoryInte
 use IntegerNet\Solr\Model\Data\ArrayCollection;
 use Magento\Catalog\Model\ResourceModel\Category\Collection as MagentoCategoryCollection;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as MagentoCategoryCollectionFactory;
+use Magento\Framework\Event\ManagerInterface as EventManagerInterface;
+use Magento\Store\Model\StoreManager;
+use Magento\Store\Model\GroupRepository as StoreGroupRepository;
 
 class PagedCategoryIterator implements CategoryIteratorInterface, \OuterIterator
 {
+    const EVENT_CATEGORY_COLLECTION_LOAD_BEFORE = 'integernet_solr_category_collection_load_before';
+    const EVENT_CATEGORY_COLLECTION_LOAD_AFTER = 'integernet_solr_category_collection_load_after';
+
     /**
      * @var int
      */
@@ -60,12 +66,27 @@ class PagedCategoryIterator implements CategoryIteratorInterface, \OuterIterator
     const PARAM_STORE_ID = 'storeId';
     const PARAM_PAGE_SIZE = 'pageSize';
     const PARAM_CATEGORY_ID_FILTER = 'categoryIdFilter';
+    /**
+     * @var EventManagerInterface
+     */
+    private $eventManager;
+    /**
+     * @var StoreManager
+     */
+    private $storeManager;
+    /**
+     * @var StoreGroupRepository
+     */
+    private $storeGroupRepository;
 
     /**
      * PagedCategoryIterator constructor.
      * @param MagentoCategoryCollectionFactory $magentoCategoryCollectionFactory
      * @param CategoryFactoryInterface $categoryFactory
      * @param int $pageSize
+     * @param EventManagerInterface $eventManager
+     * @param StoreManager $storeManager
+     * @param StoreGroupRepository $storeGroupRepository
      * @param int[]|null $categoryIdFilter
      * @param int|null $storeId
      */
@@ -73,14 +94,20 @@ class PagedCategoryIterator implements CategoryIteratorInterface, \OuterIterator
         MagentoCategoryCollectionFactory $magentoCategoryCollectionFactory,
         CategoryFactoryInterface $categoryFactory,
         $pageSize,
+        EventManagerInterface $eventManager,
+        StoreManager $storeManager,
+        StoreGroupRepository $storeGroupRepository,
         $categoryIdFilter = null,
-        $storeId = null)
-    {
+        $storeId = null
+    ) {
         $this->magentoCategoryCollectionFactory = $magentoCategoryCollectionFactory;
         $this->categoryFactory = $categoryFactory;
         $this->storeId = $storeId;
         $this->pageSize = $pageSize;
         $this->categoryIdFilter = $categoryIdFilter;
+        $this->eventManager = $eventManager;
+        $this->storeManager = $storeManager;
+        $this->storeGroupRepository = $storeGroupRepository;
     }
 
     /**
@@ -96,28 +123,22 @@ class PagedCategoryIterator implements CategoryIteratorInterface, \OuterIterator
             $magentoCategoryCollection->addIdFilter($this->categoryIdFilter);
         }
 
-        //$baseCategoryId = Mage::app()->getStore($storeId)->getGroup()->getRootCategoryId();
-        //$magentoCategoryCollection->addAttributeToFilter('path', array('like' => '1/' . $baseCategoryId . '/%'));
+        $magentoCategoryCollection->addAttributeToFilter('path', ['like' => '1/' . $this->getBaseCategoryId() . '/%']);
 
         if (!is_null($this->pageSize)) {
             $magentoCategoryCollection->setPageSize($this->pageSize);
             $magentoCategoryCollection->setCurPage($this->currentPageNumber);
         }
 
-        /*Mage::dispatchEvent('integernet_solr_category_collection_load_before', array(
+        $this->eventManager->dispatch(self::EVENT_CATEGORY_COLLECTION_LOAD_BEFORE, [
             'collection' => $magentoCategoryCollection
-        ));
-
-        $event = new Varien_Event();
-        $event->setCollection($categoryCollection);
-        $observer = new Varien_Event_Observer();
-        $observer->setEvent($event);*/
+        ]);
 
         $magentoCategoryCollection->load();
 
-        /*Mage::dispatchEvent('integernet_solr_category_collection_load_after', array(
-            'collection' => $categoryCollection
-        ));*/
+        $this->eventManager->dispatch(self::EVENT_CATEGORY_COLLECTION_LOAD_AFTER, [
+            'collection' => $magentoCategoryCollection
+        ]);
 
         return $magentoCategoryCollection;
     }
@@ -233,5 +254,15 @@ class PagedCategoryIterator implements CategoryIteratorInterface, \OuterIterator
     private function validInner()
     {
         return $this->getInnerIterator()->valid();
+    }
+
+    /**
+     * @return int|mixed
+     */
+    private function getBaseCategoryId()
+    {
+        $storeGroupId = $this->storeManager->getStore($this->storeId)->getStoreGroupId();
+        $baseCategoryId = $this->storeGroupRepository->get($storeGroupId)->getRootCategoryId();
+        return $baseCategoryId;
     }
 }
