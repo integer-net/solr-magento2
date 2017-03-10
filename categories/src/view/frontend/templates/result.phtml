@@ -1,0 +1,39 @@
+<?php /* @var $block \IntegerNet\SolrCategories\Block\Result\Categories */ ?>
+
+<?php $categoriesCollection = $block->getResultsCollection() ?>
+
+<div class="solr-search-result-categories" id="solr_tab_content_categories">
+
+    <?php $_iterator = 0; ?>
+    <ol class="solr-categories-list products-list" id="solr_categories_list">
+        <?php $i=0; foreach ($categoriesCollection as $categoriesPageDocument): ?>
+            <?php $title = $block->getCategoryTitle($categoriesPageDocument) ?>
+            <?php $url = $block->getCategoryUrl($categoriesPageDocument); ?>
+            <li class="item<?php if( ++$_iterator == $categoriesCollection->getSize() ): ?> last<?php endif; ?>">
+                <?php $_imgWidth = 135; ?>
+                <?php $_imgHeight = 135; ?>
+                <?php if ($imageUrl = $block->getCategoryImageUrl($categoriesPageDocument, $_imgWidth, $_imgHeight)): ?>
+                    <a href="<?php echo $url ?>" title="<?php echo $block->stripTags($title, null, true) ?>" class="product-image">
+                        <img
+                            src="<?php echo $imageUrl ?>"
+                            alt="<?php echo $block->stripTags($title) ?>"
+                            width="<?php echo $_imgWidth ?>"
+                            height="<?php echo $_imgHeight ?>"
+                        />
+                    </a>
+                <?php endif ?>
+                <div class="product-shop">
+                    <div class="f-fix">
+                        <p class="category-path"><?php echo $block->getCategoryPath($categoriesPageDocument) ?></p>
+                        <?php $_categoriesPageNameStripped = $block->stripTags($title, null, true); ?>
+                        <h2 class="product-name"><a href="<?php echo $url ?>" title="<?php echo $_categoriesPageNameStripped; ?>"><?php echo $title ?></a></h2>
+                        <div class="desc std">
+                            <?php echo $block->getCategoryAbstract($categoriesPageDocument) ?>
+                            <a href="<?php echo $url ?>" title="<?php echo $_categoriesPageNameStripped ?>" class="link-learn"><?php echo __('Learn More') ?></a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        <?php endforeach ?>
+    </ol>
+</div>

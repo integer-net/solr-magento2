@@ -9,6 +9,7 @@
  */
 namespace IntegerNet\Solr\Model\Bridge;
 
+use IntegerNet\Solr\Exception;
 use IntegerNet\Solr\Implementor\AttributeRepository as AttributeRepositoryInterface;
 use IntegerNet\Solr\Implementor\EventDispatcher as EventDispatcherInterface;
 use IntegerNet\Solr\Implementor\Pagination as PaginationInterface;
@@ -19,6 +20,7 @@ use IntegerNet\Solr\Request\Request;
 use IntegerNet\Solr\Request\SearchRequestFactory;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use IntegerNet\SolrCategories\Request\CategoryRequestFactory;
+use IntegerNet\SolrCategories\Request\CategorySearchRequestFactory;
 use Psr\Log\LoggerInterface;
 
 class RequestFactory implements SolrRequestFactoryInterface
@@ -84,6 +86,7 @@ class RequestFactory implements SolrRequestFactoryInterface
      *
      * @param int $requestMode
      * @return Request
+     * @throws \Exception
      */
     public function getSolrRequest($requestMode = self::REQUEST_MODE_AUTODETECT)
     {
@@ -119,6 +122,19 @@ class RequestFactory implements SolrRequestFactoryInterface
             );
             return $factory->createRequest();
         }
+
+        if ($requestMode === self::REQUEST_MODE_CATEGORY_SEARCH) {
+            $applicationContext->setCategoryConfig($this->storeConfig->getCategoryConfig());
+            $applicationContext->setQuery($this->searchRequest);
+            $factory = new CategorySearchRequestFactory(
+                $applicationContext,
+                $this->getSolrResource(),
+                $this->storeConfig->getStoreId()
+            );
+            return $factory->createRequest();
+        }
+
+        throw new \Exception(sprintf('Request Mode "%s" is not implemented yet.', $requestMode));
     }
 
 }
