@@ -12,6 +12,7 @@ namespace IntegerNet\Solr\Model\Plugin;
 
 use IntegerNet\Solr\Model\Config\CurrentStoreConfig;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Registry;
 
 /**
  * Plugin to set search engine per store view based on module configuration
@@ -27,16 +28,24 @@ class SearchEnginePlugin
      * @var CurrentStoreConfig
      */
     private $currentStoreConfig;
+    /**
+     * @var Registry
+     */
+    private $registry;
 
-    public function __construct(CurrentStoreConfig $currentStoreConfig)
+    public function __construct(CurrentStoreConfig $currentStoreConfig, Registry $registry)
     {
         $this->currentStoreConfig = $currentStoreConfig;
+        $this->registry = $registry;
     }
 
     public function aroundGetValue(ScopeConfigInterface $subject, \Closure $proceed, $path,
                                    $scopeType = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $scopeCode = null)
     {
         if ($path === \Magento\CatalogSearch\Model\ResourceModel\EngineInterface::CONFIG_ENGINE_PATH) {
+            if ($this->registry->registry('current_category')) {
+                return self::ENGINE_DEFAULT;
+            }
             if ($this->currentStoreConfig->getGeneralConfig()->isActive()) {
                 return self::ENGINE_INTEGERNET_SOLR;
             }
