@@ -3,9 +3,9 @@
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
          colors="true"
          bootstrap="../../../dev/tests/unit/framework/bootstrap.php"
-        >
+>
     <testsuite name="IntegerNet_Solr Unit Tests">
-        <directory suffix="Test.php">test/unit</directory>
+        <directory suffix="Test.php">main/test/unit</directory>
     </testsuite>
     <php>
         <ini name="date.timezone" value="America/Los_Angeles"/>
