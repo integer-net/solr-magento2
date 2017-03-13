@@ -191,13 +191,11 @@
           <comment>If the exact name / sku / ... is entered in the search field, the customer will be redirected to the product view page.</comment>
           <source_model>IntegerNet\Solr\Model\Source\VarcharProductAttribute</source_model>
         </field>
-        <!--
         <field id="category_attributes_redirect" translate="label,comment" sortOrder="80" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Redirect to category page on direct match in one of these attributes</label>
           <comment>If the exact name / ... is entered in the search field, the customer will be redirected to the category view page.</comment>
           <source_model>IntegerNet\Solr\Model\Source\VarcharCategoryAttribute</source_model>
         </field>
-        -->
       </group>
       <!--
       <group id="category" translate="label" sortOrder="60" type="text" showInDefault="1" showInWebsite="1" showInStore="1">

@@ -19,10 +19,15 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Magento\Catalog\Model\Category;
+use Magento\Catalog\Model\ResourceModel\Category\Collection as CategoryCollection;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\GroupedProduct\Model\Product\Type\Grouped as GroupedTypeInstance;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableTypeInstance;
+use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
 
-class RedirectToProduct implements ObserverInterface
+class RedirectToProductOrCategory implements ObserverInterface
 {
     /**
      * @var ScopeConfigInterface
@@ -44,19 +49,41 @@ class RedirectToProduct implements ObserverInterface
      * @var ConfigurableTypeInstance
      */
     private $configurableTypeInstance;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+    /**
+     * @var CategoryCollectionFactory
+     */
+    private $categoryCollectionFactory;
 
+    /**
+     * RedirectToProduct constructor.
+     * @param ScopeConfigInterface $scopeConfig
+     * @param RedirectInterface $redirect
+     * @param ProductCollectionFactory $productCollectionFactory
+     * @param CategoryCollectionFactory $categoryCollectionFactory
+     * @param GroupedTypeInstance $groupedTypeInstance
+     * @param ConfigurableTypeInstance $configurableTypeInstance
+     * @param StoreManagerInterface $storeManager
+     */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         RedirectInterface $redirect,
         ProductCollectionFactory $productCollectionFactory,
+        CategoryCollectionFactory $categoryCollectionFactory,
         GroupedTypeInstance $groupedTypeInstance,
-        ConfigurableTypeInstance $configurableTypeInstance
+        ConfigurableTypeInstance $configurableTypeInstance,
+        StoreManagerInterface $storeManager
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->redirect = $redirect;
         $this->productCollectionFactory = $productCollectionFactory;
         $this->groupedTypeInstance = $groupedTypeInstance;
         $this->configurableTypeInstance = $configurableTypeInstance;
+        $this->storeManager = $storeManager;
+        $this->categoryCollectionFactory = $categoryCollectionFactory;
     }
 
     /**
@@ -76,7 +103,7 @@ class RedirectToProduct implements ObserverInterface
         $action = $observer->getData('controller_action');
 
         if ($query = trim($request->getParam('q'))) {
-            if (($url = $this->_getProductPageRedirectUrl($query))) {
+            if (($url = $this->getProductPageRedirectUrl($query)) || ($url = $this->getCategoryPageRedirectUrl($query))) {
                 $this->redirect->redirect($action->getResponse(), $url);
             }
         }
@@ -86,7 +113,7 @@ class RedirectToProduct implements ObserverInterface
      * @param string $query
      * @return string|false;
      */
-    private function _getProductPageRedirectUrl($query)
+    private function getProductPageRedirectUrl($query)
     {
         $matchingProductAttributeCodes = explode(',', $this->scopeConfig->getValue('integernet_solr/results/product_attributes_redirect'));
         if (!sizeof($matchingProductAttributeCodes) || (sizeof($matchingProductAttributeCodes) && !current($matchingProductAttributeCodes))) {
@@ -159,6 +186,50 @@ class RedirectToProduct implements ObserverInterface
                 return $productUrl;
             }
         }
+        return false;
+    }
+
+    /**
+     * @param string $query
+     * @return string|false;
+     */
+    private function getCategoryPageRedirectUrl($query)
+    {
+        $matchingCategoryAttributeCodes = explode(',', $this->scopeConfig->getValue('integernet_solr/results/category_attributes_redirect'));
+        if (!sizeof($matchingCategoryAttributeCodes) || (sizeof($matchingCategoryAttributeCodes) && !current($matchingCategoryAttributeCodes))) {
+            return false;
+        }
+        $filters = [];
+        foreach ($matchingCategoryAttributeCodes as $attributeCode) {
+            if (!$attributeCode) {
+                continue;
+            }
+            $filters[] = ['attribute' => $attributeCode, 'eq' => $query];
+        }
+
+        if (!sizeof($filters)) {
+            return false;
+        }
+
+        /** @var Store $store */
+        $store = $this->storeManager->getStore();
+        $rootCategoryId = $store->getRootCategoryId();
+
+        /** @var CategoryCollection $matchingCategoryCollection */
+        $matchingCategoryCollection = $this->categoryCollectionFactory->create();
+        $matchingCategoryCollection
+            ->setStoreId($store->getId())
+            ->addAttributeToFilter($filters)
+            ->addAttributeToFilter('is_active', 1)
+            ->addAttributeToFilter('path', ['like' => '1/' . $rootCategoryId . '/%'])
+            ->addAttributeToSelect('url_key');
+
+        if ($matchingCategoryCollection->getSize() == 1) {
+            /** @var Category $category */
+            $category = $matchingCategoryCollection->getFirstItem();
+            return $category->getUrl();
+        }
+
         return false;
     }
 }
