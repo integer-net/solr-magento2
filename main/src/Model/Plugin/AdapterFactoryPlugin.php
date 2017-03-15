@@ -19,9 +19,6 @@ use Magento\Framework\Registry;
 
 /**
  * Plugin to set search engine per store view based on module configuration
- *
- * Since \Magento\Search\Model\EngineResolver is not used everywhere and can only have one scope,
- * we have to plug in the scope configuration directly
  */
 class AdapterFactoryPlugin
 {
