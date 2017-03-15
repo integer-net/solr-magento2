@@ -14,7 +14,7 @@ use IntegerNet\SolrCategories\Implementor\CategoryFactory as CategoryFactoryInte
 use IntegerNet\SolrSuggest\Implementor\SuggestCategory;
 use IntegerNet\SolrSuggest\Implementor\SuggestCategoryRepository;
 use IntegerNet\SolrCategories\Implementor\CategoryRepository as CategoryRepositoryInterface;
-use IntegerNet\SolrCategories\Implementor\CategoryIterator;
+use IntegerNet\SolrCategories\Implementor\CategoryIterator as CategoryIteratorInterface;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use IntegerNet\Solr\Indexer\Data\CategoryPositionCollection;
 use IntegerNet\Solr\Model\Data\ArrayCollection;
@@ -225,7 +225,7 @@ class CategoryRepository implements SuggestCategoryRepository, CategoryRepositor
      *
      * @param int $storeId Categories will be returned that are visible in this store and with store specific values
      * @param null|int[] $categoryIds filter by category ids
-     * @return CategoryIterator
+     * @return CategoryIteratorInterface
      */
     public function getCategoriesForIndex($storeId, $categoryIds = null)
     {

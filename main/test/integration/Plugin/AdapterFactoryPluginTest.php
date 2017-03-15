@@ -12,29 +12,19 @@ namespace IntegerNet\Solr\Plugin;
 use IntegerNet\Solr\Model\Plugin\AdapterFactoryPlugin;
 use Magento\Search\Model\AdapterFactory;
 use Magento\TestFramework\Interception\PluginList;
-use Magento\TestFramework\ObjectManager;
 use IntegerNet\Solr\Model\Search\Adapter\SolrAdapter;
 use Magento\Framework\Search\Adapter\Mysql\Adapter as MysqlAdapter;
 
-class AdapterFactoryPluginTest extends \PHPUnit_Framework_TestCase
+
+class AdapterFactoryPluginTest extends \Magento\TestFramework\TestCase\AbstractController
 {
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
-
-    protected function setUp()
-    {
-        $this->objectManager = ObjectManager::getInstance();
-    }
-
     /**
      * @magentoAppArea frontend
      */
     public function testTheAdapterFactoryPluginIsRegistered()
     {
         /** @var PluginList $pluginList */
-        $pluginList = $this->objectManager->create(PluginList::class);
+        $pluginList = $this->_objectManager->create(PluginList::class);
 
         $pluginInfo = $pluginList->get(AdapterFactory::class, []);
         $this->assertSame(AdapterFactoryPlugin::class, $pluginInfo['integernet_solr_choose_adapter']['instance']);
@@ -44,13 +34,12 @@ class AdapterFactoryPluginTest extends \PHPUnit_Framework_TestCase
      * @magentoAppArea frontend
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
-     * @magentoConfigFixture current_store integernet_solr/general/is_active 0
+     * @magentoConfigFixture default/integernet_solr/general/is_active 0
      */
     public function testMysqlAdapterIsCreated()
     {
         /** @var AdapterFactory $adapterFactory */
-        $adapterFactory = $this->objectManager->create(AdapterFactory::class);
-        $this->assertInstanceOf(AdapterFactory::class, $adapterFactory);
+        $adapterFactory = $this->_objectManager->create(AdapterFactory::class);
 
         $adapter = $adapterFactory->create();
         $this->assertInstanceOf(MysqlAdapter::class, $adapter);
@@ -60,17 +49,59 @@ class AdapterFactoryPluginTest extends \PHPUnit_Framework_TestCase
      * @magentoAppArea frontend
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
-     * @magentoConfigFixture current_store integernet_solr/general/is_active 1
+     * @magentoConfigFixture default/integernet_solr/general/is_active 1
+     * @magentoConfigFixture default/integernet_solr/category/is_active 0
      */
     public function testSolrAdapterIsCreated()
     {
-        $this->markTestSkipped('Setting configuration doesn\'t work with Magento 2.1.5.');
-
         /** @var AdapterFactory $adapterFactory */
-        $adapterFactory = $this->objectManager->create(AdapterFactory::class);
-        $this->assertInstanceOf(AdapterFactory::class, $adapterFactory);
+        $adapterFactory = $this->_objectManager->create(AdapterFactory::class);
 
         $adapter = $adapterFactory->create();
         $this->assertInstanceOf(SolrAdapter::class, $adapter);
+    }
+
+    /**
+     * @magentoDataFixture loadFixture
+     * @magentoAppArea frontend
+     * @magentoDbIsolation enabled
+     * @magentoAppIsolation enabled
+     * @magentoConfigFixture default/integernet_solr/general/is_active 1
+     * @magentoConfigFixture default/integernet_solr/category/is_active 0
+     */
+    public function testMysqlAdapterIsCreatedOnCategoryPage()
+    {
+        $this->dispatch('catalog/category/view/id/333');
+
+        /** @var AdapterFactory $adapterFactory */
+        $adapterFactory = $this->_objectManager->create(AdapterFactory::class);
+
+        $adapter = $adapterFactory->create();
+        $this->assertInstanceOf(MysqlAdapter::class, $adapter);
+    }
+
+    /**
+     * @magentoDataFixture loadFixture
+     * @magentoAppArea frontend
+     * @magentoDbIsolation enabled
+     * @magentoAppIsolation enabled
+     * @magentoConfigFixture default/integernet_solr/general/is_active 1
+     * @magentoConfigFixture default/integernet_solr/category/is_active 1
+     */
+    public function testSolrAdapterIsCreatedOnCategoryPage()
+    {
+        $this->markTestSkipped('Exception is thrown as Solr Server is not configured.');
+        $this->dispatch('catalog/category/view/id/333');
+
+        /** @var AdapterFactory $adapterFactory */
+        $adapterFactory = $this->_objectManager->create(AdapterFactory::class);
+
+        $adapter = $adapterFactory->create();
+        $this->assertInstanceOf(SolrAdapter::class, $adapter);
+    }
+
+    public static function loadFixture()
+    {
+        include __DIR__ . '/../_files/categories.php';
     }
 }
