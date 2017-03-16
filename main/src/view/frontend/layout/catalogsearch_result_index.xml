@@ -3,7 +3,9 @@
     <body>
 
         <referenceBlock name="search.result">
-            <block class="IntegerNet\SolrCategories\Block\Result\Categories" name="search.result.categories" template="IntegerNet_SolrCategories::result.phtml" cacheable="false" />
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">IntegerNet_Solr::catalogsearch/result.phtml</argument>
+            </action>
         </referenceBlock>
     </body>
 </page>

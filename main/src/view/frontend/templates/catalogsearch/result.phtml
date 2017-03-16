@@ -1,0 +1,66 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+
+<?php if ($block->getResultCount()): ?>
+
+    <?php echo $block->getChildHtml('tagged_product_list_rss_link'); ?>
+    <div class="solr-search-result-wrapper product data items">
+        <div data-role="collapsible" class="data item title">
+            <a class="data switch" href="#search-products"tabindex="-1" data-toggle="switch"><?php echo __('Products') ?></a>
+        </div>
+        <div class="search results data item content" id="search-products" data-role="content">
+            <?php if ($messages = $block->getNoteMessages()):?>
+                <div class="message notice">
+                    <div>
+                        <?php foreach ($messages as $message):?>
+                            <?php /* @escapeNotVerified */ echo $message?><br />
+                        <?php endforeach;?>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <?php echo $block->getProductListHtml() ?>
+        </div>
+        <div data-role="collapsible" class="data item title">
+            <a class="data switch" href="#search-categories"tabindex="-1" data-toggle="switch"><?php echo __('Categories') ?></a>
+        </div>
+        <div id="search-categories" data-role="content" class="data item content">
+            <?php echo $block->getChildHtml('search.result.categories'); ?>
+        </div>
+    </div>
+<?php else: ?>
+
+    <div class="message notice">
+        <div>
+            <?php /* @escapeNotVerified */ echo($block->getNoResultText()) ? $block->getNoResultText() : __('Your search returned no results.') ?>
+            <?php echo $block->getAdditionalHtml() ?>
+            <?php if ($messages = $block->getNoteMessages()):?>
+                <?php foreach ($messages as $message):?>
+                    <br /><?php /* @escapeNotVerified */ echo $message?>
+                <?php endforeach;?>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php endif; ?>
+
+<script>
+
+    require([
+        'jquery',
+        'tabs'
+    ], function ($) {
+        $(function () {
+            $('.solr-search-result-wrapper')
+                .tabs({
+                    openedState: 'active'
+                });
+        });
+    });
+
+</script>
