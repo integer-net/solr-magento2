@@ -1,8 +1,12 @@
 <?xml version="1.0"?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceContainer name="content">
+
+        <referenceBlock name="search.result">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">IntegerNet_SolrCategories::catalogsearch/result.phtml</argument>
+            </action>
             <block class="IntegerNet\SolrCategories\Block\Result\Categories" name="search.result.categories" template="IntegerNet_SolrCategories::result.phtml" cacheable="false" />
-        </referenceContainer>
+        </referenceBlock>
     </body>
 </page>
