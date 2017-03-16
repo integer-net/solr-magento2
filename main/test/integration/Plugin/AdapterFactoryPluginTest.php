@@ -34,6 +34,7 @@ class AdapterFactoryPluginTest extends \Magento\TestFramework\TestCase\AbstractC
      * @magentoAppArea frontend
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
+     * @magentoDataFixture loadFixture
      * @magentoConfigFixture default/integernet_solr/general/is_active 0
      */
     public function testMysqlAdapterIsCreated()
@@ -49,6 +50,7 @@ class AdapterFactoryPluginTest extends \Magento\TestFramework\TestCase\AbstractC
      * @magentoAppArea frontend
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
+     * @magentoDataFixture loadFixture
      * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoConfigFixture default/integernet_solr/category/is_active 0
      */
@@ -62,10 +64,10 @@ class AdapterFactoryPluginTest extends \Magento\TestFramework\TestCase\AbstractC
     }
 
     /**
-     * @magentoDataFixture loadFixture
      * @magentoAppArea frontend
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
+     * @magentoDataFixture loadFixture
      * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoConfigFixture default/integernet_solr/category/is_active 0
      */
@@ -81,16 +83,15 @@ class AdapterFactoryPluginTest extends \Magento\TestFramework\TestCase\AbstractC
     }
 
     /**
-     * @magentoDataFixture loadFixture
      * @magentoAppArea frontend
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
+     * @magentoDataFixture loadFixture
      * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoConfigFixture default/integernet_solr/category/is_active 1
      */
     public function testSolrAdapterIsCreatedOnCategoryPage()
     {
-        $this->markTestSkipped('Exception is thrown as Solr Server is not configured.');
         $this->dispatch('catalog/category/view/id/333');
 
         /** @var AdapterFactory $adapterFactory */
@@ -102,6 +103,7 @@ class AdapterFactoryPluginTest extends \Magento\TestFramework\TestCase\AbstractC
 
     public static function loadFixture()
     {
+        include __DIR__ . '/../_files/solr_config.php';
         include __DIR__ . '/../_files/categories.php';
     }
 }
