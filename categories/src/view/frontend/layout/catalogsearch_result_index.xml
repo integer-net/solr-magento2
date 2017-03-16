@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
 
-        <referenceBlock name="search.result">
+        <referenceBlock name="search.result.tabs">
             <block class="IntegerNet\SolrCategories\Block\Result\Categories" name="search.result.categories" template="IntegerNet_SolrCategories::result.phtml" cacheable="false" />
         </referenceBlock>
     </body>

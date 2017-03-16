@@ -1,0 +1,34 @@
+<?php // @codingStandardsIgnoreFile ?>
+<?php $categoryContent = $block->getChildHtml('search.result.categories') ?>
+
+<?php if(trim($categoryContent)): ?>
+<div class="solr-search-result-wrapper product data items">
+    <div data-role="collapsible" class="data item title">
+        <a class="data switch" href="#search-products"tabindex="-1" data-toggle="switch"><?php echo __('Products') ?></a>
+    </div>
+    <div class="data item content" id="search-products" data-role="content">
+        <?php echo $block->getChildHtml('search.result') ?>
+    </div>
+    <div data-role="collapsible" class="data item title">
+        <a class="data switch" href="#search-categories"tabindex="-1" data-toggle="switch"><?php echo __('Categories') ?></a>
+    </div>
+    <div id="search-categories" data-role="content" class="data item content">
+        <?php echo $categoryContent; ?>
+    </div>
+</div>
+<script>
+    require([
+        'jquery',
+        'tabs'
+    ], function ($) {
+        $(function () {
+            $('.solr-search-result-wrapper')
+                .tabs({
+                    openedState: 'active'
+                });
+        });
+    });
+</script>
+<?php else: ?>
+    <?php echo $block->getChildHtml('search.result') ?>
+<?php endif; ?>
