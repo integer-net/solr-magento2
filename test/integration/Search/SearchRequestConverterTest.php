@@ -72,31 +72,70 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
 
     public static function dataConvertRequest()
     {
-        $bagStyleFilterMagentoRequest = new MagentoRequest(
+        return [
+            'bag_style_filter' => [
+                'query_text' => 'bag',
+                'magento_request' => self::createMagentoRequest(
+                    [],
+                    [
+                        'search' => new Match(
+                            'search',
+                            'bag',
+                            1,
+                            [] // fields to mach query are handled by library
+                        ),
+                        'style_bags_query' => new Filter(
+                            'style_bags_query',
+                            1,
+                            'filter',
+                            new Term('style_bags_filter', '24', 'style_bags')
+                        )
+                    ]
+                ),
+                'expected_filter_query' => [
+                    'store_id:1',
+                    'style_bags_facet:24',
+                ],
+            ],
+            'category_filter' => [
+                'query_text' => 'bag',
+                'magento_request' => self::createMagentoRequest(
+                    [
+                        'category' => new Filter(
+                            'category',
+                            1,
+                            'filter',
+                            new Term('category_filter', '20', 'category_ids')
+                        )
+                    ],
+                    [
+                        'search' => new Match(
+                            'search',
+                            'bag',
+                            1,
+                            [] // fields to mach query are handled by library
+                        ),
+                    ]
+                ),
+                'expected_filter_query' => [
+                    'store_id:1',
+                    'category:20',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param $shouldMatch
+     * @return MagentoRequest
+     */
+    private static function createMagentoRequest($mustMatch, $shouldMatch)
+    {
+        return new MagentoRequest(
             'quick_search_container',
             'catalogsearch_fulltext',
-            new BoolExpression(
-                'quick_search_container',
-                '1',
-                [],
-                [
-                    'search' => new Match(
-                        'search',
-                        'bag',
-                        1,
-                        [] // fields to mach query are handled by library
-                    ),
-                    'style_bags_query' => new Filter(
-                        'style_bags_query',
-                        1,
-                        'filter',
-                        new Term('style_bags_filter', '24', 'style_bags')
-                    )
-                ],
-                []
-            ),
-            0,
-            10000,
+            new BoolExpression('quick_search_container', '1', $mustMatch, $shouldMatch, []),
+            0, 10000,
             [
                 'scope' => new Dimension('scope', '1'),
             ],
@@ -106,17 +145,6 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
                 new TermBucket('style_bags_bucket', 'style_bags', [new Metric('count')]),
             ]
         );
-
-        return [
-            'bag_style_filter' => [
-                'query_text' => 'bag',
-                'magento_request' => $bagStyleFilterMagentoRequest,
-                'expected_filter_query' => [
-                    'store_id:1',
-                    'style_bags_facet:24',
-                ],
-            ]
-        ];
     }
 
     /**

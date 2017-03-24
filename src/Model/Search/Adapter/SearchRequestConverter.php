@@ -90,6 +90,16 @@ class SearchRequestConverter
                     );
                 }
             }
+            foreach ($query->getMust() as $mustQuery)
+            {
+                if ($mustQuery instanceof Filter) {
+                    /** @var \Magento\Framework\Search\Request\Filter\Term $reference */
+                    $reference = $mustQuery->getReference();
+                    if ($reference->getField() === 'category_ids') {
+                        $solrRequest->getFilterQueryBuilder()->addCategoryFilter($reference->getValue());
+                    }
+                }
+            }
         }
         return $solrRequest;
     }
