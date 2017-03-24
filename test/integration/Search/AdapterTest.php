@@ -32,6 +32,7 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
      * @magentoDataFixture loadFixture
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
+     * @magentoConfigFixture current_store integernet_solr/general/is_active 1
      * @magentoConfigFixture current_store integernet_solr/results/use_html_from_solr 0
      * @magentoConfigFixture current_store catalog/search/engine integernet_solr
      */
