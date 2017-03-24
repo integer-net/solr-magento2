@@ -12,9 +12,15 @@ namespace IntegerNet\Solr\Search;
 use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Implementor\SolrRequestFactoryInterface;
 use IntegerNet\Solr\Model\Bridge\RequestFactory;
+use IntegerNet\Solr\Model\Bridge\SearchRequest;
+use IntegerNet\Solr\Model\Search\Adapter\SolrAdapter;
+use IntegerNet\Solr\Request\ApplicationContext;
 use IntegerNet\Solr\Request\Request;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection as FulltextSearchCollection;
+use Magento\Framework\Search\Adapter\Mysql\ResponseFactory;
+use Magento\Search\Model\Query;
+use Magento\Search\Model\QueryFactory;
 use Magento\TestFramework\ObjectManager;
 
 class AdapterTest extends \PHPUnit_Framework_TestCase
@@ -67,6 +73,7 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $fulltextSearch->count(), "1 dummy result");
 
     }
+
     public static function loadFixture()
     {
         include __DIR__ . '/../_files/products.php';
