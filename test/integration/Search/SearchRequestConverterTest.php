@@ -20,11 +20,18 @@ use IntegerNet\Solr\Model\Search\Adapter\SearchRequestConverter;
 use IntegerNet\Solr\Request\Request;
 use IntegerNet\Solr\Request\SearchRequest;
 use Magento\Framework\App\ObjectManager;
+use Magento\Framework\App\RequestInterface as MagentoRequestInterface;
+use Magento\Framework\Search\Request as MagentoRequest;
 use Magento\Framework\Search\Request\Aggregation\DynamicBucket;
 use Magento\Framework\Search\Request\Aggregation\Metric;
 use Magento\Framework\Search\Request\Aggregation\TermBucket;
+use Magento\Framework\Search\Request\Dimension;
+use Magento\Framework\Search\Request\Filter\Term;
+use Magento\Framework\Search\Request\Query\BoolExpression;
+use Magento\Framework\Search\Request\Query\Filter;
 use Magento\Framework\Search\Request\Query\Match;
 use Magento\Framework\Search\RequestInterface;
+use Magento\Search\Model\QueryFactory;
 
 class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
 {
@@ -56,18 +63,19 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
         $storeId = 1;
         $this->setRequestQueryText($queryText);
 
-        /** @var \IntegerNet\Solr\Request\SearchRequest $actualSolrRequest */
+        /** @var SearchRequest $actualSolrRequest */
         $actualSolrRequest = $this->converter->convert($magentoRequest);
-        $this->assertInstanceOf(\IntegerNet\Solr\Request\SearchRequest::class, $actualSolrRequest);
+        $this->assertInstanceOf(SearchRequest::class, $actualSolrRequest);
         $actualFq = $actualSolrRequest->getFilterQueryBuilder()->buildFilterQuery($storeId);
         $this->assertFilterQueryParts($expectedFqParts, $actualFq);
     }
+
     public static function dataConvertRequest()
     {
-        $bagStyleFilterMagentoRequest = new \Magento\Framework\Search\Request(
+        $bagStyleFilterMagentoRequest = new MagentoRequest(
             'quick_search_container',
             'catalogsearch_fulltext',
-            new \Magento\Framework\Search\Request\Query\BoolExpression(
+            new BoolExpression(
                 'quick_search_container',
                 '1',
                 [],
@@ -76,52 +84,13 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
                         'search',
                         'bag',
                         1,
-                        array(
-                            0 =>
-                                array(
-                                    'field' => 'sku',
-                                ),
-                            1 =>
-                                array(
-                                    'field' => '*',
-                                ),
-                            2 =>
-                                array(
-                                    'field' => 'name',
-                                    'boost' => '5',
-                                ),
-                            3 =>
-                                array(
-                                    'field' => 'description',
-                                    'boost' => '1',
-                                ),
-                            4 =>
-                                array(
-                                    'field' => 'short_description',
-                                    'boost' => '1',
-                                ),
-                            5 =>
-                                array(
-                                    'field' => 'manufacturer',
-                                    'boost' => '1',
-                                ),
-                            6 =>
-                                array(
-                                    'field' => 'status',
-                                    'boost' => '1',
-                                ),
-                            7 =>
-                                array(
-                                    'field' => 'tax_class_id',
-                                    'boost' => '1',
-                                ),
-                        )
+                        [] // fields to mach query are handled by library
                     ),
-                    'style_bags_query' => new \Magento\Framework\Search\Request\Query\Filter(
+                    'style_bags_query' => new Filter(
                         'style_bags_query',
                         1,
                         'filter',
-                        new \Magento\Framework\Search\Request\Filter\Term('style_bags_filter', '24', 'style_bags')
+                        new Term('style_bags_filter', '24', 'style_bags')
                     )
                 ],
                 []
@@ -129,7 +98,7 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
             0,
             10000,
             [
-                'scope' => new \Magento\Framework\Search\Request\Dimension('scope', '1'),
+                'scope' => new Dimension('scope', '1'),
             ],
             [
                 new DynamicBucket('price_bucket', 'price', 'auto'),
@@ -155,9 +124,9 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
      */
     private function setRequestQueryText($queryText)
     {
-        /** @var \Magento\Framework\App\RequestInterface $request */
-        $request = $this->objectManager->get(\Magento\Framework\App\RequestInterface::class);
-        $request->setParams([\Magento\Search\Model\QueryFactory::QUERY_VAR_NAME => $queryText]);
+        /** @var MagentoRequestInterface $request */
+        $request = $this->objectManager->get(MagentoRequestInterface::class);
+        $request->setParams([QueryFactory::QUERY_VAR_NAME => $queryText]);
     }
 
     /**
