@@ -9,7 +9,6 @@
  */
 namespace IntegerNet\Solr\Search;
 
-use IntegerNet\Solr\Implementor\SolrRequestFactory;
 use IntegerNet\Solr\Implementor\SolrRequestFactoryInterface;
 use IntegerNet\Solr\Model\Bridge\RequestFactory;
 use IntegerNet\Solr\Request\Request;
@@ -33,8 +32,9 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
      * @magentoDataFixture loadFixture
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
-     * @magentoConfigFixture current_store integernet_solr/results/use_html_from_solr 0
-     * @magentoConfigFixture current_store catalog/search/engine integernet_solr
+     * @magentoConfigFixture default/integernet_solr/general/is_active 1
+     * @magentoConfigFixture default/integernet_solr/results/use_html_from_solr 0
+     * @magentoConfigFixture default/catalog/search/engine integernet_solr
      */
     public function testSearchAdapterIsTriggeredInNonHtmlMode()
     {
@@ -67,6 +67,7 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $fulltextSearch->count(), "1 dummy result");
 
     }
+
     public static function loadFixture()
     {
         include __DIR__ . '/../_files/products.php';
