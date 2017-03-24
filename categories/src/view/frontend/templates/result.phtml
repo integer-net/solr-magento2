@@ -15,9 +15,9 @@
 
                     <div class="product-item-info">
                         <a href="<?php echo $url ?>" title="<?php echo $block->stripTags($title, null, true) ?>" class="product photo product-item-photo">
-                                <span class="product-image-container">
-                                    <span class="product-image-wrapper">
-                            <?php if ($imageUrl = $block->getCategoryImageUrl($categoriesPageDocument, $_imgWidth, $_imgHeight)): ?>
+                            <span class="product-image-container">
+                                <span class="product-image-wrapper">
+                                    <?php if ($imageUrl = $block->getCategoryImageUrl($categoriesPageDocument, $_imgWidth, $_imgHeight)): ?>
                                         <img
                                             class="product-image-photo"
                                             src="<?php echo $imageUrl ?>"
@@ -25,9 +25,9 @@
                                             width="<?php echo $_imgWidth ?>"
                                             height="<?php echo $_imgHeight ?>"
                                         />
-                            <?php endif ?>
-                                    </span>
+                                    <?php endif ?>
                                 </span>
+                            </span>
                         </a>
                         <div class="product-item-details product-item-description">
                             <div class="f-fix">
@@ -44,34 +44,8 @@
                             <a href="<?php echo $url ?>" title="<?php echo $_categoriesPageNameStripped ?>" class="action primary"><?php echo __('Learn More') ?></a>
                         </div>
                     </div>
-                    <?php if( $_iterator !== $categoriesCollection->getSize() ): ?>
-
-                    <?php endif; ?>
                 </li>
             <?php endforeach ?>
         </ol>
     </div>
-
-    <style type="text/css">
-        .solr-categories-list .products-list .product-item-details{
-            vertical-align: middle;
-            width: calc(50% - 100px);
-        }
-
-        .solr-categories-list .product-item-description { margin-top: 0; }
-        .solr-categories-list .product-image-photo {
-            max-height: <?php echo $_imgHeight; ?>px;
-            width: auto;
-        }
-
-        .solr-categories-list .product-image-wrapper { padding-bottom: 125%; }
-
-        .solr-categories-list .product-image-container,
-        .solr-categories-list .products-grid .product-item-photo {
-            width: <?php echo $_imgWidth ?>px;
-        }
-
-        .solr-categories-list .category-path { margin-bottom: .5rem }
-        .solr-categories-list .product-name { margin-top: 0; }
-    </style>
 <?php endif;?>
