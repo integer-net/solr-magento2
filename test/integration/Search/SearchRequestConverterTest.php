@@ -64,7 +64,7 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
     public static function dataConvertRequest()
     {
         return [
-            'bag_style_filter' => [
+            'color_filter' => [
                 'query_text' => 'bag',
                 'magento_request' => self::createMagentoRequest(
                     [],
@@ -75,17 +75,17 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
                             1,
                             [] // fields to mach query are handled by library
                         ),
-                        'style_bags_query' => new MagentoRequest\Query\Filter(
-                            'style_bags_query',
+                        'color_query' => new MagentoRequest\Query\Filter(
+                            'color_query',
                             1,
                             'filter',
-                            new MagentoRequest\Filter\Term('style_bags_filter', '24', 'style_bags')
+                            new MagentoRequest\Filter\Term('color_filter', '24', 'color')
                         )
                     ]
                 ),
                 'expected_filter_query' => [
                     'store_id:1',
-                    'style_bags_facet:24',
+                    'color_facet:24',
                 ],
             ],
             'category_filter' => [
@@ -167,8 +167,8 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
                     [new MagentoRequest\Aggregation\Metric('count')]
                 ),
                 new MagentoRequest\Aggregation\TermBucket(
-                    'style_bags_bucket',
-                    'style_bags',
+                    'color_bucket',
+                    'color',
                     [new MagentoRequest\Aggregation\Metric('count')]
                 ),
             ]
