@@ -93,6 +93,8 @@ class GroupedProductAssociations extends AbstractDb implements ProductAssociatio
             []
         );
 
+        $select->distinct();
+
         $childrenIdsByParentId = [];
         $result = $connection->fetchAll($select, $bind);
         foreach ($result as $row) {

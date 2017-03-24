@@ -12,6 +12,7 @@ namespace IntegerNet\Solr\Model\Search\Adapter;
 use IntegerNet\Solr\Implementor\SolrRequestFactoryInterface;
 use IntegerNet\Solr\Model\Bridge\SearchRequest;
 use IntegerNet\SolrCategories\Request\CategoryRequest;
+use Magento\Framework\Search\Adapter\Mysql\ResponseFactory;
 use Magento\Framework\Search\AdapterInterface;
 use Magento\Framework\Search\Request\Filter\Term;
 use Magento\Framework\Search\Request\Query\BoolExpression;
@@ -25,31 +26,31 @@ use Magento\Framework\Search\Response\QueryResponse;
 class SolrAdapter implements AdapterInterface
 {
     /**
-     * @var \Magento\Framework\Search\Adapter\Mysql\ResponseFactory
+     * @var ResponseFactory
      */
     protected $responseFactory;
     /**
-     * @var \IntegerNet\Solr\Implementor\SolrRequestFactoryInterface
+     * @var SearchRequestConverter
      */
-    private $requestFactory;
+    private $searchRequestBuilder;
     /**
-     * @var SearchRequest
+     * @var CategoryRequestConverter
      */
-    private $searchRequest;
+    private $categoryRequestBuilder;
 
     /**
-     * @param SolrRequestFactoryInterface $requestFactory
-     * @param \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory
-     * @param SearchRequest $searchRequest
+     * @param SearchRequestConverter $searchRequestBuilder
+     * @param CategoryRequestConverter $categoryRequestBuilder
+     * @param ResponseFactory $responseFactory
      */
     public function __construct(
-        \IntegerNet\Solr\Implementor\SolrRequestFactoryInterface $requestFactory,
-        \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory,
-        SearchRequest $searchRequest
+        SearchRequestConverter $searchRequestBuilder,
+        CategoryRequestConverter $categoryRequestBuilder,
+        ResponseFactory $responseFactory
     ) {
-        $this->requestFactory = $requestFactory;
         $this->responseFactory = $responseFactory;
-        $this->searchRequest = $searchRequest;
+        $this->searchRequestBuilder = $searchRequestBuilder;
+        $this->categoryRequestBuilder = $categoryRequestBuilder;
     }
     /**
      * Process Search Request
@@ -60,42 +61,30 @@ class SolrAdapter implements AdapterInterface
     public function query(RequestInterface $request)
     {
         if ($request->getName() === 'catalog_view_container') {
-            /** @var BoolExpression $queryExpression */
-            $queryExpression = $request->getQuery();
-            /** @var Filter $queryFilter */
-            $queryFilter = $queryExpression->getMust()['category'];
-            /** @var Term $queryFilterTerm */
-            $queryFilterTerm = $queryFilter->getReference();
-            $categoryId = $queryFilterTerm->getValue();
-            return $this->responseFactory->create(
-                ResponseWithProductIds::fromSolrResponse($this->categoryRequest($categoryId))->toArray()
-            );
+            $solrResponse = $this->makeCategoryRequest($request);
+        } else {
+            $solrResponse = $this->makeSearchRequest($request);
         }
         return $this->responseFactory->create(
-            ResponseWithProductIds::fromSolrResponse($this->searchRequest())->toArray()
+            ResponseWithProductIds::fromSolrResponse($solrResponse)->toArray()
         );
     }
 
     /**
      * @return \IntegerNet\Solr\Response\Response
      */
-    private function searchRequest()
+    private function makeSearchRequest(RequestInterface $request)
     {
-        return $this->requestFactory->getSolrRequest(
-            SolrRequestFactoryInterface::REQUEST_MODE_SEARCH
-        )->doRequest();
+        return $this->searchRequestBuilder->convert($request)->doRequest();
     }
 
     /**
-     * @param int $categoryId
+     * @param RequestInterface $request
      * @return \IntegerNet\Solr\Response\Response
      */
-    private function categoryRequest($categoryId)
+    private function makeCategoryRequest(RequestInterface $request)
     {
-        $this->searchRequest->setCategoryId($categoryId);
-        return $this->requestFactory->getSolrRequest(
-            SolrRequestFactoryInterface::REQUEST_MODE_CATEGORY
-        )->doRequest();
+        return $this->categoryRequestBuilder->convert($request)->doRequest();
     }
 
 }
