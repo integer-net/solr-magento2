@@ -93,10 +93,16 @@ class SearchRequestConverter
             foreach ($query->getMust() as $mustQuery)
             {
                 if ($mustQuery instanceof Filter) {
-                    /** @var \Magento\Framework\Search\Request\Filter\Term $reference */
+                    /** @var \Magento\Framework\Search\Request\Filter\Term|\Magento\Framework\Search\Request\Filter\Range $reference */
                     $reference = $mustQuery->getReference();
                     if ($reference->getField() === 'category_ids') {
                         $solrRequest->getFilterQueryBuilder()->addCategoryFilter($reference->getValue());
+                    }
+                    if ($reference->getField() === 'price') {
+                        $solrRequest->getFilterQueryBuilder()->addPriceRangeFilterByMinMax(
+                            $reference->getFrom(),
+                            $reference->getTo()
+                        );
                     }
                 }
             }

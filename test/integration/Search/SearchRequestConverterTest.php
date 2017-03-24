@@ -17,19 +17,10 @@ namespace IntegerNet\Solr\Search;
 
 
 use IntegerNet\Solr\Model\Search\Adapter\SearchRequestConverter;
-use IntegerNet\Solr\Request\Request;
 use IntegerNet\Solr\Request\SearchRequest;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\RequestInterface as MagentoRequestInterface;
 use Magento\Framework\Search\Request as MagentoRequest;
-use Magento\Framework\Search\Request\Aggregation\DynamicBucket;
-use Magento\Framework\Search\Request\Aggregation\Metric;
-use Magento\Framework\Search\Request\Aggregation\TermBucket;
-use Magento\Framework\Search\Request\Dimension;
-use Magento\Framework\Search\Request\Filter\Term;
-use Magento\Framework\Search\Request\Query\BoolExpression;
-use Magento\Framework\Search\Request\Query\Filter;
-use Magento\Framework\Search\Request\Query\Match;
 use Magento\Framework\Search\RequestInterface;
 use Magento\Search\Model\QueryFactory;
 
@@ -78,17 +69,17 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
                 'magento_request' => self::createMagentoRequest(
                     [],
                     [
-                        'search' => new Match(
+                        'search' => new MagentoRequest\Query\Match(
                             'search',
                             'bag',
                             1,
                             [] // fields to mach query are handled by library
                         ),
-                        'style_bags_query' => new Filter(
+                        'style_bags_query' => new MagentoRequest\Query\Filter(
                             'style_bags_query',
                             1,
                             'filter',
-                            new Term('style_bags_filter', '24', 'style_bags')
+                            new MagentoRequest\Filter\Term('style_bags_filter', '24', 'style_bags')
                         )
                     ]
                 ),
@@ -101,15 +92,15 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
                 'query_text' => 'bag',
                 'magento_request' => self::createMagentoRequest(
                     [
-                        'category' => new Filter(
+                        'category' => new MagentoRequest\Query\Filter(
                             'category',
                             1,
                             'filter',
-                            new Term('category_filter', '20', 'category_ids')
+                            new MagentoRequest\Filter\Term('category_filter', '20', 'category_ids')
                         )
                     ],
                     [
-                        'search' => new Match(
+                        'search' => new MagentoRequest\Query\Match(
                             'search',
                             'bag',
                             1,
@@ -120,6 +111,31 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
                 'expected_filter_query' => [
                     'store_id:1',
                     'category:20',
+                ],
+            ],
+            'price_filter_range' => [
+                'query_text' => 'bag',
+                'magento_request' => self::createMagentoRequest(
+                    [
+                        'category' => new MagentoRequest\Query\Filter(
+                            'price',
+                            1,
+                            'filter',
+                            new MagentoRequest\Filter\Range('price_filter', 'price', '10', '19.999')
+                        )
+                    ],
+                    [
+                        'search' => new MagentoRequest\Query\Match(
+                            'search',
+                            'bag',
+                            1,
+                            [] // fields to mach query are handled by library
+                        ),
+                    ]
+                ),
+                'expected_filter_query' => [
+                    'store_id:1',
+                    'price_f:[10.000000 TO 19.999000]',
                 ],
             ],
         ];
@@ -134,15 +150,27 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
         return new MagentoRequest(
             'quick_search_container',
             'catalogsearch_fulltext',
-            new BoolExpression('quick_search_container', '1', $mustMatch, $shouldMatch, []),
+            new MagentoRequest\Query\BoolExpression('quick_search_container', '1', $mustMatch, $shouldMatch, []),
             0, 10000,
             [
-                'scope' => new Dimension('scope', '1'),
+                'scope' => new MagentoRequest\Dimension('scope', '1'),
             ],
             [
-                new DynamicBucket('price_bucket', 'price', 'auto'),
-                new TermBucket('category_bucket', 'category_ids', [new Metric('count')]),
-                new TermBucket('style_bags_bucket', 'style_bags', [new Metric('count')]),
+                new MagentoRequest\Aggregation\DynamicBucket(
+                    'price_bucket',
+                    'price',
+                    'auto'
+                ),
+                new MagentoRequest\Aggregation\TermBucket(
+                    'category_bucket',
+                    'category_ids',
+                    [new MagentoRequest\Aggregation\Metric('count')]
+                ),
+                new MagentoRequest\Aggregation\TermBucket(
+                    'style_bags_bucket',
+                    'style_bags',
+                    [new MagentoRequest\Aggregation\Metric('count')]
+                ),
             ]
         );
     }
