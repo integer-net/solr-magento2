@@ -10,17 +10,12 @@
 
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
-
 use IntegerNet\Solr\Implementor\SolrRequestFactoryInterface;
-use IntegerNet\Solr\Model\Bridge\AttributeRepository;
-use IntegerNet\Solr\Model\Bridge\SearchRequest;
-use IntegerNet\SolrCategories\Request\CategoryRequest;
-use Magento\Framework\Search\AdapterInterface;
-use Magento\Framework\Search\Request\Filter\Term;
+use Magento\Framework\Search\Adapter\Mysql\ResponseFactory;
 use Magento\Framework\Search\Request\Query\BoolExpression;
 use Magento\Framework\Search\Request\Query\Filter;
 use Magento\Framework\Search\RequestInterface;
-use Magento\Framework\Search\Response\QueryResponse;
+use Psr\Log\LoggerInterface;
 
 /**
  * Creates search request for Solr library based on Magento request
@@ -30,36 +25,38 @@ use Magento\Framework\Search\Response\QueryResponse;
 class SearchRequestConverter
 {
     /**
-     * @var \IntegerNet\Solr\Implementor\SolrRequestFactoryInterface
+     * @var SolrRequestFactoryInterface
      */
     private $requestFactory;
     /**
-     * @var SearchRequest
+     * @var FilterConverter
      */
-    private $searchRequest;
+    private $filterConverter;
     /**
-     * @var \IntegerNet\Solr\Implementor\AttributeRepository
+     * @var LoggerInterface
      */
-    private $attributeRepository;
+    private $logger;
 
     /**
      * @param SolrRequestFactoryInterface $requestFactory
-     * @param \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory
-     * @param SearchRequest $searchRequest
+     * @param FilterConverter $filterConverter
+     * @param ResponseFactory $responseFactory
+     * @param LoggerInterface $logger
      */
     public function __construct(
-        \IntegerNet\Solr\Implementor\AttributeRepository $attributeRepository,
-        \IntegerNet\Solr\Implementor\SolrRequestFactoryInterface $requestFactory,
-        \Magento\Framework\Search\Adapter\Mysql\ResponseFactory $responseFactory,
-        SearchRequest $searchRequest
+        SolrRequestFactoryInterface $requestFactory,
+        FilterConverter $filterConverter,
+        ResponseFactory $responseFactory,
+        LoggerInterface $logger
     ) {
         $this->requestFactory = $requestFactory;
         $this->responseFactory = $responseFactory;
-        $this->searchRequest = $searchRequest;
-        $this->attributeRepository = $attributeRepository;
+        $this->filterConverter = $filterConverter;
+        $this->logger = $logger;
     }
 
     /**
+     * @param RequestInterface $magentoRequest
      * @return \IntegerNet\Solr\Request\Request
      * @throws \IntegerNet\Solr\Exception
      */
@@ -71,41 +68,15 @@ class SearchRequestConverter
          *
          * This should better be changed in M1 and M2, but in a backwards compatible way
          */
-        /** @var \IntegerNet\Solr\Request\SearchRequest $solrRequest */
-        $solrRequest = $this->requestFactory->getSolrRequest(
-            SolrRequestFactoryInterface::REQUEST_MODE_SEARCH
-        );
         $query = $magentoRequest->getQuery();
+        $solrRequest = $this->createSolrRequest();
+        $fqBuilder = $solrRequest->getFilterQueryBuilder();
         if ($query instanceof BoolExpression) {
-            foreach ($query->getShould() as $shouldQuery) {
-                if ($shouldQuery instanceof Filter) {
-                    /** @var \Magento\Framework\Search\Request\Filter\Term $reference */
-                    $reference = $shouldQuery->getReference();
-                    $solrRequest->getFilterQueryBuilder()->addAttributeFilter(
-                        $this->attributeRepository->getAttributeByCode(
-                            $reference->getField(),
-                            $this->getStoreIdFromRequest($magentoRequest)
-                        ),
-                        $reference->getValue()
-                    );
-                }
+            foreach ($this->getFiltersFromQuery($query) as $filter) {
+                $this->filterConverter->configure($fqBuilder, $filter, $this->getStoreIdFromRequest($magentoRequest));
             }
-            foreach ($query->getMust() as $mustQuery)
-            {
-                if ($mustQuery instanceof Filter) {
-                    /** @var \Magento\Framework\Search\Request\Filter\Term|\Magento\Framework\Search\Request\Filter\Range $reference */
-                    $reference = $mustQuery->getReference();
-                    if ($reference->getField() === 'category_ids') {
-                        $solrRequest->getFilterQueryBuilder()->addCategoryFilter($reference->getValue());
-                    }
-                    if ($reference->getField() === 'price') {
-                        $solrRequest->getFilterQueryBuilder()->addPriceRangeFilterByMinMax(
-                            $reference->getFrom(),
-                            $reference->getTo()
-                        );
-                    }
-                }
-            }
+        } else {
+            $this->logger->notice(sprintf('[SOLR] Unknown query type %s', get_class($query)));
         }
         return $solrRequest;
     }
@@ -122,7 +93,35 @@ class SearchRequestConverter
                 $storeId = $dimension->getValue();
                 break;
             }
-        };
+        }
         return $storeId;
+    }
+
+    /**
+     * @param BoolExpression $query
+     * @return Filter[]
+     */
+    private function getFiltersFromQuery(BoolExpression $query)
+    {
+        /** @var Filter[] $filters */
+        $filters = array_filter(
+            array_merge($query->getMust(), $query->getShould()),
+            function ($part) {
+                return $part instanceof Filter;
+            }
+        );
+        return $filters;
+    }
+
+    /**
+     * @return \IntegerNet\Solr\Request\SearchRequest
+     */
+    private function createSolrRequest()
+    {
+        /** @var \IntegerNet\Solr\Request\SearchRequest $solrRequest */
+        $solrRequest = $this->requestFactory->getSolrRequest(
+            SolrRequestFactoryInterface::REQUEST_MODE_SEARCH
+        );
+        return $solrRequest;
     }
 }
