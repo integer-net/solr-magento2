@@ -68,15 +68,15 @@ class SearchRequestConverter
          *
          * This should better be changed in M1 and M2, but in a backwards compatible way
          */
-        $query = $magentoRequest->getQuery();
+        $queryExpression = $magentoRequest->getQuery();
         $solrRequest = $this->createSolrRequest();
         $fqBuilder = $solrRequest->getFilterQueryBuilder();
-        if ($query instanceof BoolExpression) {
-            foreach ($this->getFiltersFromQuery($query) as $filter) {
+        if ($queryExpression instanceof BoolExpression) {
+            foreach ($this->getFiltersFromQuery($queryExpression) as $filter) {
                 $this->filterConverter->configure($fqBuilder, $filter, $this->getStoreIdFromRequest($magentoRequest));
             }
         } else {
-            $this->logger->notice(sprintf('[SOLR] Unknown query type %s', get_class($query)));
+            $this->logger->notice(sprintf('[SOLR] Unknown query type %s', get_class($queryExpression)));
         }
         return $solrRequest;
     }

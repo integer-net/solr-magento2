@@ -16,18 +16,18 @@ use Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection as FulltextSea
 namespace IntegerNet\Solr\Search;
 
 
-use IntegerNet\Solr\Model\Search\Adapter\SearchRequestConverter;
-use IntegerNet\Solr\Request\SearchRequest;
+use IntegerNet\Solr\Model\Search\Adapter\CategoryRequestConverter;
+use IntegerNet\SolrCategories\Request\CategoryRequest;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\RequestInterface as MagentoRequestInterface;
 use Magento\Framework\Search\Request as MagentoRequest;
 use Magento\Framework\Search\RequestInterface;
 use Magento\Search\Model\QueryFactory;
 
-class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
+class CategoryRequestConverterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var SearchRequestConverter
+     * @var CategoryRequestConverter
      */
     private $converter;
     /**
@@ -38,7 +38,7 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->objectManager = ObjectManager::getInstance();
-        $this->converter = $this->objectManager->create(SearchRequestConverter::class);
+        $this->converter = $this->objectManager->create(CategoryRequestConverter::class);
     }
 
     /**
@@ -54,9 +54,9 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
         $storeId = 1;
         $this->setRequestQueryText($queryText);
 
-        /** @var SearchRequest $actualSolrRequest */
+        /** @var CategoryRequest $actualSolrRequest */
         $actualSolrRequest = $this->converter->convert($magentoRequest);
-        $this->assertInstanceOf(SearchRequest::class, $actualSolrRequest);
+        $this->assertInstanceOf(CategoryRequest::class, $actualSolrRequest);
         $actualFq = $actualSolrRequest->getFilterQueryBuilder()->buildFilterQuery($storeId);
         $this->assertFilterQueryParts($expectedFqParts, $actualFq);
     }
@@ -65,31 +65,6 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'color_filter' => [
-                'query_text' => 'bag',
-                'magento_request' => self::createMagentoRequest(
-                    [],
-                    [
-                        'search' => new MagentoRequest\Query\Match(
-                            'search',
-                            'bag',
-                            1,
-                            [] // fields to mach query are handled by library
-                        ),
-                        'color_query' => new MagentoRequest\Query\Filter(
-                            'color_query',
-                            1,
-                            'filter',
-                            new MagentoRequest\Filter\Term('color_filter', '24', 'color')
-                        )
-                    ]
-                ),
-                'expected_filter_query' => [
-                    'store_id:1',
-                    'is_visible_in_search_i:1',
-                    'color_facet:24',
-                ],
-            ],
-            'category_filter' => [
                 'query_text' => 'bag',
                 'magento_request' => self::createMagentoRequest(
                     [
@@ -101,23 +76,30 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
                         )
                     ],
                     [
-                        'search' => new MagentoRequest\Query\Match(
-                            'search',
-                            'bag',
+                        'color_query' => new MagentoRequest\Query\Filter(
+                            'color_query',
                             1,
-                            [] // fields to mach query are handled by library
-                        ),
+                            'filter',
+                            new MagentoRequest\Filter\Term('color_filter', '24', 'color')
+                        )
                     ]
                 ),
                 'expected_filter_query' => [
                     'store_id:1',
-                    'category:20',
+                    'is_visible_in_catalog_i:1',
+                    'color_facet:24',
                 ],
             ],
             'price_filter_range' => [
                 'query_text' => 'bag',
                 'magento_request' => self::createMagentoRequest(
                     [
+                        'category' => new MagentoRequest\Query\Filter(
+                            'category',
+                            1,
+                            'filter',
+                            new MagentoRequest\Filter\Term('category_filter', '20', 'category_ids')
+                        ),
                         'price' => new MagentoRequest\Query\Filter(
                             'price',
                             1,
@@ -125,18 +107,11 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
                             new MagentoRequest\Filter\Range('price_filter', 'price', '10', '19.999')
                         )
                     ],
-                    [
-                        'search' => new MagentoRequest\Query\Match(
-                            'search',
-                            'bag',
-                            1,
-                            [] // fields to mach query are handled by library
-                        ),
-                    ]
+                    []
                 ),
                 'expected_filter_query' => [
                     'store_id:1',
-                    'is_visible_in_search_i:1',
+                    'is_visible_in_catalog_i:1',
                     'price_f:[10.000000 TO 19.999000]',
                 ],
             ],
@@ -150,9 +125,9 @@ class SearchRequestConverterTest extends \PHPUnit_Framework_TestCase
     private static function createMagentoRequest($mustMatch, $shouldMatch)
     {
         return new MagentoRequest(
-            'quick_search_container',
+            'catalog_view_container',
             'catalogsearch_fulltext',
-            new MagentoRequest\Query\BoolExpression('quick_search_container', '1', $mustMatch, $shouldMatch, []),
+            new MagentoRequest\Query\BoolExpression('catalog_view_container', '1', $mustMatch, $shouldMatch, []),
             0, 10000,
             [
                 'scope' => new MagentoRequest\Dimension('scope', '1'),
