@@ -5,6 +5,16 @@
     <section id="integernet_solr">
       <group id="category" translate="label" sortOrder="60" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Category Pages</label>
+        <field id="is_active" translate="label" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Use Solr to display products on category pages</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <!--
+            <field id="filter_position" translate="label" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+              <label>Position of Filters</label>
+              <source_model>IntegerNet\Solr\Model\Source\FilterPosition</source_model>
+            </field>
+        -->
         <field id="is_indexer_active" translate="label" sortOrder="30" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Use Solr to index category pages</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

@@ -10,9 +10,12 @@
 
 namespace IntegerNet\SolrCategories\Model\ResourceModel;
 
+use IntegerNet\Solr\Model\Config\AllStoresConfig;
 use IntegerNet\Solr\Model\Config\CurrentStoreConfig;
+use IntegerNet\Solr\Resource\ResourceFacade;
 use Magento\Framework\Data\Collection as DataCollection;
 use Magento\Framework\Data\Collection\EntityFactoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  *
@@ -31,6 +34,14 @@ class CategoriesCollection extends DataCollection
      * @var int|null
      */
     protected $totalRecords;
+    /**
+     * @var ResourceFacade
+     */
+    private $solrResource;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     /**
      * @param EntityFactoryInterface $entityFactory
@@ -40,19 +51,38 @@ class CategoriesCollection extends DataCollection
     public function __construct(
         EntityFactoryInterface $entityFactory,
         CurrentStoreConfig $config,
-        CategoriesResult $result
+        CategoriesResult $result,
+        AllStoresConfig $solrConfig,
+        StoreManagerInterface $storeManager
     ) {
         parent::__construct($entityFactory);
         $this->config = $config;
         $this->result = $result;
+        $this->solrResource = new ResourceFacade($solrConfig->getArrayCopy());
+        $this->storeManager = $storeManager;
     }
 
     public function loadData($printQuery = false, $logQuery = false)
     {
         if ($this->config->getCategoryConfig()->canUseInSearchResults()) {
+            $storeId = $this->storeManager->getStore()->getId();
+            if (!$this->canPingSolrServer($storeId)) {
+                return $this;
+            }
             $this->_items = $this->result->getSolrResult()->response->docs;
         }
         return $this;
+    }
+
+    /**
+     * @param int $storeId
+     * @return boolean
+     */
+    private function canPingSolrServer($storeId)
+    {
+        $solr = $this->solrResource->getSolrService($storeId);
+
+        return boolval($solr->ping());
     }
 
     public function getColumnValues($colName)

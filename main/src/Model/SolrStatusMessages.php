@@ -11,7 +11,6 @@
 namespace IntegerNet\Solr\Model;
 
 use IntegerNet\Solr\Model\Config\AllStoresConfig;
-use IntegerNet\Solr\Model\Plugin\SearchEnginePlugin;
 use IntegerNet\Solr\Resource\ResourceFacade;
 use Magento\Backend\Model\Url;
 use Magento\CatalogSearch\Model\ResourceModel\EngineInterface;
@@ -124,17 +123,9 @@ class SolrStatusMessages implements StatusMessages
      */
     protected function _isModuleActive($storeId)
     {
-        $configuredSearchEngine = $this->scopePool
-            ->getScope(ScopeInterface::SCOPE_STORE, $storeId)
-            ->getValue(EngineInterface::CONFIG_ENGINE_PATH);
-        $fallbackSearchEngine = $configuredSearchEngine === SearchEnginePlugin::ENGINE_INTEGERNET_SOLR ? SearchEnginePlugin::ENGINE_DEFAULT : $configuredSearchEngine;
-
         if (! $this->moduleConfig[(int)$storeId]->getGeneralConfig()->isActive()) {
             $this->_addWarningMessage(
                 __('Module is not active. Activate the module below.')
-            );
-            $this->_addNoticeMessage(
-                __('Used fallback search engine: <span class="engine">%1</span>', $fallbackSearchEngine)
             );
             return false;
         }
@@ -143,12 +134,6 @@ class SolrStatusMessages implements StatusMessages
             __('Module is active.')
         );
 
-        $this->_addNoticeMessage(
-            __(
-                'Fallback search engine: <span class="engine">%1</span>',
-                $fallbackSearchEngine
-            )
-        );
         return true;
     }
 

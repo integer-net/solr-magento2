@@ -197,19 +197,6 @@
           <source_model>IntegerNet\Solr\Model\Source\VarcharCategoryAttribute</source_model>
         </field>
       </group>
-      <!--
-      <group id="category" translate="label" sortOrder="60" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
-        <label>Category Pages</label>
-          <field id="is_active" translate="label" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Use Solr to display products on category pages</label>
-            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-          </field>
-          <field id="filter_position" translate="label" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Position of Filters</label>
-            <source_model>IntegerNet\Solr\Model\Source\FilterPosition</source_model>
-          </field>
-      </group>
-      -->
       <group id="autosuggest" translate="label" sortOrder="80" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Autosuggest Box</label>
         <field id="is_active" translate="label" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -273,7 +260,7 @@
     <section id="catalog">
       <group id="search">
         <field id="engine" translate="comment">
-          <comment><![CDATA[The IntegerNet_Solr engine will automatically be selected if and only if the module is activated, setting it here will not have any effect. Click on <strong>IntegerNet_Solr</strong> under the <strong>Services</strong> tab to the left, to activate and configure it. The module can be activated per store view.]]></comment>
+          <comment><![CDATA[The IntegerNet_Solr engine will automatically be selected if and only if the module is activated, it cannot be set here. Click on <strong>IntegerNet_Solr</strong> under the <strong>Services</strong> tab to the left, to activate and configure it. The module can be activated per store view.]]></comment>
         </field>
       </group>
     </section>
