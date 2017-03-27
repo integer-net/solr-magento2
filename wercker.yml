@@ -49,7 +49,7 @@ build:
           composer config repositories.solr-autosuggest vcs git@github.com:integer-net/solr-magento2-autosuggest.git
           composer config repositories.solr-base vcs git@github.com:integer-net/solr-base.git
           composer config repositories.solr-pro vcs git@github.com:integer-net/solr-pro.git
-          sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/test\/unit", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
+          sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/main\/test\/unit", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
           composer config minimum-stability dev
           composer require integer-net/solr-magento2 dev-tmp
           composer require --dev phpunit/phpunit ^5.0 --no-update
@@ -58,8 +58,8 @@ build:
           bin/magento setup:upgrade
           cd vendor/integer-net/solr-magento2
           php ../../phpunit/phpunit/phpunit
-          cp $MODULE_DIR/test/integration/phpunit.xml.dist /srv/www/dev/tests/integration/phpunit.xml
-          cp $MODULE_DIR/test/integration/install-config-mysql.php /srv/www/dev/tests/integration/etc/
+          cp $MODULE_DIR/main/test/integration/phpunit.xml.dist /srv/www/dev/tests/integration/phpunit.xml
+          cp $MODULE_DIR/main/test/integration/install-config-mysql.php /srv/www/dev/tests/integration/etc/
           sed -i -e "s/DB_HOST/$M2SETUP_DB_HOST/g" /srv/www/dev/tests/integration/etc/install-config-mysql.php
           sed -i -e "s/DB_USER/$M2SETUP_DB_USER/g" /srv/www/dev/tests/integration/etc/install-config-mysql.php
           sed -i -e "s/DB_PASSWORD/$M2SETUP_DB_PASSWORD/g" /srv/www/dev/tests/integration/etc/install-config-mysql.php

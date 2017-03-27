@@ -1,0 +1,51 @@
+<?php /* @var $block \IntegerNet\SolrCategories\Block\Result\Categories */ ?>
+<?php $_imgWidth = 240; ?>
+<?php $_imgHeight = 300; ?>
+<?php $categoriesCollection = $block->getResultsCollection() ?>
+
+<?php if ($categoriesCollection->getSize()): ?>
+    <div class="solr-search-result-categories products wrapper grid products-grid" id="solr_tab_content_categories">
+
+        <?php $_iterator = 0; ?>
+        <ol class="solr-categories-list products list items product-items" id="solr_categories_list">
+            <?php $i=0; foreach ($categoriesCollection as $categoriesPageDocument): ?>
+                <?php $title = $block->getCategoryTitle($categoriesPageDocument) ?>
+                <?php $url = $block->getCategoryUrl($categoriesPageDocument); ?>
+                <li class="item product product-item<?php if( ++$_iterator == $categoriesCollection->getSize() ): ?> last<?php endif; ?>">
+
+                    <div class="product-item-info">
+                        <a href="<?php echo $url ?>" title="<?php echo $block->stripTags($title, null, true) ?>" class="product photo product-item-photo">
+                            <span class="product-image-container">
+                                <span class="product-image-wrapper">
+                                    <?php if ($imageUrl = $block->getCategoryImageUrl($categoriesPageDocument, $_imgWidth, $_imgHeight)): ?>
+                                        <img
+                                            class="product-image-photo"
+                                            src="<?php echo $imageUrl ?>"
+                                            alt="<?php echo $block->stripTags($title) ?>"
+                                            width="<?php echo $_imgWidth ?>"
+                                            height="<?php echo $_imgHeight ?>"
+                                        />
+                                    <?php endif ?>
+                                </span>
+                            </span>
+                        </a>
+                        <div class="product-item-details product-item-description">
+                            <div class="f-fix">
+                                <p class="category-path"><?php echo $block->getCategoryPath($categoriesPageDocument) ?></p>
+                                <?php $_categoriesPageNameStripped = $block->stripTags($title, null, true); ?>
+                                <h2 class="product-name"><a href="<?php echo $url ?>" title="<?php echo $_categoriesPageNameStripped; ?>"><?php echo $title ?></a></h2>
+                                <div class="desc std">
+                                    <?php echo $block->getCategoryAbstract($categoriesPageDocument) ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-item-details product-item-button">
+                            <a href="<?php echo $url ?>" title="<?php echo $_categoriesPageNameStripped ?>" class="action primary"><?php echo __('Learn More') ?></a>
+                        </div>
+                    </div>
+                </li>
+            <?php endforeach ?>
+        </ol>
+    </div>
+<?php endif;?>

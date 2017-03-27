@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+  
+  <!-- Bridge implementations -->
+
+  <!--<preference for="IntegerNet\SolrCategories\Implementor\SolrRequestFactoryInterface" type="IntegerNet\Solr\Model\Bridge\RequestFactory" />-->
+  <preference for="IntegerNet\SolrCategories\Implementor\CategoryRepository" type="IntegerNet\SolrCategories\Model\Bridge\CategoryRepository" />
+  <preference for="IntegerNet\SolrCategories\Implementor\CategoryIterator" type="IntegerNet\SolrCategories\Model\Bridge\CategoryIterator" />
+  <preference for="IntegerNet\SolrCategories\Implementor\Category" type="IntegerNet\SolrCategories\Model\Bridge\Category" />
+  <preference for="IntegerNet\SolrCategories\Implementor\CategoryRenderer" type="IntegerNet\SolrCategories\Model\Bridge\CategoryRenderer" />
+  <preference for="IntegerNet\SolrCategories\Implementor\PagedCategoryIterator" type="IntegerNet\SolrCategories\Model\Bridge\PagedCategoryIterator" />
+</config>

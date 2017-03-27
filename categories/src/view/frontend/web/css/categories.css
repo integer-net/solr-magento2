@@ -1,0 +1,20 @@
+.solr-categories-list .products-list .product-item-details{
+    vertical-align: middle;
+    width: calc(50% - 100px);
+}
+
+.solr-categories-list .product-item-description { margin-top: 0; }
+.solr-categories-list .product-image-photo {
+    max-height: 300px;
+    width: auto;
+}
+
+.solr-categories-list .product-image-wrapper { padding-bottom: 125%; }
+
+.solr-categories-list .product-image-container,
+.solr-categories-list .products-grid .product-item-photo {
+    width: 240px;
+}
+
+.solr-categories-list .category-path { margin-bottom: .5rem }
+.solr-categories-list .product-name { margin-top: 0; }
