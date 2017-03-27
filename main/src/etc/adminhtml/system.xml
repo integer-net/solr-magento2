@@ -186,7 +186,6 @@
           <label>Custom Price Intervals</label>
           <comment>Divide steps by comma, i.e. 10,20,50,100,200,300,400,500</comment>
         </field>
-        <!--
         <field id="product_attributes_redirect" translate="label,comment" sortOrder="70" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Redirect to product page on direct match in one of these attributes</label>
           <comment>If the exact name / sku / ... is entered in the search field, the customer will be redirected to the product view page.</comment>
@@ -197,7 +196,6 @@
           <comment>If the exact name / ... is entered in the search field, the customer will be redirected to the category view page.</comment>
           <source_model>IntegerNet\Solr\Model\Source\VarcharCategoryAttribute</source_model>
         </field>
-        -->
       </group>
       <!--
       <group id="category" translate="label" sortOrder="60" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
