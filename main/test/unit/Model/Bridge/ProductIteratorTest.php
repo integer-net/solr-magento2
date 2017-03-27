@@ -90,7 +90,7 @@ class ProductIteratorTest extends \PHPUnit_Framework_TestCase
      */
     private function getEventManagerStub()
     {
-        return $this->getMock(ManagerInterface::class);
+        return $this->getMockBuilder(ManagerInterface::class)->getMock();
     }
 
     /**

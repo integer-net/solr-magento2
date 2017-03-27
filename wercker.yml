@@ -49,7 +49,7 @@ build:
           composer config repositories.solr-autosuggest vcs git@github.com:integer-net/solr-magento2-autosuggest.git
           composer config repositories.solr-base vcs git@github.com:integer-net/solr-base.git
           composer config repositories.solr-pro vcs git@github.com:integer-net/solr-pro.git
-          sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/test\/unit", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
+          sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/main\/test\/unit", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
           composer config minimum-stability dev
           composer require integer-net/solr-magento2 dev-tmp
           composer require --dev phpunit/phpunit ^5.0 --no-update

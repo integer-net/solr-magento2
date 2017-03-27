@@ -49,7 +49,7 @@ class StoreEmulationTest extends \PHPUnit_Framework_TestCase
     public function testRunInStoreEmulation()
     {
         $storeId = 2;
-        $callback = $this->getMock(\stdClass::class, ['__invoke']);
+        $callback = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
         $callback->expects($this->once())->method('__invoke');
 
         $this->setStartStopExpectations($storeId);
@@ -62,7 +62,7 @@ class StoreEmulationTest extends \PHPUnit_Framework_TestCase
     {
         $storeId = 2;
         $exceptionMessage = 'this is an exception';
-        $callback = $this->getMock(\stdClass::class, ['__invoke']);
+        $callback = $this->getMockBuilder(\stdClass::class)->setMethods(['__invoke'])->getMock();
         $callback->expects($this->once())->method('__invoke')->willThrowException(new \Exception($exceptionMessage));
 
         $this->setStartStopExpectations($storeId);
