@@ -1,5 +1,4 @@
 <?php
-
 $solrConfig = [
     'integernet_solr/server/host' => 'localhost',
     'integernet_solr/server/port' => '8983',

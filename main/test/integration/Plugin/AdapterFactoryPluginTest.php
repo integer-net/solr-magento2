@@ -103,7 +103,11 @@ class AdapterFactoryPluginTest extends \Magento\TestFramework\TestCase\AbstractC
 
     public static function loadFixture()
     {
-        include __DIR__ . '/../_files/solr_config.php';
+        if (file_exists(__DIR__ . '/../_files/solr_config.php')) {
+            include __DIR__ . '/../_files/solr_config.php';
+        } else {
+            include __DIR__ . '/../_files/solr_config.dist.php';
+        }
         include __DIR__ . '/../_files/categories.php';
     }
 }
