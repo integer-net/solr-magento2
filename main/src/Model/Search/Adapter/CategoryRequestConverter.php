@@ -13,10 +13,9 @@ namespace IntegerNet\Solr\Model\Search\Adapter;
 
 use IntegerNet\Solr\Implementor\SolrRequestFactoryInterface;
 use IntegerNet\Solr\Model\Bridge\SearchRequest;
+use IntegerNet\SolrCategories\Request\CategoryRequest;
 use Magento\Framework\Search\Adapter\Mysql\ResponseFactory;
-use Magento\Framework\Search\Request\Filter\Term;
 use Magento\Framework\Search\Request\Query\BoolExpression;
-use Magento\Framework\Search\Request\Query\Filter;
 use Magento\Framework\Search\RequestInterface;
 use Psr\Log\LoggerInterface;
 
@@ -60,78 +59,59 @@ class CategoryRequestConverter
      * @return \IntegerNet\Solr\Request\Request
      * @throws \IntegerNet\Solr\Exception
      */
-    public function convert(\Magento\Framework\Search\RequestInterface $magentoRequest)
+    public function convert(RequestInterface $magentoRequest)
     {
-        /** @var BoolExpression $queryExpression */
-        $queryExpression = $magentoRequest->getQuery();
-        if (! $queryExpression instanceof BoolExpression) {
-            $this->logger->notice(sprintf('[SOLR] Unknown query type %s', get_class($queryExpression)));
+        if (! $magentoRequest->getQuery() instanceof BoolExpression) {
+            $this->logger->notice(sprintf('[SOLR] Unknown query type %s', get_class($magentoRequest->getQuery())));
+            return $this->createSolrRequest();
         }
-        $solrRequest = $this->createSolrRequest($queryExpression);
-        $fqBuilder = $solrRequest->getFilterQueryBuilder();
-        foreach ($this->getFiltersFromQuery($queryExpression) as $filter) {
+        $request = new Request($magentoRequest);
+        $this->registerCategoryId($request->categoryId());
+        return $this->applyFilters($request, $this->createSolrRequest());
+    }
+
+    /**
+     * @return CategoryRequest
+     */
+    private function createSolrRequest()
+    {
+        /** @var CategoryRequest $solrRequest */
+        $solrRequest = $this->requestFactory->getSolrRequest(
+            SolrRequestFactoryInterface::REQUEST_MODE_CATEGORY
+        );
+        return $solrRequest;
+    }
+
+    /**
+     * Registers category in search request object (application context)
+     *
+     * Must be called before creating seach request!
+     *
+     * @param int $categoryId
+     */
+    private function registerCategoryId($categoryId)
+    {
+        $this->searchRequest->setCategoryId($categoryId);
+    }
+
+    /**
+     * @param $source
+     * @param $target
+     * @return CategoryRequest
+     * @throws \IntegerNet\Solr\Exception
+     */
+    private function applyFilters(Request $source, CategoryRequest $target)
+    {
+        $fqBuilder = $target->getFilterQueryBuilder();
+        foreach ($source->filters() as $filter) {
             /*
              * Categories are not filtered but searched via query text
              * (see \IntegerNet\SolrCategories\Query\CategoryQueryBuilder)
              */
             if ($filter->getName() !== 'category') {
-                $this->filterConverter->configure($fqBuilder, $filter, $this->getStoreIdFromRequest($magentoRequest));
+                $this->filterConverter->configure($fqBuilder, $filter, $source->storeId());
             }
         }
-
-        return $solrRequest;
-    }
-
-
-    /**
-     * @param RequestInterface $magentoRequest
-     * @return int|mixed
-     */
-    private function getStoreIdFromRequest(RequestInterface $magentoRequest)
-    {
-        $storeId = 1;
-        foreach ($magentoRequest->getDimensions() as $dimension) {
-            if ($dimension->getName() === 'scope') {
-                $storeId = $dimension->getValue();
-                break;
-            }
-        }
-        return $storeId;
-    }
-
-    /**
-     * @param BoolExpression $query
-     * @return Filter[]
-     */
-    private function getFiltersFromQuery(BoolExpression $query)
-    {
-        /** @var Filter[] $filters */
-        $filters = array_filter(
-            array_merge($query->getMust(), $query->getShould()),
-            function ($part) {
-                return $part instanceof Filter;
-            }
-        );
-        return $filters;
-    }
-
-    /**
-     * @param BoolExpression $queryExpression
-     * @return \IntegerNet\SolrCategories\Request\CategoryRequest
-     */
-    private function createSolrRequest(BoolExpression $queryExpression)
-    {
-        /** @var Filter $queryFilter */
-        $queryFilter = $queryExpression->getMust()['category'];
-        /** @var Term $queryFilterTerm */
-        $queryFilterTerm = $queryFilter->getReference();
-        $categoryId = $queryFilterTerm->getValue();
-        $this->searchRequest->setCategoryId($categoryId);
-
-        /** @var \IntegerNet\SolrCategories\Request\CategoryRequest $solrRequest */
-        $solrRequest = $this->requestFactory->getSolrRequest(
-            SolrRequestFactoryInterface::REQUEST_MODE_CATEGORY
-        );
-        return $solrRequest;
+        return $target;
     }
 }
