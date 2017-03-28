@@ -11,6 +11,7 @@
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
 use IntegerNet\Solr\Implementor\SolrRequestFactoryInterface;
+use IntegerNet\Solr\Request\SearchRequest;
 use Magento\Framework\Search\Adapter\Mysql\ResponseFactory;
 use Magento\Framework\Search\Request\Query\BoolExpression;
 use Magento\Framework\Search\Request\Query\Filter;
@@ -68,60 +69,37 @@ class SearchRequestConverter
          *
          * This should better be changed in M1 and M2, but in a backwards compatible way
          */
-        $query = $magentoRequest->getQuery();
-        $solrRequest = $this->createSolrRequest();
-        $fqBuilder = $solrRequest->getFilterQueryBuilder();
-        if ($query instanceof BoolExpression) {
-            foreach ($this->getFiltersFromQuery($query) as $filter) {
-                $this->filterConverter->configure($fqBuilder, $filter, $this->getStoreIdFromRequest($magentoRequest));
-            }
-        } else {
-            $this->logger->notice(sprintf('[SOLR] Unknown query type %s', get_class($query)));
+        if (! $magentoRequest->getQuery() instanceof BoolExpression) {
+            $this->logger->notice(sprintf('[SOLR] Unknown query type %s', get_class($magentoRequest->getQuery())));
+            return $this->createSolrRequest();
         }
-        return $solrRequest;
+        return $this->applyFilters(new Request($magentoRequest), $this->createSolrRequest());
     }
 
     /**
-     * @param RequestInterface $magentoRequest
-     * @return int|mixed
-     */
-    private function getStoreIdFromRequest(RequestInterface $magentoRequest)
-    {
-        $storeId = 1;
-        foreach ($magentoRequest->getDimensions() as $dimension) {
-            if ($dimension->getName() === 'scope') {
-                $storeId = $dimension->getValue();
-                break;
-            }
-        }
-        return $storeId;
-    }
-
-    /**
-     * @param BoolExpression $query
-     * @return Filter[]
-     */
-    private function getFiltersFromQuery(BoolExpression $query)
-    {
-        /** @var Filter[] $filters */
-        $filters = array_filter(
-            array_merge($query->getMust(), $query->getShould()),
-            function ($part) {
-                return $part instanceof Filter;
-            }
-        );
-        return $filters;
-    }
-
-    /**
-     * @return \IntegerNet\Solr\Request\SearchRequest
+     * @return SearchRequest
      */
     private function createSolrRequest()
     {
-        /** @var \IntegerNet\Solr\Request\SearchRequest $solrRequest */
+        /** @var SearchRequest $solrRequest */
         $solrRequest = $this->requestFactory->getSolrRequest(
             SolrRequestFactoryInterface::REQUEST_MODE_SEARCH
         );
         return $solrRequest;
+    }
+
+    /**
+     * @param $source
+     * @param $target
+     * @return SearchRequest
+     * @throws \IntegerNet\Solr\Exception
+     */
+    private function applyFilters(Request $source, SearchRequest $target)
+    {
+        $fqBuilder = $target->getFilterQueryBuilder();
+        foreach ($source->filters() as $filter) {
+            $this->filterConverter->configure($fqBuilder, $filter, $source->storeId());
+        }
+        return $target;
     }
 }
