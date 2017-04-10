@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!-- Configuration for features which are not implemented yet are commented out -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+  <system>
+    <section id="integernet_solr">
+      <group id="category" translate="label" sortOrder="60" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Category Pages</label>
+        <field id="is_active" translate="label" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Use Solr to display products on category pages</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <!--
+            <field id="filter_position" translate="label" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+              <label>Position of Filters</label>
+              <source_model>IntegerNet\Solr\Model\Source\FilterPosition</source_model>
+            </field>
+        -->
+        <field id="is_indexer_active" translate="label" sortOrder="30" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Use Solr to index category pages</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="use_in_search_results" translate="label" sortOrder="40" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Display categories as search results</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="max_number_results" translate="label" sortOrder="50" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Maximum number of results</label>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        <field id="fuzzy_is_active" translate="label" sortOrder="60" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Fuzzy Search is active</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="fuzzy_sensitivity" translate="label,comment" sortOrder="70" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Sensitivity for Search</label>
+          <comment>Value between 0 and 1. Smaller values mean more fuzzy search results.</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+      </group>
+      <group id="autosuggest">
+        <field id="max_number_category_suggestions">
+          <comment>0 = don't show&lt;br /&gt;Attention: If &lt;i&gt;Category Indexing&lt;/i&gt; is active, the suggestions will be better, but it will affect the performance of the autosuggest!</comment>
+        </field>
+      </group>
+    </section>
+  </system>
+</config>

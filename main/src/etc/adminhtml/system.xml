@@ -1,0 +1,268 @@
+<?xml version="1.0"?>
+<!-- Configuration for features which are not implemented yet are commented out -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+  <system>
+    <section id="integernet_solr" translate="label" sortOrder="28" showInDefault="1" showInWebsite="1" showInStore="1">
+      <label>IntegerNet_Solr</label>
+      <class>integernet-solr-tab</class>
+      <tab>service</tab>
+      <resource>IntegerNet_Solr::config_integernet_solr</resource>
+      <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>General</label>
+        <field id="description" translate="label" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+          <frontend_model>IntegerNet\Solr\Block\Config\Description</frontend_model>
+        </field>
+        <field id="is_active" translate="label" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Is active</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <!--
+        <field id="license_key" translate="label,comment" sortOrder="20" type="text" showInDefault="1">
+          <label>License Key</label>
+          <comment>Example: AAAAA-BBBBB. Will be necessary two weeks after install.</comment>
+        </field>
+        -->
+        <field id="log" translate="label,comment" sortOrder="30" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Activate Logging</label>
+          <comment>The logs can be found at var/log/solr.log. Make sure to have logging activated.</comment>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+      </group>
+      <group id="server" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Solr Server</label>
+        <field id="host" translate="label,comment" sortOrder="10" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Host</label>
+          <comment>Example: localhost, 192.168.46.102</comment>
+        </field>
+        <field id="port" translate="label,comment" sortOrder="20" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Server Port</label>
+          <comment>Example: 8081</comment>
+        </field>
+        <field id="path" translate="label,comment" sortOrder="30" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Path</label>
+          <comment>Example: /solr/</comment>
+        </field>
+        <field id="core" translate="label,comment" sortOrder="40" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Core</label>
+          <comment>Example: collection1, core0</comment>
+        </field>
+        <field id="http_method" translate="label,comment" sortOrder="50" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>HTTP Transport Method</label>
+          <comment>Please change if you are getting communication errors</comment>
+          <source_model>IntegerNet\Solr\Model\Source\HttpTransportMethod</source_model>
+        </field>
+        <field id="use_https" translate="label,comment" sortOrder="60" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Use HTTPS</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="use_http_basic_auth" translate="label" sortOrder="70" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Use HTTP Basic Authentication</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="http_basic_auth_username" translate="label" sortOrder="80" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>HTTP Basic Authentication: Username</label>
+        </field>
+        <field id="http_basic_auth_password" translate="label" sortOrder="90" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>HTTP Basic Authentication: Password</label>
+        </field>
+      </group>
+      <!--
+      <group id="connection_check" translate="label" sortOrder="25" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Connection Check</label>
+        <field id="is_active" translate="label,comment" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Check Solr Server Connectivity automatically</label>
+          <comment>A test request will be sent to the server every 5 minutes.</comment>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="send_email_on_nth_failure" translate="label" sortOrder="20" type="text" showInDefault="1">
+          <label>Send Notification Email after X Failures in a Row</label>
+          <validate>validate-digits validate-greater-than-zero</validate>
+        </field>
+        <field id="recipient_emails" translate="label" sortOrder="40" type="text" showInDefault="1">
+          <label>Email Recipient(s)</label>
+          <comment>Divide email addresses by comma</comment>
+        </field>
+        <field id="email_template" translate="label" sortOrder="50" type="select" showInDefault="1">
+          <label>Email Template</label>
+          <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+        </field>
+        <field id="identity" translate="label" sortOrder="60" type="select" showInDefault="1">
+          <label>Email Sender</label>
+          <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+        </field>
+      </group>
+      -->
+      <group id="indexing" translate="label" sortOrder="30" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Indexing</label>
+        <field id="pagesize" translate="label,comment" sortOrder="10" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Number of Products per Bunch</label>
+          <comment>Higher number means better indexing performance. Reduce if you are getting memory errors.</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        <field id="delete_documents_before_indexing" translate="label" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Delete all Solr Index Entries before Reindexing</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="swap_cores" translate="label,comment" sortOrder="30" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Swap Cores after Full Reindex</label>
+          <comment>Allows reindexing on an inactive core and switch when finished</comment>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="swap_core" translate="label,comment" sortOrder="40" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Name of Core to swap active Core with</label>
+        </field>
+      </group>
+      <group id="fuzzy" translate="label" sortOrder="40" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Fuzzy Search</label>
+        <field id="is_active" translate="label" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Is active for Search</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="sensitivity" translate="label,comment" sortOrder="20" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Sensitivity for Search</label>
+          <comment>Value between 0 and 1. Smaller values mean more fuzzy search results.</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        <field id="minimum_results" translate="label" sortOrder="25" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Number of Sufficient Direct Search Results</label>
+          <comment>If there are at least this many search results, fuzzy search will not be performed. If you enter 0 or no value, fuzzy search will always be performed.</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        <field id="is_active_autosuggest" translate="label" sortOrder="30" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Is active for Autosuggest</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="sensitivity_autosuggest" translate="label" sortOrder="40" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Sensitivity for Autosuggest</label>
+          <comment>Value between 0 and 1. Smaller values mean more fuzzy search results.</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        <field id="minimum_results_autosuggest" translate="label" sortOrder="45" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Number of Sufficient Direct Search Results for Autosuggest</label>
+          <comment>If there are at least this many search results for autosuggest, fuzzy search will not be performed. If you enter 0 or no value, fuzzy search will always be performed.</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+      </group>
+      <group id="results" translate="label" sortOrder="50" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Search Results</label>
+<!--
+        <field id="use_html_from_solr" translate="label,comment" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Use HTML from Solr Index</label>
+          <comment>Advantages: faster search&lt;br /&gt;Disadvantages: slower indexing, no user dependant results</comment>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+-->
+        <field id="search_operator" translate="label" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Search Operator</label>
+          <source_model>IntegerNet\Solr\Model\Source\SearchOperator</source_model>
+        </field>
+        <!--
+        <field id="filter_position" translate="label" sortOrder="23" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Position of Filters</label>
+          <source_model>IntegerNet\Solr\Model\Source\FilterPosition</source_model>
+        </field>
+        -->
+        <field id="priority_categories" translate="label,comment" sortOrder="25" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Solr Priority of Category Names</label>
+          <comment>1 is default, use higher numbers for higher priority.</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        <field id="price_step_size" translate="label,comment" sortOrder="30" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Size of Price Steps</label>
+          <comment>i.e. 100</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        <field id="max_price" translate="label,comment" sortOrder="40" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Upper Limit of Price Steps</label>
+          <comment>i.e. 1000</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        <field id="use_custom_price_intervals" translate="label,comment" sortOrder="50" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Use Custom Price Intervals</label>
+          <comment>Needs Solr 4.10+</comment>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="custom_price_intervals" translate="label,comment" sortOrder="60" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Custom Price Intervals</label>
+          <comment>Divide steps by comma, i.e. 10,20,50,100,200,300,400,500</comment>
+        </field>
+        <field id="product_attributes_redirect" translate="label,comment" sortOrder="70" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Redirect to product page on direct match in one of these attributes</label>
+          <comment>If the exact name / sku / ... is entered in the search field, the customer will be redirected to the product view page.</comment>
+          <source_model>IntegerNet\Solr\Model\Source\VarcharProductAttribute</source_model>
+        </field>
+        <field id="category_attributes_redirect" translate="label,comment" sortOrder="80" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Redirect to category page on direct match in one of these attributes</label>
+          <comment>If the exact name / ... is entered in the search field, the customer will be redirected to the category view page.</comment>
+          <source_model>IntegerNet\Solr\Model\Source\VarcharCategoryAttribute</source_model>
+        </field>
+      </group>
+      <group id="autosuggest" translate="label" sortOrder="80" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Autosuggest Box</label>
+        <field id="is_active" translate="label" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Is active</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <!--
+        <field id="use_php_file_in_home_dir" translate="label,comment" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Method to retrieve autosuggest information</label>
+          <comment>Please see manual for information about the different methods.</comment>
+          <source_model>IntegerNet\Solr\Model\Source\AutosuggestMethod</source_model>
+        </field>
+        -->
+        <field id="max_number_searchword_suggestions" translate="label" sortOrder="30" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Maximum number of searchword suggestions</label>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        <field id="max_number_product_suggestions" translate="label,comment" sortOrder="40" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Maximum number of product suggestions</label>
+          <comment>0 = don't show</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        <field id="max_number_category_suggestions" translate="label,comment" sortOrder="50" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Maximum number of category suggestions</label>
+          <comment>0 = don't show</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        <!--
+        <field id="max_number_cms_page_suggestions" translate="label,comment" sortOrder="50" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Maximum number of CMS page suggestions</label>
+          <comment>0 = don't show&lt;br /&gt;Indexing of CMS pages must be active.&lt;br /&gt;Attention: This will affect the performance of the autosuggest!</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
+        -->
+        <field id="show_complete_category_path" translate="label" sortOrder="60" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Show complete category path</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="category_link_type" translate="label" sortOrder="70" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Type of Category Links</label>
+          <source_model>IntegerNet\Solr\Model\Source\CategoryLinkType</source_model>
+        </field>
+        <field id="attribute_filter_suggestions" translate="label" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Attribute Filter Suggestions</label>
+          <comment>0 = show all</comment>
+          <frontend_model>IntegerNet\Solr\Block\Config\AttributeFilterSuggestions</frontend_model>
+          <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+        </field>
+      </group>
+      <!--
+      <group id="seo" translate="label,comment" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>SEO</label>
+        <field id="hide_from_robots" sortOrder="10" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Hide the following pages from robots:</label>
+          <comment>This will set NOINDEX,NOFOLLOW</comment>
+          <source_model>IntegerNet\Solr\Model\Source\RobotOptions</source_model>
+        </field>
+      </group>
+      -->
+    </section>
+    <section id="catalog">
+      <group id="search">
+        <field id="engine" translate="comment">
+          <comment><![CDATA[The IntegerNet_Solr engine will automatically be selected if and only if the module is activated, it cannot be set here. Click on <strong>IntegerNet_Solr</strong> under the <strong>Services</strong> tab to the left, to activate and configure it. The module can be activated per store view.]]></comment>
+        </field>
+      </group>
+    </section>
+  </system>
+</config>

@@ -38,7 +38,7 @@ build:
           export M2SETUP_ADMIN_EMAIL=dummy@example.com
           export M2SETUP_ADMIN_USER=magento2
           export M2SETUP_ADMIN_PASSWORD=magento2
-          export M2SETUP_VERSION=2.1.0
+          export M2SETUP_VERSION=2.1.5
           export M2SETUP_USE_SAMPLE_DATA=false
           export M2SETUP_USE_ARCHIVE=true
           mysqladmin -u$M2SETUP_DB_USER -p"$M2SETUP_DB_PASSWORD" -h$M2SETUP_DB_HOST create $M2SETUP_DB_NAME
@@ -49,17 +49,20 @@ build:
           composer config repositories.solr-autosuggest vcs git@github.com:integer-net/solr-magento2-autosuggest.git
           composer config repositories.solr-base vcs git@github.com:integer-net/solr-base.git
           composer config repositories.solr-pro vcs git@github.com:integer-net/solr-pro.git
-          sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/test\/unit", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
+          sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/main\/test\/unit", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
           composer config minimum-stability dev
           composer require integer-net/solr-magento2 dev-tmp
           composer require --dev phpunit/phpunit ^5.0 --no-update
           composer update
+          sed -i -e "s/8983/$SOLR_CI_PORT_8983_TCP_PORT/g"  vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
+          sed -i -e "s/localhost/$SOLR_CI_PORT_8983_TCP_ADDR/g" vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
+          sed -i -e "s/solr-magento2-tests/core0/g" vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
           bin/magento module:enable IntegerNet_Solr
           bin/magento setup:upgrade
           cd vendor/integer-net/solr-magento2
           php ../../phpunit/phpunit/phpunit
-          cp $MODULE_DIR/test/integration/phpunit.xml.dist /srv/www/dev/tests/integration/phpunit.xml
-          cp $MODULE_DIR/test/integration/install-config-mysql.php /srv/www/dev/tests/integration/etc/
+          cp $MODULE_DIR/main/test/integration/phpunit.xml.dist /srv/www/dev/tests/integration/phpunit.xml
+          cp $MODULE_DIR/main/test/integration/install-config-mysql.php /srv/www/dev/tests/integration/etc/
           sed -i -e "s/DB_HOST/$M2SETUP_DB_HOST/g" /srv/www/dev/tests/integration/etc/install-config-mysql.php
           sed -i -e "s/DB_USER/$M2SETUP_DB_USER/g" /srv/www/dev/tests/integration/etc/install-config-mysql.php
           sed -i -e "s/DB_PASSWORD/$M2SETUP_DB_PASSWORD/g" /srv/www/dev/tests/integration/etc/install-config-mysql.php

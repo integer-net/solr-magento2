@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="layout_generate_blocks_after">
+        <observer name="integernet_solr" instance="IntegerNet\Solr\Observer\LayoutGenerateBlocksAfter"/>
+    </event>
+    <event name="controller_action_predispatch_catalogsearch_result_index">
+        <observer name="integernet_solr" instance="IntegerNet\Solr\Observer\RedirectToProductOrCategory"/>
+    </event>
+</config>
