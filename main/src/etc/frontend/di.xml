@@ -4,6 +4,9 @@
         <plugin name="updateLayout" type="IntegerNet\Solr\Model\Plugin\LayoutPlugin" />
     </type>
     <type name="Magento\Catalog\Model\Layer\Filter\Item">
-        <plugin name="filterItemUrl"
+        <plugin name="filterItemUrl" type="IntegerNet\Solr\Model\Plugin\FilterItemPlugin" />
+    </type>
+    <type name="Magento\CatalogSearch\Model\Layer\Filter\Attribute">
+        <plugin name="filterItemUrl" type="IntegerNet\Solr\Model\Plugin\CatalogsearchFilterAttributePlugin" />
     </type>
 </config>
