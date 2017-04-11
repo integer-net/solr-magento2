@@ -41,7 +41,7 @@
                         </label>
                     </a>
                 <?php else: ?>
-                    <a class="filter-options-link" href="<?php /* @escapeNotVerified */ echo $_filter->getRemoveUrl() ?>"
+                    <a class="filter-options-link" href="<?php /* @escapeNotVerified */ echo $_filter->getRemoveUrl($_filter->getValue()) ?>"
                        title="<?php /* @escapeNotVerified */ echo $block->escapeHtml(__('Remove')) . " " . $currentFilterName;?>">
                         <label class="tickbox tickbox--active" for="">
                             <input class="tickbox__field" type="checkbox" >
