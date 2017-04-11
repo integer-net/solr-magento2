@@ -49,11 +49,14 @@ build:
           composer config repositories.solr-autosuggest vcs git@github.com:integer-net/solr-magento2-autosuggest.git
           composer config repositories.solr-base vcs git@github.com:integer-net/solr-base.git
           composer config repositories.solr-pro vcs git@github.com:integer-net/solr-pro.git
-          sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/test\/unit", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
+          sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/main\/test\/unit", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
           composer config minimum-stability dev
           composer require integer-net/solr-magento2 dev-tmp
           composer require --dev phpunit/phpunit ^5.0 --no-update
           composer update
+          sed -i -e "s/8983/$SOLR_CI_PORT_8983_TCP_PORT/g"  vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
+          sed -i -e "s/localhost/$SOLR_CI_PORT_8983_TCP_ADDR/g" vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
+          sed -i -e "s/solr-magento2-tests/core0/g" vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
           bin/magento module:enable IntegerNet_Solr
           bin/magento setup:upgrade
           cd vendor/integer-net/solr-magento2

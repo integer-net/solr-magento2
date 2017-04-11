@@ -82,8 +82,8 @@
 
   <!-- Plugins -->
 
-  <type name="Magento\Framework\App\Config\ScopeConfigInterface">
-    <plugin name="changeSearchEngine" type="IntegerNet\Solr\Model\Plugin\SearchEnginePlugin" />
+  <type name="Magento\Search\Model\AdapterFactory">
+    <plugin name="integernet_solr_choose_adapter" type="IntegerNet\Solr\Model\Plugin\AdapterFactoryPlugin" />
   </type>
   <type name="Magento\Catalog\Model\Layer\ItemCollectionProviderInterface">
     <plugin name="replaceCollections" type="IntegerNet\Solr\Model\Plugin\CollectionProviderPlugin" />
@@ -101,16 +101,6 @@
   <preference for="Magento\Catalog\Model\Layer\Filter\Attribute" type="IntegerNet\Solr\Model\Catalog\Layer\Filter\Attribute"/>
   <preference for="Magento\Catalog\Model\Layer\Filter\Category" type="IntegerNet\Solr\Model\Catalog\Layer\Filter\Category"/>
   -->
-
-  <!-- Search engine -->
-
-  <type name="Magento\Search\Model\Adminhtml\System\Config\Source\Engine">
-    <arguments>
-      <argument name="engines" xsi:type="array">
-        <item name="integernet_solr" xsi:type="string">IntegerNet_Solr</item>
-      </argument>
-    </arguments>
-  </type>
 
   <!-- IntegerNet_Solr search adapter, only used if HTML is not stored in solr (i.e. we only receive product ids from Solr) -->
   <type name="Magento\Search\Model\AdapterFactory">

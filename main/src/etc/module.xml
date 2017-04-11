@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-  <module name="IntegerNet_Solr" setup_version="0.1.0">
-    <sequence> <module name="Magento_LayeredNavigation"/> </sequence>
-    <sequence> <module name="Magento_Catalogsearch"/> </sequence>
-    <sequence> <module name="Magento_Search"/> </sequence>
-  </module>
+    <module name="IntegerNet_Solr" setup_version="1.1.0">
+        <sequence>
+            <module name="Magento_Search"/>
+            <module name="Magento_Catalogsearch"/>
+            <module name="Magento_LayeredNavigation"/>
+        </sequence>
+    </module>
 </config>

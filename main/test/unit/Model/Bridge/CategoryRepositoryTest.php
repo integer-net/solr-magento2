@@ -15,6 +15,7 @@ use IntegerNet\Solr\Model\ResourceModel\CategoryPosition;
 use Magento\Catalog\Api\CategoryRepositoryInterface as MagentoCategoryRepository;
 use Magento\Catalog\Api\Data\CategoryInterface;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
+use Magento\Catalog\Model\ResourceModel\Category as CategoryResource;
 use Magento\Catalog\Model\ResourceModel\Category\Collection as CategoryCollection;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\Store\Api\Data\StoreInterface;
@@ -42,6 +43,10 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
      * @var CategoryRepository
      */
     private $categoryRepository;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|CategoryResource
+     */
+    private $categoryResource;
 
     protected function setUp()
     {
@@ -60,8 +65,11 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
             ->setMethods(['getStore'])
             ->getMockForAbstractClass();
+        $this->categoryResource = $this->getMockBuilder(CategoryResource::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->categoryRepository = new CategoryRepository($this->magentoCategoryRepository, $this->collectionFactory,
-            $this->categoryPositionResource, $this->storeManager);
+            $this->categoryPositionResource, $this->storeManager, $this->categoryResource);
     }
 
     /**
@@ -71,15 +79,13 @@ class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCategoryNames($storeId, array $categoryNamesById)
     {
-        $this->magentoCategoryRepository->method('get')
-            ->with($this->anything(), $storeId)
-            ->willReturnCallback(function($id) use ($categoryNamesById) {
-                $categoryStub = $this->getMockBuilder(CategoryInterface::class)
-                    ->setMethods(['getName'])
-                    ->getMockForAbstractClass();
-                $categoryStub->method('getName')->willReturn($categoryNamesById[$id]);
-                return $categoryStub;
-            });
+        $this->categoryResource->method('getAttributeRawValue')
+            ->with($this->anything(),'name', $storeId)
+            ->willReturnCallback(
+                function ($categoryId) use ($categoryNamesById) {
+                    return $categoryNamesById[$categoryId];
+                }
+            );
         $actualNames = $this->categoryRepository->getCategoryNames(\array_keys($categoryNamesById), $storeId);
         $this->assertEquals(\array_values($categoryNamesById), $actualNames);
     }
