@@ -9,20 +9,8 @@
  */
 namespace IntegerNet\Solr\Controller;
 
-use IntegerNet\SolrCategories\Model\Indexer\Fulltext as FulltextIndexer;
-use Magento\TestFramework\ObjectManager;
-
 class RedirectTest extends \Magento\TestFramework\TestCase\AbstractController
 {
-    /** @var  ObjectManager */
-    protected $objectManager;
-
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->objectManager = ObjectManager::getInstance();
-    }
-
     /**
      * @magentoDataFixture loadFixture
      * @magentoConfigFixture default/integernet_solr/general/is_active 1
