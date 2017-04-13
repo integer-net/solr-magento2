@@ -61,6 +61,7 @@ class ResultTest extends \Magento\TestFramework\TestCase\AbstractController
 
         $this->assertContains('solr-search-result-categories', $this->getResponse()->getBody());
         $this->assertContains('Description Category 1', $this->getResponse()->getBody());
+        $this->assertNotContains('Description Category 3', $this->getResponse()->getBody());
         $this->assertNotContains('Description Other Name 4', $this->getResponse()->getBody());
     }
 
@@ -82,7 +83,6 @@ class ResultTest extends \Magento\TestFramework\TestCase\AbstractController
 
         $this->assertContains('solr-search-result-categories', $this->getResponse()->getBody());
         $this->assertContains('Description Category 1', $this->getResponse()->getBody());
-        $this->assertNotContains('Description Other Name 4', $this->getResponse()->getBody());
     }
 
     public static function loadFixture()
