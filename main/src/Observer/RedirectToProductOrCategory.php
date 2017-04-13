@@ -136,6 +136,7 @@ class RedirectToProductOrCategory implements ObserverInterface
         $matchingProductCollection = $this->productCollectionFactory->create();
         $matchingProductCollection->addStoreFilter();
         $matchingProductCollection->addAttributeToFilter($filters);
+        $matchingProductCollection->addAttributeToFilter('status', Product\Attribute\Source\Status::STATUS_ENABLED);
         $matchingProductCollection->addAttributeToSelect(['status', 'visibility', 'url_key']);
         $matchingProductCollection->setOrder('visibility', 'desc');
 
