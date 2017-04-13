@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2017 integer_net GmbH (http://www.integer-net.de/)
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
-namespace IntegerNet\Solr\Controller;
+namespace IntegerNet\SolrCategories\Controller;
 
 use IntegerNet\SolrCategories\Model\Indexer\Fulltext as FulltextIndexer;
 use Magento\TestFramework\ObjectManager;
