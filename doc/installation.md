@@ -4,14 +4,19 @@ Installation Instructions
 
 Preparation of the Solr Server
 ---------------
-You need an Apache Solr server in order to run the IntegerNet_Solr module. In most cases, Apache Solr should be installed
-on your web server.
+You need an Apache Solr server in order to run the IntegerNet_Solr module. Apache Solr is free software (open source).
+Please see 
+[the official installation instructions for Apache Solr](https://cwiki.apache.org/confluence/display/solr/Installing+Solr)
+for information on how to install it or ask your administrator or hosting provider. Please install Apache Solr in the 
+same network or on the same server as your Magento installation in order to improve performance.
 1. Create at least one new Solr core. If you don't know how, please refer to your administrator or hosting partner.
 2. You can download the configuration files which should be installed in the "conf" directory of your core(s) from
 [https://github.com/integer-net/solr-magento1/tree/master/solr_conf](https://github.com/integer-net/solr-magento1/tree/master/solr_conf).
 Please don't use any other configuration files unless you know exactly what you are doing.
 
-Installation via Composer
+From there, you have two options:
+
+a) Installation via Composer
 ---------------
 This is the preferred method. Please follow these steps: 
 
@@ -47,7 +52,7 @@ bin/magento indexer:reindex integernet_solr_categories
 ```
 8. You are ready. Try the functionality by typing a few letters into your search box.
 
-Installation from Package
+b) Installation from Package
 ---------------
 If you received a package from us, you can install it as follows:
 
