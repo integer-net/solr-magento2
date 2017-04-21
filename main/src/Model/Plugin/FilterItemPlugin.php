@@ -11,6 +11,7 @@
 namespace IntegerNet\Solr\Model\Plugin;
 
 use \Magento\Catalog\Model\Layer\Filter\Item as Subject;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Theme\Block\Html\Pager;
 
@@ -27,11 +28,16 @@ class FilterItemPlugin
      * @var Pager
      */
     private $htmlPagerBlock;
+    /**
+     * @var RequestInterface
+     */
+    private $request;
 
-    public function __construct(UrlInterface $url, Pager $htmlPagerBlock)
+    public function __construct(UrlInterface $url, Pager $htmlPagerBlock, RequestInterface $request)
     {
         $this->htmlPagerBlock = $htmlPagerBlock;
         $this->url = $url;
+        $this->request = $request;
     }
 
     public function aroundGetUrl(Subject $subject, \Closure $proceed)
@@ -49,8 +55,9 @@ class FilterItemPlugin
         if (is_null($attributeValue)) {
             return $proceed();
         }
-        $queryRemoveParams = [$subject->getFilter()->getRequestVar() => $attributeValue];
-        $params['_query_params_remove'] = $queryRemoveParams;
+        $currentValues = $this->request->getParam($subject->getFilter()->getRequestVar());
+
+        $params['_query'] = [$subject->getFilter()->getRequestVar() => array_diff($currentValues, [$attributeValue])];
         $params['_current'] = true;
         $params['_use_rewrite'] = true;
         $params['_escape'] = true;
