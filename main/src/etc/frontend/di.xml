@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Framework\View\Result\Layout">
-        <plugin name="updateLayout" type="IntegerNet\Solr\Model\Plugin\LayoutPlugin" />
+        <plugin name="integernetSolrUpdateLayout" type="IntegerNet\Solr\Model\Plugin\LayoutPlugin" />
     </type>
     <type name="Magento\Catalog\Model\Layer\Filter\Item">
-        <plugin name="filterItemUrl" type="IntegerNet\Solr\Model\Plugin\FilterItemPlugin" />
+        <plugin name="integernetSolrFilterItemUrl" type="IntegerNet\Solr\Model\Plugin\FilterItemPlugin" />
     </type>
     <type name="Magento\CatalogSearch\Model\Layer\Filter\Attribute">
-        <plugin name="filterItemUrl" type="IntegerNet\Solr\Model\Plugin\CatalogsearchFilterAttributePlugin" />
+        <plugin name="integernetSolrFilterAttribute" type="IntegerNet\Solr\Model\Plugin\CatalogsearchFilterAttributePlugin" />
     </type>
 </config>
