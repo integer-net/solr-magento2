@@ -1,0 +1,8 @@
+{
+  "name": "integer-net/solr-magento2-categories",
+  "description": "",
+  "type": "magento2-module",
+  "license": [
+    "Proprietary"
+  ]
+}
