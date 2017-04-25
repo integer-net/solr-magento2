@@ -10,7 +10,7 @@ use Magento\Catalog\Model\Product\Visibility;
     $entityTypeId = $entityModel->setType(\Magento\Catalog\Model\Product::ENTITY)->getTypeId();
 
     /** @var \Magento\Eav\Api\AttributeOptionManagementInterface $attributeOptionManagement */
-    $attributeOptionManagement = $attribute = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
+    $attributeOptionManagement = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
         \Magento\Eav\Api\AttributeOptionManagementInterface::class
     );
 
@@ -57,6 +57,44 @@ use Magento\Catalog\Model\Product\Visibility;
         ->save();
 
 
+    /** @var \Magento\Catalog\Model\Product $product */
+    $product = $objectManager->create(
+        \Magento\Catalog\Model\Product::class
+    );
+    $product->isObjectNew(true);
+    $product->setSku('product-2')
+        ->setId(
+            334
+        )
+        ->setAttributeSetId(4)
+        ->setWebsiteIds([1])
+        ->setTypeId(Type::TYPE_SIMPLE)
+        ->setVisibility(Visibility::VISIBILITY_BOTH)
+        ->setStatus(Status::STATUS_ENABLED)
+        ->setUrlKey('product-2-global')
+        ->setPrice(10)
+        ->setWeight(1)
+        ->setTaxClassId(0)
+        ->setCategoryIds([2])
+        ->setStockData(
+            [
+                'use_config_manage_stock'   => 1,
+                'qty'                       => 100,
+                'is_qty_decimal'            => 0,
+                'is_in_stock'               => 1,
+            ]
+        )
+        ->setName('Global product name')
+        ->setData('filterable_attribute_a', $options['Attribute A Option 2'])
+        ->save();
+
+    $product->setStoreId(1)
+        ->setName('Product 2 name in store')
+        ->setStatus(Status::STATUS_ENABLED)
+        ->setUrlKey('product-2-store-1')
+        ->save();
+
+
     /** @var Category $category */
     $category = $objectManager->create(
         Category::class
@@ -83,7 +121,7 @@ use Magento\Catalog\Model\Product\Visibility;
     )->setIncludeInMenu(
         true
     )->setPostedProducts(
-        [333 => 10]
+        [333 => 10, 334 => 20]
     )->setDefaultSortBy(
         'name'
     )->save();

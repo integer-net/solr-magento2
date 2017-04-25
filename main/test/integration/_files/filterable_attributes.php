@@ -43,15 +43,19 @@ $attribute = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create
 );
 $attribute->setAttributeCode(
     'filterable_attribute_a'
-)->setBackendType('int')
-->setFrontendInput('select')
-->setEntityTypeId(
+)->setBackendType(
+    'int'
+)->setFrontendInput(
+    'select'
+)->setEntityTypeId(
     $entityTypeId
 )->setAttributeGroupId(
     $groupId
 )->setAttributeSetId(
     $attributeSetId
 )->setIsFilterable(
+    1
+)->setIsFilterableInSearch(
     1
 )->setIsUserDefined(
     1
@@ -66,9 +70,11 @@ $attribute = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create
 );
 $attribute->setAttributeCode(
     'filterable_attribute_b'
-)->setBackendType('varchar')
-->setFrontendInput('multiselect')
-->setEntityTypeId(
+)->setBackendType(
+    'varchar'
+)->setFrontendInput(
+    'multiselect'
+)->setEntityTypeId(
     $entityTypeId
 )->setAttributeGroupId(
     $groupId
