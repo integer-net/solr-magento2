@@ -27,16 +27,6 @@ if ($attribute->getId()) {
     $attribute->delete();
 }
 
-/** @var \Magento\Eav\Model\Entity\Attribute\Option $option1 */
-$option1 = $attributeOptionFactory->create();
-$option1->setLabel('Attribute A Option 1');
-/** @var \Magento\Eav\Model\Entity\Attribute\Option $option2 */
-$option2 = $attributeOptionFactory->create();
-$option2->setLabel('Attribute A Option 2');
-/** @var \Magento\Eav\Model\Entity\Attribute\Option $option3 */
-$option3 = $attributeOptionFactory->create();
-$option3->setLabel('Attribute A Option 3');
-
 /** @var $attribute \Magento\Catalog\Model\ResourceModel\Eav\Attribute */
 $attribute = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
     'Magento\Catalog\Model\ResourceModel\Eav\Attribute'
@@ -60,7 +50,17 @@ $attribute->setAttributeCode(
 )->setIsUserDefined(
     1
 )->save();
-//$attribute->setOptions([$option1, $option2, $option3])->save();
+
+/** @var \Magento\Eav\Model\Entity\Attribute\Option $option1 */
+$option1 = $attributeOptionFactory->create();
+$option1->setLabel('Attribute A Option 1');
+/** @var \Magento\Eav\Model\Entity\Attribute\Option $option2 */
+$option2 = $attributeOptionFactory->create();
+$option2->setLabel('Attribute A Option 2');
+/** @var \Magento\Eav\Model\Entity\Attribute\Option $option3 */
+$option3 = $attributeOptionFactory->create();
+$option3->setLabel('Attribute A Option 3');
+
 $attributeOptionManagement->add($entityTypeId, 'filterable_attribute_a', $option1);
 $attributeOptionManagement->add($entityTypeId, 'filterable_attribute_a', $option2);
 $attributeOptionManagement->add($entityTypeId, 'filterable_attribute_a', $option3);
@@ -82,8 +82,22 @@ $attribute->setAttributeCode(
     $attributeSetId
 )->setIsFilterable(
     1
-)->setIsUserDefined(
-    1
 )->setIsFilterableInSearch(
     1
+)->setIsUserDefined(
+    1
 )->save();
+
+/** @var \Magento\Eav\Model\Entity\Attribute\Option $option1 */
+$option1 = $attributeOptionFactory->create();
+$option1->setLabel('Attribute B Option 1');
+/** @var \Magento\Eav\Model\Entity\Attribute\Option $option2 */
+$option2 = $attributeOptionFactory->create();
+$option2->setLabel('Attribute B Option 2');
+/** @var \Magento\Eav\Model\Entity\Attribute\Option $option3 */
+$option3 = $attributeOptionFactory->create();
+$option3->setLabel('Attribute B Option 3');
+
+$attributeOptionManagement->add($entityTypeId, 'filterable_attribute_b', $option1);
+$attributeOptionManagement->add($entityTypeId, 'filterable_attribute_b', $option2);
+$attributeOptionManagement->add($entityTypeId, 'filterable_attribute_b', $option3);

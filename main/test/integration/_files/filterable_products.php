@@ -19,6 +19,10 @@ use Magento\Catalog\Model\Product\Visibility;
         $options[$option->getLabel()] = $option->getValue();
     }
 
+    foreach($attributeOptionManagement->getItems($entityTypeId, 'filterable_attribute_b') as $option) {
+        $options[$option->getLabel()] = $option->getValue();
+    }
+
     /** @var \Magento\Catalog\Model\Product $product */
     $product = $objectManager->create(
         \Magento\Catalog\Model\Product::class
@@ -48,6 +52,7 @@ use Magento\Catalog\Model\Product\Visibility;
         )
         ->setName('Global product name')
         ->setData('filterable_attribute_a', $options['Attribute A Option 1'])
+        ->setData('filterable_attribute_b', $options['Attribute B Option 1'].','.$options['Attribute B Option 2'])
         ->save();
 
     $product->setStoreId(1)
@@ -86,6 +91,7 @@ use Magento\Catalog\Model\Product\Visibility;
         )
         ->setName('Global product name')
         ->setData('filterable_attribute_a', $options['Attribute A Option 2'])
+        ->setData('filterable_attribute_b', $options['Attribute B Option 2'])
         ->save();
 
     $product->setStoreId(1)
