@@ -306,7 +306,7 @@ class Config implements ConfigInterface
                 $this->_getConfigFlag($prefix . 'is_indexer_active'),
                 $this->_getConfigFlag($prefix . 'use_in_search_results'),
                 $this->_getConfig($prefix . 'max_number_results'),
-                $this->_getConfigFlag($prefix . 'is_fuzzy_active'),
+                $this->_getConfigFlag($prefix . 'fuzzy_is_active'),
                 $this->_getConfig($prefix . 'fuzzy_sensitivity')
             );
         }

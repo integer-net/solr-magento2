@@ -1,6 +1,6 @@
 box: mageinferno/magento2-php:7.0.8-fpm-3
 services:
-  - id: mysql:5.6
+  - id: integernet/mysql_ci:5.6
     env:
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
   - id: integernet/solr_ci:1.6.0
@@ -8,16 +8,16 @@ build:
   steps:
     - install-packages:
         packages: git zip mysql-client libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev libpng12-dev netcat-openbsd
-    - script:
-        name: "Wait for MySQL connection"
-        code: |
-          while ! nc -q 1 $MYSQL_PORT_3306_TCP_ADDR $MYSQL_PORT_3306_TCP_PORT </dev/null; do echo -n . && sleep 3; done
     - add-ssh-key:
         keyname: GITHUB_DEPLOY
         host: github.com
     - add-to-known_hosts:
         hostname: github.com
         fingerprint: 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48
+    - script:
+        name: "Wait for MySQL connection"
+        code: |
+          while ! nc -q 1 $MYSQL_CI_PORT_3306_TCP_ADDR $MYSQL_CI_PORT_3306_TCP_PORT </dev/null; do echo -n . && sleep 3; done
     - script:
         name: set up and run integration tests
         code: |
@@ -28,9 +28,9 @@ build:
           git add -A
           git commit --allow-empty -m "tmp"
           export MODULE_DIR=`pwd`
-          export M2SETUP_DB_HOST=$MYSQL_PORT_3306_TCP_ADDR
+          export M2SETUP_DB_HOST=$MYSQL_CI_PORT_3306_TCP_ADDR
           export M2SETUP_DB_USER=root
-          export M2SETUP_DB_PASSWORD=$MYSQL_ENV_MYSQL_ROOT_PASSWORD
+          export M2SETUP_DB_PASSWORD=$MYSQL_CI_ENV_MYSQL_ROOT_PASSWORD
           export M2SETUP_DB_NAME=magento
           export M2SETUP_BASE_URL=http://m2.localhost:8000/
           export M2SETUP_ADMIN_FIRSTNAME=Admin
