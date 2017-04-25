@@ -355,11 +355,11 @@ class CatalogSearchFulltextCollection extends \Magento\Catalog\Model\ResourceMod
         if ($this->order && 'relevance' === $this->order['field']) {
             $this->getSelect()->order('search_result.'. TemporaryStorage::FIELD_SCORE . ' ' . $this->order['dir']);
         }
-        return parent::_renderFiltersBefore();
+        parent::_renderFiltersBefore();
     }
 
     /**
-     * @return $this
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
      */
     protected function _renderFilters()
     {
@@ -424,7 +424,7 @@ class CatalogSearchFulltextCollection extends \Magento\Catalog\Model\ResourceMod
      * Specify category filter for product collection
      *
      * @param \Magento\Catalog\Model\Category $category
-     * @return $this
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
      */
     public function addCategoryFilter(\Magento\Catalog\Model\Category $category)
     {
@@ -436,7 +436,7 @@ class CatalogSearchFulltextCollection extends \Magento\Catalog\Model\ResourceMod
      * Set product visibility filter for enabled products
      *
      * @param array $visibility
-     * @return $this
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
      */
     public function setVisibility($visibility)
     {

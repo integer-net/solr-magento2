@@ -55,7 +55,13 @@ class FilterItemPlugin
         if (is_null($attributeValue)) {
             return $proceed();
         }
+        if (is_array($attributeValue)) {
+            $attributeValue = implode('-', $attributeValue);
+        }
         $currentValues = $this->request->getParam($subject->getFilter()->getRequestVar());
+        if (!is_array($currentValues)) {
+            $currentValues = [$currentValues];
+        }
 
         $params['_query'] = [$subject->getFilter()->getRequestVar() => array_diff($currentValues, [$attributeValue])];
         $params['_current'] = true;
