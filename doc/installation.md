@@ -24,9 +24,9 @@ This is the preferred method. Please follow these steps:
 To check, try to access https://github.com/integer-net/solr-magento2/.
 2. Add the necessary private repositories by calling the following commands from the command line inside your Magento base directory:
 ```
-composer config repositories.solr-magento2 vcs https://github.com/integer-net/solr-magento2/
-composer config repositories.solr-magento2-autosuggest vcs https://github.com/integer-net/solr-magento2-autosuggest/
-composer config repositories.solr-pro vcs https://github.com/integer-net/solr-pro/
+composer config repositories.solr-magento2 git git@github.com:integer-net/solr-magento2.git
+composer config repositories.solr-magento2-autosuggest git git@github.com:integer-net/solr-magento2-autosuggest.git
+composer config repositories.solr-pro git git@github.com:integer-net/solr-pro.git
 
 ```
 3. Download the repositories by calling:
