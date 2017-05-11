@@ -206,7 +206,7 @@
         <!--
         <field id="use_php_file_in_home_dir" translate="label,comment" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Method to retrieve autosuggest information</label>
-          <comment>Please manual.mdnual for information about the different methods.</comment>
+          <comment>Please see manual for information about the different methods.</comment>
           <source_model>IntegerNet\Solr\Model\Source\AutosuggestMethod</source_model>
         </field>
         -->
