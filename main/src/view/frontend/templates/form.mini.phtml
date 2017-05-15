@@ -15,7 +15,7 @@ $helper = $this->helper('Magento\Search\Helper\Data');
                     <input id="search"
                            data-mage-init='{"quickSearch":{
                                 "formSelector":"#search_mini_form",
-                                "url":"<?php /* @escapeNotVerified */ /*echo $helper->getSuggestUrl();*/  ?>/autosuggest.php?store_id=1",
+                                "url":"<?php /* @escapeNotVerified */ echo $helper->getSuggestUrl();  ?>",
                                 "destinationSelector":"#search_autocomplete"}
                            }'
                            type="text"
