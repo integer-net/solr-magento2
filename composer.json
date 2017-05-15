@@ -3,7 +3,7 @@
   "description": "",
   "require": {
     "php": "~5.6.0|^7.0",
-    "integer-net/solr-base": "^1.0.0",
+    "integer-net/solr-base": "^2.0.0",
     "integer-net/solr-pro": "^1.0.0",
     "integer-net/solr-magento2-autosuggest" : "^1.0.0",
     "magento/module-catalog": "^101.0.0",
