@@ -2,6 +2,11 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Ongoing Work
+---------------
+
+- Fix bug with fuzzy search for categories not working
+
 Version 1.1.1 (Apr 12, 2017)
 ---------------
 
