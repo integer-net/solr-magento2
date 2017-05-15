@@ -4,6 +4,6 @@
         <plugin name="updateLayout" type="IntegerNet\Solr\Model\Plugin\LayoutPlugin" />
     </type>
     <type name="Magento\Search\Helper\Data">
-        <plugin name="integernetSolrHelperData" type="IntegerNet\Solr\Plugin\Helper\DataPlugin" />
+        <plugin name="integernetSolrSearchHelper" type="IntegerNet\Solr\Plugin\SearchHelperPlugin" />
     </type>
 </config>

@@ -6,12 +6,12 @@
  * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 
-namespace IntegerNet\Solr\Plugin\Helper;
+namespace IntegerNet\Solr\Plugin;
 
 use Magento\Search\Helper\Data as Subject;
 use Magento\Store\Model\StoreManagerInterface;
 
-class DataPlugin
+class SearchHelperPlugin
 {
     /**
      * @var StoreManagerInterface
