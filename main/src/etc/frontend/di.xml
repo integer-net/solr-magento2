@@ -3,4 +3,7 @@
     <type name="Magento\Framework\View\Result\Layout">
         <plugin name="updateLayout" type="IntegerNet\Solr\Model\Plugin\LayoutPlugin" />
     </type>
+    <type name="Magento\Search\Helper\Data">
+        <plugin name="integernetSolrSearchHelper" type="IntegerNet\Solr\Plugin\SearchHelperPlugin" />
+    </type>
 </config>
