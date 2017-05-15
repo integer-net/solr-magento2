@@ -24,10 +24,9 @@ class DataPlugin
     }
 
     /**
-     * @param Subject $subject
      * @return string
      */
-    public function afterGetSuggestUrl(Subject $subject)
+    public function aroundGetSuggestUrl()
     {
         /** @var \Magento\Store\Model\Store $store */
         $store = $this->storeManager->getStore();
