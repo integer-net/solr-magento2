@@ -84,7 +84,7 @@ class CategoryRepository implements IndexCategoryRepository
         $names = [];
         foreach ($categoryIds as $categoryId) {
             if (!isset($this->categoryNames[$storeId][$categoryId])) {
-                $this->categoryNames[$storeId][$categoryId] = $this->categoryResource->getAttributeRawValue($categoryId, 'name', $storeId);
+                $this->categoryNames[$storeId][$categoryId] = $this->getCategoryName($categoryId, $storeId);
             }
             $names[] = $this->categoryNames[$storeId][$categoryId];
         }
@@ -166,4 +166,20 @@ class CategoryRepository implements IndexCategoryRepository
         return $result;
     }
 
+    /**
+     * @param int $categoryId
+     * @param int $storeId
+     * @return string
+     */
+    private function getCategoryName($categoryId, $storeId)
+    {
+        if ($categoryName = $this->categoryResource->getAttributeRawValue($categoryId, 'name', $storeId)) {
+            return $categoryName;
+        }
+
+        // Workaround for Magento < 2.2 where "getAttributeRawValue" wasn't implemented correctly for categories.
+        $categoryCollection = $this->collectionFactory->create();
+        $category = $categoryCollection->addAttributeToSelect('name')->addIdFilter([$categoryId])->getFirstItem();
+        return $category->getData('name');
+    }
 }
