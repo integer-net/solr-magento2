@@ -9,4 +9,7 @@
     <type name="Magento\CatalogSearch\Model\Layer\Filter\Attribute">
         <plugin name="integernetSolrFilterAttribute" type="IntegerNet\Solr\Model\Plugin\CatalogsearchFilterAttributePlugin" />
     </type>
+    <type name="Magento\Search\Helper\Data">
+        <plugin name="integernetSolrHelperData" type="IntegerNet\Solr\Plugin\Helper\DataPlugin" />
+    </type>
 </config>
