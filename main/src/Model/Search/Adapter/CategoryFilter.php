@@ -12,8 +12,10 @@ namespace IntegerNet\Solr\Model\Search\Adapter;
 
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Category\Collection as CategoryCollection;
+use Magento\Framework\App\RequestInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Store;
+use Magento\Catalog\Model\Layer\Filter\DataProvider\Category as CategoryDataProvider;
 
 class CategoryFilter extends \Magento\CatalogSearch\Model\Layer\Filter\Category
 {
@@ -29,6 +31,15 @@ class CategoryFilter extends \Magento\CatalogSearch\Model\Layer\Filter\Category
      * @var StoreManagerInterface
      */
     private $storeManager;
+    /**
+     * @var CategoryDataProvider
+     */
+    private $dataProvider;
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+
 
     public function __construct(
         \Magento\Catalog\Model\Layer\Filter\ItemFactory $filterItemFactory,
@@ -38,23 +49,26 @@ class CategoryFilter extends \Magento\CatalogSearch\Model\Layer\Filter\Category
         \Magento\Framework\Escaper $escaper,
         \Magento\Catalog\Model\Layer\Filter\DataProvider\CategoryFactory $categoryDataProviderFactory,
         CategoryCollectionFactory $categoryCollectionFactory,
+        RequestInterface $request,
         array $data = []
     ) {
         parent::__construct($filterItemFactory, $storeManager, $layer, $itemDataBuilder, $escaper, $categoryDataProviderFactory, $data);
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->escaper = $escaper;
         $this->storeManager = $storeManager;
+        $this->dataProvider = $categoryDataProviderFactory->create(['layer' => $this->getLayer()]);
+        $this->request = $request;
     }
 
     /**
      * Apply category filter to product collection
      *
-     * @param   \Magento\Framework\App\RequestInterface $request
+     * @param   RequestInterface $request
      * @return  $this
      */
-    public function apply(\Magento\Framework\App\RequestInterface $request)
+    public function apply(RequestInterface $request)
     {
-        $categoryIds = $request->getParam($this->_requestVar) ?: $request->getParam('id');
+        $categoryIds = $request->getParam($this->_requestVar);
         if (empty($categoryIds)) {
             return $this;
         }
@@ -96,6 +110,10 @@ class CategoryFilter extends \Magento\CatalogSearch\Model\Layer\Filter\Category
             ->addIsActiveFilter()
             ->addAttributeToFilter('path', ['like' => '%/' . $this->getRootCategoryId() . '/%'])
             ->addAttributeToSelect(['is_active', 'name']);
+
+        if ($currentCategoryId = $this->request->getParam('id')) {
+            $categories->addAttributeToFilter('parent_id', $currentCategoryId);
+        }
 
         $collectionSize = $productCollection->getSize();
 
