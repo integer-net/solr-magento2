@@ -5,17 +5,18 @@
 /**
  * Template for filter items block
  *
- * @var $block \Magento\LayeredNavigation\Block\Navigation\FilterRenderer
+ * @var \Magento\LayeredNavigation\Block\Navigation\FilterRenderer $block
+ * @var \IntegerNet\Solr\Model\Search\Adapter\FilterItem[] $filterItems
  */
 ?>
+<?php  ?>
 
 <ol class="items">
     <?php foreach ($filterItems as $filterItem): ?>
-        <?php /** @var \Magento\Catalog\Model\Layer\Filter\Item $filterItem */ ?>
         <li class="item">
             <?php if ($filterItem->getCount() > 0): ?>
                 <a class="filter-options-link" href="<?php echo $block->escapeUrl($filterItem->getUrl()) ?>">
-                    <label class="tickbox" for="">
+                    <label class="tickbox<?php if ($filterItem->isActive()): ?> tickbox--active<?php endif ?>" for="">
                         <input class="tickbox__field" type="checkbox" >
                     </label>
                     <?php /* @escapeNotVerified */ echo $filterItem->getLabel() ?>

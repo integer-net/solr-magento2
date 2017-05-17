@@ -18,4 +18,6 @@
 
     <preference for="Magento\Framework\Search\Request\Cleaner"
                 type="IntegerNet\Solr\Model\Search\Adapter\SearchRequestCleaner" />
+    <preference for="Magento\Catalog\Model\Layer\Filter\Item"
+                type="IntegerNet\Solr\Model\Search\Adapter\FilterItem" />
 </config>
