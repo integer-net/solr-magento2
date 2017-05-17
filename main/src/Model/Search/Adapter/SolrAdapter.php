@@ -75,7 +75,13 @@ class SolrAdapter implements AdapterInterface
      */
     private function makeSearchRequest(RequestInterface $request)
     {
-        return $this->searchRequestBuilder->convert($request)->doRequest();
+        $activeAttributeCodes = [];
+        /** @var BoolExpression $query */
+        $query = $request->getQuery();
+        if (is_array($query->getMust())) {
+            $activeAttributeCodes = array_unique(array_keys($query->getMust()));
+        }
+        return $this->searchRequestBuilder->convert($request)->doRequest($activeAttributeCodes);
     }
 
     /**
