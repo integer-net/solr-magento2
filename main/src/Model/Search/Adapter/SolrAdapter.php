@@ -78,20 +78,8 @@ class SolrAdapter implements AdapterInterface
         $activeAttributeCodes = [];
         /** @var BoolExpression $query */
         $query = $request->getQuery();
-        if (is_array($query->getMust())) {
-            foreach($query->getMust() as $queryFilter) {
-                if ($queryFilter instanceof \Magento\Framework\Search\Request\Query\Filter) {
-                    $activeAttributeCodes[] = $queryFilter->getReference()->getField();
-                }
-            }
-        }
-        if (is_array($query->getShould())) {
-            foreach($query->getShould() as $queryFilter) {
-                if ($queryFilter instanceof \Magento\Framework\Search\Request\Query\Filter) {
-                    $activeAttributeCodes[] = $queryFilter->getReference()->getField();
-                }
-            }
-        }
+        $activeAttributeCodes = $this->addActiveAttributeCodes($query->getMust(), $activeAttributeCodes);
+        $activeAttributeCodes = $this->addActiveAttributeCodes($query->getShould(), $activeAttributeCodes);
         return $this->searchRequestBuilder->convert($request)->doRequest($activeAttributeCodes);
     }
 
@@ -102,6 +90,27 @@ class SolrAdapter implements AdapterInterface
     private function makeCategoryRequest(RequestInterface $request)
     {
         return $this->categoryRequestBuilder->convert($request)->doRequest();
+    }
+
+    /**
+     * @param \Magento\Framework\Search\Request\QueryInterface[]
+     * @param string[] $activeAttributeCodes
+     * @return string[]
+     */
+    private function addActiveAttributeCodes($filters, $activeAttributeCodes)
+    {
+        if (is_array($filters)) {
+            foreach ($filters as $queryFilter) {
+                if ($queryFilter instanceof \Magento\Framework\Search\Request\Query\Filter) {
+                    if ($queryFilter->getName() == 'category') {
+                        $activeAttributeCodes[] = 'category';
+                    } else {
+                        $activeAttributeCodes[] = $queryFilter->getReference()->getField();
+                    }
+                }
+            }
+        }
+        return $activeAttributeCodes;
     }
 
 }

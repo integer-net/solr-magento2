@@ -433,6 +433,18 @@ class CatalogSearchFulltextCollection extends \Magento\Catalog\Model\ResourceMod
     }
 
     /**
+     * Filter Product by Categories
+     *
+     * @param array $categoriesFilter
+     */
+    public function addCategoriesFilter(array $categoriesFilter)
+    {
+        foreach ($categoriesFilter as $conditionType => $values) {
+            $this->addFieldToFilter('category_ids', $values);
+        }
+    }
+
+    /**
      * Set product visibility filter for enabled products
      *
      * @param array $visibility
