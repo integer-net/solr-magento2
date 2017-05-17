@@ -79,7 +79,18 @@ class SolrAdapter implements AdapterInterface
         /** @var BoolExpression $query */
         $query = $request->getQuery();
         if (is_array($query->getMust())) {
-            $activeAttributeCodes = array_unique(array_keys($query->getMust()));
+            foreach($query->getMust() as $queryFilter) {
+                if ($queryFilter instanceof \Magento\Framework\Search\Request\Query\Filter) {
+                    $activeAttributeCodes[] = $queryFilter->getReference()->getField();
+                }
+            }
+        }
+        if (is_array($query->getShould())) {
+            foreach($query->getShould() as $queryFilter) {
+                if ($queryFilter instanceof \Magento\Framework\Search\Request\Query\Filter) {
+                    $activeAttributeCodes[] = $queryFilter->getReference()->getField();
+                }
+            }
         }
         return $this->searchRequestBuilder->convert($request)->doRequest($activeAttributeCodes);
     }
