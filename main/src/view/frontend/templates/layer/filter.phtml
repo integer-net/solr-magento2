@@ -1,11 +1,5 @@
 <?php
-/**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
-
 // @codingStandardsIgnoreFile
-
 ?>
 <?php
 /**
@@ -17,10 +11,10 @@
 
 <ol class="items">
     <?php foreach ($filterItems as $filterItem): ?>
+        <?php /** @var \Magento\Catalog\Model\Layer\Filter\Item $filterItem */ ?>
         <li class="item">
             <?php if ($filterItem->getCount() > 0): ?>
                 <a class="filter-options-link" href="<?php echo $block->escapeUrl($filterItem->getUrl()) ?>">
-                    <?php //var_dump($filterItem->getData()) ?>
                     <label class="tickbox" for="">
                         <input class="tickbox__field" type="checkbox" >
                     </label>

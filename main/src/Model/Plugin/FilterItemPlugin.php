@@ -42,6 +42,15 @@ class FilterItemPlugin
 
     public function aroundGetUrl(Subject $subject, \Closure $proceed)
     {
+        $currentValues = $this->request->getParam($subject->getFilter()->getRequestVar());
+        if (!is_array($currentValues)) {
+            $currentValues = [$currentValues];
+        }
+
+        if (in_array($subject->getValue(), $currentValues)) {
+            return $subject->getRemoveUrl($subject->getValue());
+        }
+
         $query = [
             $subject->getFilter()->getRequestVar() . '[]' => $subject->getValue(),
             // exclude current page from urls
