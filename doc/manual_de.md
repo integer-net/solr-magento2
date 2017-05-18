@@ -57,10 +57,10 @@ Installation
 5. Kopieren Sie die Dateien und Verzeichnisse des `src`-Verzeichnisses des Modul-Pakets in Ihre Magento-Installation. Falls Sie **modman** und/oder **composer** nutzen, können Sie die Dateien `modman` bzw. `composer.json` im Hauptverzeichnis nutzen.
 6. Leeren Sie den Magento-Cache.
 7. (Starten Sie den Kompilierungsprozess und reaktivieren Sie die Magento-Kompilierung - wir empfehlen, die Kompilierungsfunktion von Magento nicht zu nutzen, unabhängig von diesem Modul.)
-8. Gehen Sie in den Administrationsbereich von Magento zu <!--@TODO Übersetzung des Pfads --> `Stores -> Settings -> Configuration -> Services -> Solr` (weit unten).
+8. Gehen Sie in den Administrationsbereich von Magento zu `Shops -> Einstellungen -> Konfiguration -> IntegerNet_Services -> Solr` (weit unten).
 9. Geben Sie die Solr-Zugangsdaten ein und konfigurieren Sie das Modul ([siehe unten](#solr-server-data)).
 10. Klicken Sie auf "Konfiguration speichern". Die Verbindung zum Solr-Server wird automatisch getestet. Sie erhalten entsprechende Erfolgs- und/oder Fehlermeldungen.
-<!-- 11. Wenn Sie die Magento Enterprise Edition nutzen, müssen Sie die integrierte Solr-Suche ausschalten. Setzen Sie `System -> Konfiguration -> Katalog -> Katalogsuche -> Search Engine` auf `MySql Fulltext`.-->
+<!-- 11. Wenn Sie die Magento Enterprise Edition nutzen, müssen Sie die integrierte Solr-Suche ausschalten. Setzen Sie `Shops -> Einstellungen -> Konfiguration -> Katalog -> Katalogsuche -> Search Engine` auf `MySql Fulltext`.-->
 11. Reindizieren Sie den Index von IntegerNet_Solr. Wir empfehlen, dies über die Kommandozeile zu machen. Gehen Sie in das Verzeichnis `shell` und rufen Sie den Befehl `php -f indexer.php -- --reindex integernet_solr` auf.
 12. Versuchen Sie, ein paar Buchstaben in das Suchfeld im Frontend einzutippen. Ein Fenster mit Produkt- und Suchwortvorschlägen sollte erscheinen.
 
@@ -81,7 +81,7 @@ Die in Solr gespeicherten Daten beinhalten die folgenden Informationen:
 - IDs aller Optionen der filterbaren Attribute für die Filternavigation
 
 Wenn Sie regelmäßig eine komplette Neuindizierung vornehmen, empfehlen wir Ihnen die **Swap**-Funktionalität.
-Sie können das Modul so konfigurieren, dass es einen unterschiedlichen Solr-Kern zur Indizierung nutzt und dass anschließend die Kerne getauscht werden (`System -> Konfiguration -> Solr -> Indizierung -> Cores tauschen nach vollständiger Neuindizierung`).
+Sie können das Modul so konfigurieren, dass es einen unterschiedlichen Solr-Kern zur Indizierung nutzt und dass anschließend die Kerne getauscht werden (`Shops -> Einstellungen -> Konfiguration -> Services -> IntegerNet_Solr -> Indizierung -> Cores tauschen nach vollständiger Neuindizierung`).
 
 ### Suchvorschläge
 Wenn Sie die Suchvorschlags-Funktionalität nutzen, gibt es jedes Mal, wenn ein Kunde Zeichen ins Suchfeld im Frontend eingetippt hat, einen AJAX-Aufruf. Die Antwort davon beinhaltet den HTML-Code des Suchvorschau-Fensters, welches Produktdaten, Suchwortvorschläge, passende Kategorien und/oder Attribute anzeigt. Die Ziel-URL des AJAX-Aufrufs ist unterschiedlich je nach der Konfigurationseinstellung unter `System -> Konfiguration -> Solr -> Suchvorschlags-Box -> Methode zum Ermitteln von Suchvorschlags-Informationen`:
@@ -119,13 +119,13 @@ Konfiguration
 
 Die Konfiguration befindet sich im Administrationsbereich von Magento unter *System -> Konfiguration -> Solr*:
 
-![Configuration Menu](http://integernet-solr.com/download/documentation/Backend%20Config%20Menu%20M2.png)
+![Konfigurationsmenü](http://integernet-solr.com/download/documentation/Backend%20Config%20Menu%20M2%20DE.png)
 
 Im Folgenden werden die Konfigurationsoptionen aufgelistet und beschrieben.
 
 ### Allgemein
 
-![General](http://integernet-solr.com/download/documentation/General.png)
+![Allgemein](http://integernet-solr.com/download/documentation/General%20DE.png)
 
 Im oberen Bereich werden Erfolgs-, Fehler-, Warn- und Informationsmeldungen ausgegeben. So wird automatisch geprüft, ob das Modul aktiviert ist, Zugangsdaten zum Solr-Server eingetragen sind und ob diese auch korrekt funktionieren.
 
@@ -153,7 +153,7 @@ Die Logdateien werden ausschließlich zur Fehlersuche bzw. zur Optimierung der S
 
 ### Server
 
-![Server](http://integernet-solr.com/download/documentation/Solr%20Server.png)
+![Server](http://integernet-solr.com/download/documentation/Solr%20Server%20DE.png)
 
 In diesem Bereich werden die Zugangsdaten zum Solr-Server eingetragen. Wenn die Daten korrekt sind, erscheinen im oberen Bereich der Konfigurationsseite entsprechende Erfolgsmeldungen, andernfalls Fehlermeldungen.
 Sollten Sie die Zugangsdaten nicht kennen, erhalten Sie diese von Ihrem Administrator bzw. Hoster, der den Solr-Server eingerichtet hat.
@@ -175,7 +175,7 @@ Die URL wird wie folgt in die einzelnen Teile aufgeteilt:
 
 Die einzelnen Teile werden dann wie folgt in die Konfiguration eingetragen:
 
-![Solr Server Configuration](http://integernet-solr.com/download/documentation/Solr%20Server%20URL.png)
+![Solr Serverkonfiguration](http://integernet-solr.com/download/documentation/Solr%20Server%20URL%20DE.png)
 
 Achten Sie darauf, dass das Feld *Kern* keine Schrägstriche enthält, das Feld *Path* aber mindestens je einen Schrägstrich am Anfang und am Ende.
 
@@ -219,7 +219,7 @@ Die Benachrichtigungen über die Erreichbarkeitsprüfung werden per E-Mail an di
 
 #### E-Mail-Vorlage
 
-Sie haben die Möglichkeit, eine eigene E-Mail-Vorlage für die Erreichbarkeitsprüfung anzulegen. Diese wird im Magento Backend in `System -> Transaktions-E-Mails`  hinterlegt.
+Sie haben die Möglichkeit, eine eigene E-Mail-Vorlage für die Erreichbarkeitsprüfung anzulegen. Diese wird im Magento Backend in `Marketing -> Kommunikation -> E-Mail-Vorlagen`  hinterlegt.
 Falls Sie eine eigene Vorlage angelegt haben, stellen Sie bitte sicher, dass die angelegte E-Mail-Vorlage mit der ausgewählten Vorlage in der Konfiguration des Solr-Moduls übereinstimmt.
 
 #### E-Mail-Absender
@@ -228,7 +228,7 @@ Für den Versand der Benachrichtigung können Sie den E-Mail-Absender auswählen
 
 ### Indizierung
 
-![Indizierung](http://integernet-solr.com/download/documentation/Indexing.png)
+![Indizierung](http://integernet-solr.com/download/documentation/Indexing%20DE.png)
 
 #### Anzahl Produkte pro Durchlauf
 
@@ -245,7 +245,7 @@ Wenn Sie regelmäßig den Index neu aufbauen (z. B. nächtlich), ist es sinnvoll
 
 ### Unscharfe Suche
 
-![Unscharfe Suche](http://integernet-solr.com/download/documentation/Fuzzy%20Search.png)
+![Unscharfe Suche](http://integernet-solr.com/download/documentation/Fuzzy%20Search%20DE.png)
 
 #### Ist aktiv für Suche
 
@@ -279,7 +279,7 @@ Wird der Wert 0 oder kein Wert eingegeben, dann wird die unscharfe Suche für Su
 
 ### Suchergebnisse
 
-![Suchergebnisse](http://integernet-solr.com/download/documentation/Search%20Results.png)
+![Suchergebnisse](http://integernet-solr.com/download/documentation/Search%20Results%20DE.png)
 
 #### Such-Operator
 
@@ -327,7 +327,7 @@ Hier sollten nur Attribute genutzt werden, bei denen die Zuordnung zur Kategorie
 
 ### Kategorieseiten
 
-![Kategorieseiten](http://www.integer-net.com/download/solr/integernet-solr-config-category-display-de.png)
+![Kategorieseiten](http://integernet-solr.com/download/documentation/Category%20Pages%20DE.png)
 
 #### Solr für die Darstellung von Produkten auf Kategorieseiten verwenden
 
@@ -366,7 +366,7 @@ Um CMS-Seiten in den Suchvorschlägen anzuzeigen, muss diese Funktion aktiviert 
 
 Die Suchvorschlags-Box wird auch als "Suchvorschau" oder "Autosuggest" bezeichnet.
 
-![Suchvorschlags-Box](http://integernet-solr.com/download/documentation/Autosuggest%20Box.png)
+![Suchvorschlags-Box](http://integernet-solr.com/download/documentation/Autosuggest%20Box%20DE.png)
 
 #### Ist aktiv
 
@@ -426,14 +426,15 @@ Es gibt allerdings weitere Möglichkeiten der Anpassung:
 
 Wenn Suchbegriffe im Namen oder der Artikelnummer eines Artikels vorkommen, sollte dies höher gewertet werden als wenn der gleiche Suchbegriff nur im Beschreibungstext vorkommt. Daher werden bereits im Standard manche Attribute höher priorisiert als andere.
 
-Die Priorisierung erfolgt anhand des Wertes "Solr-Priorität", die man jedem Produktattribut zuweisen kann.<!-- Diese neue Eigenschaft kann man in der Auflistung der Attribute (unter *Katalog -> Attribute -> Attribute verwalten*) bereits sehen:
+Die Priorisierung erfolgt anhand des Wertes "Solr-Priorität", die man jedem Produktattribut zuweisen kann.
+<!-- Diese neue Eigenschaft kann man in der Auflistung der Attribute (unter *Katalog -> Attribute -> Attribute verwalten*) bereits sehen:
 
 ![Attribut-Tabelle](http://www.integer-net.de/download/solr/integernet-solr-attribute-grid-de.png)
 
 Die Tabelle ist hier bereits nach dem neuen Wert "Solr-Priorität" sortiert.
 Den Wert können Sie in den Attributeigenschaften auch setzen:-->
 
-![Attribut-Ansicht](http://integernet-solr.com/download/documentation/Attribute%20boost.png)
+![Attribut-Ansicht](http://integernet-solr.com/download/documentation/Attribute%20boost%20DE.png)
 
 Mit diesem Wert wird die errechnete Priorität des Suchbegriffes für das Produkt multipliziert, wenn der gesuchte Begriff in dem Attribut gefunden wird. Daher entspricht *1.0* dem Standard - hier findet keine Modifikation statt. Somit können Sie die Priorität von einzelnen Attributen erhöhen oder senken. Wir empfehlen Werte zwischen 0.5 und höchstens 10.
 
@@ -445,7 +446,7 @@ Es kommt immer mal wieder vor, dass einzelne Produkte hervorgehoben werden solle
 
 Dafür gibt es das neue Produktattribut "Solr-Priorität" im Tab "Solr" der Produktansicht im Backend.
 
-![Produkt-Ansicht](http://integernet-solr.com/download/documentation/Product%20Details.png)
+![Produktansicht](http://integernet-solr.com/download/documentation/Product%20Details%20DE.png)
 
 Hierüber haben Sie die Möglichkeit, ein Produkt, sofern es zu den Suchbegriffen passt, weiter oben oder weiter unten zu platzieren als seine Standard-Position. Wir empfehlen hier Werte zwischen 0.5 und höchstens 10. Der Mechanismus ist der gleiche wie beim Boosting von Attributen. Eine Neuindizierung ist nach der Anpassung nicht erforderlich, sofern die Index-Aktualisierung aktiviert ist.
 
@@ -461,7 +462,7 @@ Im Feld "Solr-Priorität" können Sie durch die Eingabe einer Zahl, die größer
 Kategorieanpassungen
 ---------------------
 
-![Kategorieansicht](http://integernet-solr.com/download/documentation/Category%20Details.png)
+![Kategorieansicht](http://integernet-solr.com/download/documentation/Category%20Details%20DE.png)
 
 ### Diese Kategorie vom Solr-Index ausnehmen
 Bei Bedarf gibt es die Option, Kategorien von der Solr-Suche auszuschließen. Die Einstellungsmöglichkeiten dafür finden Sie im Magento-Backend in der jeweiligen Kategorie im Tab "Solr". Wird der Wert auf "Ja" gesetzt, erscheint diese Kategorie nicht mehr als Vorschlag in den Suchvorschlägen.
