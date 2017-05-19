@@ -75,12 +75,7 @@ class SolrAdapter implements AdapterInterface
      */
     private function makeSearchRequest(RequestInterface $request)
     {
-        $activeAttributeCodes = [];
-        /** @var BoolExpression $query */
-        $query = $request->getQuery();
-        $activeAttributeCodes = $this->addActiveAttributeCodes($query->getMust(), $activeAttributeCodes);
-        $activeAttributeCodes = $this->addActiveAttributeCodes($query->getShould(), $activeAttributeCodes);
-        return $this->searchRequestBuilder->convert($request)->doRequest($activeAttributeCodes);
+        return $this->searchRequestBuilder->convert($request)->doRequest($this->getActiveAttributeCodes($request));
     }
 
     /**
@@ -89,7 +84,21 @@ class SolrAdapter implements AdapterInterface
      */
     private function makeCategoryRequest(RequestInterface $request)
     {
-        return $this->categoryRequestBuilder->convert($request)->doRequest();
+        return $this->categoryRequestBuilder->convert($request)->doRequest($this->getActiveAttributeCodes($request));
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @return string[]
+     */
+    private function getActiveAttributeCodes(RequestInterface $request)
+    {
+        $activeAttributeCodes = [];
+        /** @var BoolExpression $query */
+        $query = $request->getQuery();
+        $activeAttributeCodes = $this->addActiveAttributeCodes($query->getMust(), $activeAttributeCodes);
+        $activeAttributeCodes = $this->addActiveAttributeCodes($query->getShould(), $activeAttributeCodes);
+        return $activeAttributeCodes;
     }
 
     /**
@@ -112,5 +121,4 @@ class SolrAdapter implements AdapterInterface
         }
         return $activeAttributeCodes;
     }
-
 }
