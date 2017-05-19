@@ -66,11 +66,23 @@ class ProductRepository implements ProductRepositoryInterface
     }
 
     /**
+     * @param null|int $sliceId
+     * @param null|int $totalNumberSlices
      * @return int[]
      */
-    public function getAllProductIds()
+    public function getAllProductIds($sliceId = null, $totalNumberSlices = null)
     {
-        return $this->productCollectionFactory->create()->getAllIds();
+        /** @var ProductCollection $productCollection */
+        $productCollection = $this->productCollectionFactory->create();
+
+        if ((!is_null($sliceId)) && (!is_null($totalNumberSlices))) {
+            if ($sliceId == $totalNumberSlices) {
+                $sliceId = 0;
+            }
+            $productCollection->getSelect()->where('e.entity_id % ' . intval($totalNumberSlices) . ' = ' . intval($sliceId));
+        }
+
+        return $productCollection->getAllIds();
     }
 
     /**

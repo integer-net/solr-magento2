@@ -2,10 +2,18 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
-Ongoing Work
+Version 1.1.3 (May 16, 2017)
 ---------------
 
+- Fix bug during DI compilation
+
+Version 1.1.2 (May 15, 2017)
+---------------
+
+- Improve search requests for queries including numbers
 - Fix bug with fuzzy search for categories not working
+- Fix bug with autosuggest in multistore environments
+- Add check for correct attribute configuration
 
 Version 1.1.1 (Apr 12, 2017)
 ---------------
