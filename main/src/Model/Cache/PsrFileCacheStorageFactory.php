@@ -34,8 +34,16 @@ class PsrFileCacheStorageFactory implements CacheStorageFactoryInterface
     {
         return new PsrCache(
             new FileCacheBackend(
-                $this->directoryList->getPath(DirectoryList::CACHE) . '/integernet_solr'
+                $this->rootDir()
             )
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function rootDir()
+    {
+        return $this->directoryList->getPath(DirectoryList::CACHE) . DIRECTORY_SEPARATOR . 'integernet_solr';
     }
 }
