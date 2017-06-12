@@ -14,6 +14,8 @@ namespace IntegerNet\Solr\Model\Bridge;
 use IntegerNet\Solr\Model\Cache\PsrFileCacheStorageFactory;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository as TemplateRepositoryInterface;
 use IntegerNet\SolrSuggest\Plain\Block\Template;
+use Magento\Framework\Locale\ResolverInterface as LocaleResolverInterface;
+use Magento\Store\Model\App\Emulation;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Design\Theme\ThemeProviderInterface;
 use Magento\Framework\View\DesignInterface;
@@ -38,17 +40,29 @@ class TemplateRepository implements TemplateRepositoryInterface
      * @var PsrFileCacheStorageFactory
      */
     private $cacheStorageFactory;
+    /**
+     * @var Emulation
+     */
+    private $emulation;
+    /**
+     * @var LocaleResolverInterface
+     */
+    private $localeResolver;
 
     public function __construct(
         TemplateFileResolver $templateFileResolver,
         ScopeConfigInterface $scopeConfig,
         ThemeProviderInterface $themeProvider,
-        PsrFileCacheStorageFactory $cacheStorageFactory
+        PsrFileCacheStorageFactory $cacheStorageFactory,
+        Emulation $emulation,
+        LocaleResolverInterface $localeResolver
     ) {
         $this->templateFileResolver = $templateFileResolver;
         $this->scopeConfig = $scopeConfig;
         $this->themeProvider = $themeProvider;
         $this->cacheStorageFactory = $cacheStorageFactory;
+        $this->emulation = $emulation;
+        $this->localeResolver = $localeResolver;
     }
 
     /**
@@ -57,9 +71,18 @@ class TemplateRepository implements TemplateRepositoryInterface
      */
     public function getTemplateByStoreId($storeId)
     {
-        return new Template(
+        $this->emulation->startEnvironmentEmulation($storeId, \Magento\Framework\App\Area::AREA_FRONTEND, true);
+        // App\Emulation cannot use setLocale() if Backend\LocaleResolver is used, so we have to emulate locale explicitly
+        $this->localeResolver->emulate($storeId);
+
+        $template = new Template(
             $this->getTemplateFile($storeId)
         );
+
+        $this->localeResolver->revert();
+        $this->emulation->stopEnvironmentEmulation();
+
+        return $template;
     }
 
 
@@ -112,10 +135,19 @@ class TemplateRepository implements TemplateRepositoryInterface
 
         foreach($results[1] as $key => $search) {
 
-            $replace = __($search);
-            $templateContents = str_replace($search, $replace, $templateContents);
+            $replace = (string)__($search);
+            $templateContents = str_replace($this->quote($search), $this->quote($replace), $templateContents);
         }
 
         return $templateContents;
+    }
+
+    /**
+     * @param string $search
+     * @return string
+     */
+    private function quote($search)
+    {
+        return '\'' . $search . '\'';
     }
 }
