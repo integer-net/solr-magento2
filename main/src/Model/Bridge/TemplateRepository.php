@@ -15,6 +15,7 @@ use IntegerNet\Solr\Model\Cache\PsrFileCacheStorageFactory;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository as TemplateRepositoryInterface;
 use IntegerNet\SolrSuggest\Plain\Block\Template;
 use Magento\Framework\Locale\ResolverInterface as LocaleResolverInterface;
+use Magento\Framework\View\DesignLoader;
 use Magento\Store\Model\App\Emulation;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Design\Theme\ThemeProviderInterface;
@@ -48,6 +49,10 @@ class TemplateRepository implements TemplateRepositoryInterface
      * @var LocaleResolverInterface
      */
     private $localeResolver;
+    /**
+     * @var DesignLoader
+     */
+    private $designLoader;
 
     public function __construct(
         TemplateFileResolver $templateFileResolver,
@@ -55,7 +60,8 @@ class TemplateRepository implements TemplateRepositoryInterface
         ThemeProviderInterface $themeProvider,
         PsrFileCacheStorageFactory $cacheStorageFactory,
         Emulation $emulation,
-        LocaleResolverInterface $localeResolver
+        LocaleResolverInterface $localeResolver,
+        DesignLoader $designLoader
     ) {
         $this->templateFileResolver = $templateFileResolver;
         $this->scopeConfig = $scopeConfig;
@@ -63,6 +69,7 @@ class TemplateRepository implements TemplateRepositoryInterface
         $this->cacheStorageFactory = $cacheStorageFactory;
         $this->emulation = $emulation;
         $this->localeResolver = $localeResolver;
+        $this->designLoader = $designLoader;
     }
 
     /**
@@ -74,6 +81,7 @@ class TemplateRepository implements TemplateRepositoryInterface
         $this->emulation->startEnvironmentEmulation($storeId, \Magento\Framework\App\Area::AREA_FRONTEND, true);
         // App\Emulation cannot use setLocale() if Backend\LocaleResolver is used, so we have to emulate locale explicitly
         $this->localeResolver->emulate($storeId);
+        $this->designLoader->load();
 
         $template = new Template(
             $this->getTemplateFile($storeId)
