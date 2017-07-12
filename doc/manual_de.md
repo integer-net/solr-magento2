@@ -27,8 +27,9 @@ Features
 
 #### Suchergebnisse
 - Unterstützt alle Magento-Standardfunktionen wie Sortierung, Paginierung und Filter
+- Erlaubt Mehrfachauswahl von Filtern
 - Verwendet Suchergebnisse aus Solr für bessere Performance und Qualität
-- Rendert Produkt-HTML-Blöcke bereits bei der Indizierung für schnellere Darstellung
+- Rendert Produkt-HTML-Blöcke bereits bei der Indizierung für schnellere Darstellung (optional)
 - Ermöglicht die Konfiguration der Preisfilter-Schritte
 - Der Solr-Index wird beim Erstellen/Bearbeiten/Löschen von Produkten automatisch aktualisiert
 
@@ -50,19 +51,7 @@ Systemvoraussetzungen
 
 Installation
 ------------
-1. Installieren Sie **Solr** und mindestens einen funktionsfähigen **Solr-Kern** ("Core")
-2. Kopieren Sie die Dateien vom Verzeichnis `solr_conf` des Modul-Pakets in das Verzeichnis `conf` des Solr-Kerns / der Solr-Kerne.
-3. Laden Sie den Solr-Kern neu (oder Solr komplett)
-4. (Falls aktiviert: Deaktivieren Sie die Magento-Kompilierung (Compiler).)
-5. Kopieren Sie die Dateien und Verzeichnisse des `src`-Verzeichnisses des Modul-Pakets in Ihre Magento-Installation. Falls Sie **modman** und/oder **composer** nutzen, können Sie die Dateien `modman` bzw. `composer.json` im Hauptverzeichnis nutzen.
-6. Leeren Sie den Magento-Cache.
-7. (Starten Sie den Kompilierungsprozess und reaktivieren Sie die Magento-Kompilierung - wir empfehlen, die Kompilierungsfunktion von Magento nicht zu nutzen, unabhängig von diesem Modul.)
-8. Gehen Sie in den Administrationsbereich von Magento zu <!--@TODO Übersetzung des Pfads --> `Stores -> Settings -> Configuration -> Services -> Solr` (weit unten).
-9. Geben Sie die Solr-Zugangsdaten ein und konfigurieren Sie das Modul ([siehe unten](#solr-server-data)).
-10. Klicken Sie auf "Konfiguration speichern". Die Verbindung zum Solr-Server wird automatisch getestet. Sie erhalten entsprechende Erfolgs- und/oder Fehlermeldungen.
-<!-- 11. Wenn Sie die Magento Enterprise Edition nutzen, müssen Sie die integrierte Solr-Suche ausschalten. Setzen Sie `System -> Konfiguration -> Katalog -> Katalogsuche -> Search Engine` auf `MySql Fulltext`.-->
-11. Reindizieren Sie den Index von IntegerNet_Solr. Wir empfehlen, dies über die Kommandozeile zu machen. Gehen Sie in das Verzeichnis `shell` und rufen Sie den Befehl `php -f indexer.php -- --reindex integernet_solr` auf.
-12. Versuchen Sie, ein paar Buchstaben in das Suchfeld im Frontend einzutippen. Ein Fenster mit Produkt- und Suchwortvorschlägen sollte erscheinen.
+<!-- @TODO Copy and translate from OR link to installation.md -->
 
 <a name="technischer-ablauf">Technischer Ablauf</a>
 ------------------
@@ -81,43 +70,35 @@ Die in Solr gespeicherten Daten beinhalten die folgenden Informationen:
 - IDs aller Optionen der filterbaren Attribute für die Filternavigation
 
 Wenn Sie regelmäßig eine komplette Neuindizierung vornehmen, empfehlen wir Ihnen die **Swap**-Funktionalität.
-Sie können das Modul so konfigurieren, dass es einen unterschiedlichen Solr-Kern zur Indizierung nutzt und dass anschließend die Kerne getauscht werden (`System -> Konfiguration -> Solr -> Indizierung -> Cores tauschen nach vollständiger Neuindizierung`).
+Sie können das Modul so konfigurieren, dass es einen unterschiedlichen Solr-Kern zur Indizierung nutzt und dass anschließend die Kerne getauscht werden (`Stores -> Konfiguration -> Solr -> Indizierung -> Cores tauschen nach vollständiger Neuindizierung`).
 
 ### Suchvorschläge
-Wenn Sie die Suchvorschlags-Funktionalität nutzen, gibt es jedes Mal, wenn ein Kunde Zeichen ins Suchfeld im Frontend eingetippt hat, einen AJAX-Aufruf. Die Antwort davon beinhaltet den HTML-Code des Suchvorschau-Fensters, welches Produktdaten, Suchwortvorschläge, passende Kategorien und/oder Attribute anzeigt. Die Ziel-URL des AJAX-Aufrufs ist unterschiedlich je nach der Konfigurationseinstellung unter `System -> Konfiguration -> Solr -> Suchvorschlags-Box -> Methode zum Ermitteln von Suchvorschlags-Informationen`:
+Wenn Sie die Suchvorschlags-Funktionalität nutzen, gibt es jedes Mal, wenn ein Kunde Zeichen ins Suchfeld im Frontend eingetippt hat, einen AJAX-Aufruf. Die Antwort davon beinhaltet den HTML-Code des Suchvorschau-Fensters, welches Produktdaten, Suchwortvorschläge, passende Kategorien und/oder Attribute anzeigt. 
 
-#### Magento-Controller
-Das ist die Basismethode, die ausschließlich Magento-Methoden einsetzt, so wie es auch die Standard-Suchfunktion von Magento macht oder die Solr-Funktionalität der Magento Enterprise-Edition. Diese Methode ist die langsamste, aber auch die flexibelste. Sie ist vorgesehen als Fallback, falls die anderen Methoden aus welchen Gründen auch immer nicht eingesetzt werden können.
-
-#### Magento mit separater PHP-Datei
-Hierdurch wird per AJAX die separate PHP-Datei `autosuggest-mage.php` im Magento-Hauptverzeichnis direkt aufgerufen. Dadurch wird der Routing-Prozess von Magento übergangen, die Inhalte werden schneller ausgeliefert. Dennoch sollten alle Magento-Funktionen nutzbar sein. Außer der Geschwindigkeit (siehe unten) haben wir bisher keine Nachteile dieser Methode gefunden, sie kann also bedenkenlos eingesetzt werden.
-
-#### PHP ohne Magento-Instanziierung
-Mit dieser Methode wird eine andere PHP-Datei `autosuggest.php` im Magento-Hauptverzeichnis per AJAX direkt aufgerufen. Ein Großteil der Magento-Funktionalität wird dabei nicht verwendet, wodurch sie in den meisten Umgebungen deutlich schneller ist. Da dabei keine Datenbank-Abfragen ausgeführt werden, müssen alle Daten, die für das Suchvorschaufenster benötigt werden, entweder direkt vom Solr-Server oder aus einer Textdatei kommen. Das Modul generiert automatisch Textdateien, die die Informationen enthalten, die von der Suchvorschaufunktion benötigt werden:
+Dadurch Methode wird eine andere PHP-Datei `autosuggest.php` im Magento-Hauptverzeichnis per AJAX direkt aufgerufen. Ein Großteil der Magento-Funktionalität wird dabei nicht verwendet, wodurch sie in den meisten Umgebungen deutlich schneller ist. Da dabei keine Datenbank-Abfragen ausgeführt werden, müssen alle Daten, die für das Suchvorschaufenster benötigt werden, entweder direkt vom Solr-Server oder aus einer Textdatei kommen. Das Modul generiert automatisch Textdateien, die die Informationen enthalten, die von der Suchvorschaufunktion benötigt werden:
 
 - Die Solr-Konfiguration (z. B. Zugangsdaten)
 - Ein paar zusätzliche Konfigurationswerte
 - Alle Kategoriedaten (Namen, IDs und URLs)
 - Alle Attributdaten, die in der Konfiguration eingestellt sind (Optionsnamen, IDs und URLs)
 - Einige Zusatzinformationen wie die Base-URL oder der Dateiname der Templatedatei (s. u.)
-- Eine Kopie der Datei `template/integernet/solr/result/autosuggest.phtml`, die in Ihrem Theme verwendet wird. Alle Übersetzungstexte sind darin bereits in die korrekte Sprache übersetzt.
+- Eine Kopie der Datei `src/view/frontend/templates/autosuggest/index.phtml`, die in Ihrem Theme verwendet wird. Alle Übersetzungstexte sind darin bereits in die korrekte Sprache übersetzt.
 
-Die Informationen werden in der Datei `var/integernet_solr/store_x/config.txt` als serialisiertes Array gespeichert bzw. befinden sich in der Datei `var/integernet_solr/store_x/autosuggest.phtml`. Diese Dateien werden automatisch in einem der folgenden Fälle neu erzeugt:
+Die Informationen werden im Verzeichnis `var/cache/integernet_solr/` gespeichert. Diese Dateien werden automatisch in einem der folgenden Fälle neu erzeugt:
 
-- AJAX-Aufruf im Frontend, während die Datei `var/integernet_solr/store_x/config.txt` nicht existiert.
+- AJAX-Aufruf im Frontend, während die Dateien in  `var/cache/integernet_solr/` nicht existieren.
 - Die Konfiguration des Solr-Moduls wird gespeichert
-- Der Cache wird vollständig geleert.
 - Der Button "Solr Suchvorschlagscache neu aufbauen" auf der Magento-Backend-Seite "Cache-Verwaltung" wird betätigt.
 
 Wenn Sie also die gespeicherten Informationen erneuern lassen wollen, lösen Sie einen der drei obigen Fälle aus.
 
-Beachten Sie, dass Sie nicht alle Magento-Funktionen zur Verfügung haben werden, wenn Sie diese Methode verwenden.
-Versuchen Sie, sich an die Methoden zu halten, die in `app/design/frontend/base/default/template/integernet/solr/autosuggest.phtml` verwendet werden. Beispielsweise können Sie keine statischen Blöcke oder andere externen Informationen ohne zusätzliche Erweiterung verwenden.
+Beachten Sie, dass Sie nicht alle Magento-Funktionen zur Verfügung haben werden, wenn Sie das Template anpassen.
+Versuchen Sie, sich an die Methoden zu halten, die in `src/view/frontend/templates/autosuggest/index.phtml` verwendet werden. Beispielsweise können Sie keine statischen Blöcke oder andere externen Informationen ohne zusätzliche Erweiterung verwenden.
 
 Konfiguration
 -------------
 
-Die Konfiguration befindet sich im Administrationsbereich von Magento unter *System -> Konfiguration -> Solr*:
+Die Konfiguration befindet sich im Administrationsbereich von Magento unter *Stores -> Konfiguration -> Solr*:
 
 ![Configuration Menu](http://integernet-solr.com/download/documentation/Backend%20Config%20Menu%20M2.png)
 
@@ -372,10 +353,6 @@ Die Suchvorschlags-Box wird auch als "Suchvorschau" oder "Autosuggest" bezeichne
 
 Bei Deaktivieren dieser Einstellung wird kein Suchvorschaufenster angezeigt.
 
-#### Methode zum Ermitteln von Suchvorschlags-Informationen
-
-Diese Einstellung wurde bereits oben im Kapitel ["Technischer Ablauf"](#technischer-ablauf) umfassend beschrieben.
-
 #### Maximale Anzahl Suchwort-Vorschläge
 
 Die Anzahl der Suchwort-Vorschläge in der Suchvorschlags-Box. Abhängig von Ihren Produkten wird der eingegebene Suchbegriff um sinnvolle Varianten ergänzt. Bei Eingabe von "re" im Demo-Shop erscheinen z. B. die folgenden Vorschläge: *regular…*, *resistant…*, *refined…*, *red…*.
@@ -477,36 +454,16 @@ Für jede Kategorie können Sie bestimmen, wo die Filter angezeigt werden, auch 
 
 Template-Anpassungen
 --------------------
-<!-- @TODO update template file path -->
 
 Wenn Sie ein Nicht-Standard-Template verwenden, müssen voraussichtlich ein paar Anpassungen gemacht werden.
-Das Template des Suchvorschaufensters und der Suchergebnisseite ist in `app/design/frontend/base/default/template/integernet/solr/` (PHTML-Dateien) definiert sowie in `skin/frontend/base/default/integernet/solr/` für die CSS-Datei, die auf jeder Seite eingebunden wird.
-
-### Suchergebnisseite
-<!-- @TODO update template file path -->
-Sehr wahrscheinlich haben Sie bereits ein Template für die Suchergebnisseite. Üblicherweise ist es in `template/catalog/product/list.phtml` in Ihrem Theme-Verzeichnis zu finden.
-Um den passenden Inhalt für die PHTML-Dateien des IntegerNet_Solr-Moduls zu erstellen, müssen Sie den Inhalt Ihrer Datei in drei Teile teilen:
-<!-- @TODO update template file path -->
-- Die Teile innerhalb von  `<li class="item...">` werden in `template/integernet/solr/result/list/item.phtml` und `template/integernet/solr/result/grid/item.phtml` eingefügt, abhängig davon, um welchen Modus (Grid oder List) es sich handelt.
-- Der Rest wird in `template/integernet/solr/result.phtml` eingefügt. Die vorher ausgeschnittenen Teile müssen mit dem folgenden Code ersetzt werden:
-
-    <?php echo $this
-        ->getChild('item')
-        ->setProduct($_product)
-        ->setListType('list')
-        ->toHtml() ?>
-
-Ersetzen Sie entsprechend `list` durch `grid`, abhängig davon, welchen Teil Sie ersetzen.
-Während Sie die Template-Dateien anpassen, sollten Sie die Konfigurationsoption `Suchergebnisse -> HTML vom Solr-Index verwenden` ausschalten.
-Wenn Sie die Option aktiviert haben, benötigen Sie eine komplette Neuindizierung nach jeder Änderung einer Template-Datei. Aktivieren Sie die Option nach Fertigstellung der Anpassungen wieder und führen Sie eine Neuindizierung durch.
+Das Template des Suchvorschaufensters und der Suchergebnisseite ist in `src/view/frontend/templates/autosuggest/` (PHTML-Dateien) definiert sowie in `src/view/frontend/web/autosuggest.css` für die CSS-Datei, die auf jeder Seite eingebunden wird.
 
 ### Suchvorschaufenster
-Sie können die Dateien `template/integernet/solr/autosuggest.phtml` und `template/integernet/solr/autosuggest/item.phtml` bearbeiten, um das Erscheinungsbild des Suchvorschaufensters anzupassen.
-Achtung: Da der generierte HTML-Code für jedes Produkt im Solr-Index gespeichert ist, müssen Sie nach Änderungen an der Datei `template/integernet/solr/autosuggest/item.phtml` eine Neuindizierung vornehmen.
-<!-- @TODO update template file path -->
+Sie können die Dateien `src/view/frontend/templates/autosuggest/index.phtml` und `src/view/frontend/templates/autosuggest/item.phtml` bearbeiten, um das Erscheinungsbild des Suchvorschaufensters anzupassen.
+Achtung: Da der generierte HTML-Code für jedes Produkt im Solr-Index gespeichert ist, müssen Sie nach Änderungen an der Datei `src/view/frontend/templates/autosuggest/item.phtml` eine Neuindizierung vornehmen.
 
-Bitte beachten Sie: Wenn die Suchvorschaufunktion nicht von Magento, sondern von einer blanken PHP-Version ausgeliefert wird (Standard, siehe oben), können Sie in Ihrer `template/integernet/solr/result/autosuggest.phtml` nicht alle Magento-Funktionen verwenden.
-Versuchen Sie, sich an die in `app/design/frontend/base/default/template/integernet/solr/result/autosuggest.phtml` genutzten Funktionen zu halten. Da der HTML-Code für die einzelnen Produkte von Magento generiert wird, können Sie dort hingegen alle Magento-Funktionen verwenden.
+Bitte beachten Sie: Sie können in Ihrer `src/view/frontend/templates/autosuggest/index.phtml` nicht alle Magento-Funktionen verwenden.
+Versuchen Sie, sich an die in `src/view/frontend/templates/autosuggest/index.phtml` genutzten Funktionen zu halten. Da der HTML-Code für die einzelnen Produkte von Magento generiert wird, können Sie dort hingegen alle Magento-Funktionen verwenden.
 
 Wenn Sie Produkt-, Kategorie-, Attribut- oder Suchwortvorschläge in der Suchvorschaufunktion nicht verwenden, schalten Sie sie bitte auch in der Konfiguration aus, um die Performance zu verbessern.
 
@@ -526,11 +483,8 @@ Weitere Informationen zu den Events, ihren Parametern und Nutzungszwecken, ebens
 
 Mögliche Probleme und Lösungsansätze
 -------------------------------------
-1. **Rewrite-Konflikte mit Modulen, die die Filternavigation beeinflussen**
-    Sie können dies nicht vermeiden, wenn Sie ein entsprechendes Modul einsetzen. Sie können aber die Konflikte auflösen. Bitte sehen Sie, wie wir einen Konflikt mit einem solchen Modul aufgelöst haben, in der Datei `app/code/community/IntegerNet/Solr/Model/Resource/Catalog/Layer/Filter/Price.php`.
-
-2. **Das Speichern von Produkten im Backend dauert lange**
+1. **Das Speichern von Produkten im Backend dauert lange**
     Das kann passieren, wenn Sie viele Store Views haben, da für die beim Speichern stattfindende Indizierung für jeden Store View eine eigene Anfrage an Solr gesendet werden muss. Wir empfehlen, in diesem Fall den Indizierungs-Modus des `integernet_solr`-Index auf "manuell" zu stellen und jede Nacht eine komplette Reindizierung per Cronjob vorzunehmen, wenn möglich.
 
-3. **Die Produktdaten im Suchvorschaufenster sollten für verschiedene Kundengruppen unterschiedlich aussehen, sehen aber überall gleich aus**
+2. **Die Produktdaten im Suchvorschaufenster sollten für verschiedene Kundengruppen unterschiedlich aussehen, sehen aber überall gleich aus**
     Da der produktabhängige HTML-Code immer im Solr-Index gespeichert wird, ist das leider nicht möglich. Versuchen Sie, das HTML in `template/integernet/solr/autosuggest/item.phtml` so anzupassen, dass es keine kundenspezifischen Informationen (z. B. Preise) mehr enthält.
