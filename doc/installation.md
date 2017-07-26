@@ -50,7 +50,14 @@ area after saving.
 bin/magento indexer:reindex integernet_solr
 bin/magento indexer:reindex integernet_solr_categories
 ```
-8. You are ready. Try the functionality by typing a few letters into your store's frontend search box.
+8. If you run nginx with the configuration provided by Magento, you need to add `autosuggest.php` to the whitelist:
+```diff
+-location ~ (index|get|static|report|404|503)\.php$ {
++location ~ (index|get|static|report|404|503|autosuggest)\.php$ {
+```
+    Source: https://github.com/magento/magento2/blob/2.1/nginx.conf.sample#L158
+ 
+9. You are ready. Try the functionality by typing a few letters into your store's frontend search box.
 
 b) Installation from Package
 ---------------
