@@ -33,10 +33,6 @@ class SolrStatusMessages implements StatusMessages
      */
     private $productMetadata;
     /**
-     * @var ScopePool
-     */
-    private $scopePool;
-    /**
      * @var Url
      */
     private $urlBuilder;
@@ -46,14 +42,13 @@ class SolrStatusMessages implements StatusMessages
     private $moduleConfig;
 
     public function __construct(ProductMetadataInterface $productMetadata, ModuleListInterface $moduleList,
-                                ScopePool $scopePool, Url $urlBuilder, AllStoresConfig $moduleConfig)
+                                Url $urlBuilder, AllStoresConfig $moduleConfig)
     {
         $this->moduleList = $moduleList;
         $this->productMetadata = $productMetadata;
         $this->urlBuilder = $urlBuilder;
         $this->moduleConfig = $moduleConfig;
         $this->solrResource = new ResourceFacade($this->moduleConfig->getArrayCopy());
-        $this->scopePool = $scopePool;
     }
 
     /**
