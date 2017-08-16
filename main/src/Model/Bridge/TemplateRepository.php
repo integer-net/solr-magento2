@@ -14,8 +14,8 @@ namespace IntegerNet\Solr\Model\Bridge;
 use IntegerNet\Solr\Model\Cache\PsrFileCacheStorageFactory;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository as TemplateRepositoryInterface;
 use IntegerNet\SolrSuggest\Plain\Block\Template;
+use Magento\Framework\App\AreaList;
 use Magento\Framework\Locale\ResolverInterface as LocaleResolverInterface;
-use Magento\Framework\View\DesignLoader;
 use Magento\Store\Model\App\Emulation;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Design\Theme\ThemeProviderInterface;
@@ -50,9 +50,9 @@ class TemplateRepository implements TemplateRepositoryInterface
      */
     private $localeResolver;
     /**
-     * @var DesignLoader
+     * @var AreaList
      */
-    private $designLoader;
+    private $areaList;
 
     public function __construct(
         TemplateFileResolver $templateFileResolver,
@@ -61,7 +61,7 @@ class TemplateRepository implements TemplateRepositoryInterface
         PsrFileCacheStorageFactory $cacheStorageFactory,
         Emulation $emulation,
         LocaleResolverInterface $localeResolver,
-        DesignLoader $designLoader
+        AreaList $areaList
     ) {
         $this->templateFileResolver = $templateFileResolver;
         $this->scopeConfig = $scopeConfig;
@@ -69,7 +69,7 @@ class TemplateRepository implements TemplateRepositoryInterface
         $this->cacheStorageFactory = $cacheStorageFactory;
         $this->emulation = $emulation;
         $this->localeResolver = $localeResolver;
-        $this->designLoader = $designLoader;
+        $this->areaList = $areaList;
     }
 
     /**
@@ -81,7 +81,9 @@ class TemplateRepository implements TemplateRepositoryInterface
         $this->emulation->startEnvironmentEmulation($storeId, \Magento\Framework\App\Area::AREA_FRONTEND, true);
         // App\Emulation cannot use setLocale() if Backend\LocaleResolver is used, so we have to emulate locale explicitly
         $this->localeResolver->emulate($storeId);
-        $this->designLoader->load();
+
+        $area = $this->areaList->getArea(\Magento\Framework\App\Area::AREA_FRONTEND);
+        $area->load(\Magento\Framework\App\Area::PART_TRANSLATE);
 
         $template = new Template(
             $this->getTemplateFile($storeId)

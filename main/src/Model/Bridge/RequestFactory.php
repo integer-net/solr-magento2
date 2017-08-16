@@ -114,6 +114,7 @@ class RequestFactory implements SolrRequestFactoryInterface
         }
 
         if ($requestMode === self::REQUEST_MODE_CATEGORY) {
+            $applicationContext->setCategoryConfig($this->storeConfig->getCategoryConfig());
             $factory = new CategoryRequestFactory(
                 $applicationContext,
                 $this->getSolrResource(),
