@@ -75,7 +75,7 @@ class SolrAdapter implements AdapterInterface
      */
     private function makeSearchRequest(RequestInterface $request)
     {
-        return $this->searchRequestBuilder->convert($request)->doRequest();
+        return $this->searchRequestBuilder->convert($request)->doRequest($this->getActiveAttributeCodes($request));
     }
 
     /**
@@ -84,7 +84,41 @@ class SolrAdapter implements AdapterInterface
      */
     private function makeCategoryRequest(RequestInterface $request)
     {
-        return $this->categoryRequestBuilder->convert($request)->doRequest();
+        return $this->categoryRequestBuilder->convert($request)->doRequest($this->getActiveAttributeCodes($request));
     }
 
+    /**
+     * @param RequestInterface $request
+     * @return string[]
+     */
+    private function getActiveAttributeCodes(RequestInterface $request)
+    {
+        $activeAttributeCodes = [];
+        /** @var BoolExpression $query */
+        $query = $request->getQuery();
+        $activeAttributeCodes = $this->addActiveAttributeCodes($query->getMust(), $activeAttributeCodes);
+        $activeAttributeCodes = $this->addActiveAttributeCodes($query->getShould(), $activeAttributeCodes);
+        return $activeAttributeCodes;
+    }
+
+    /**
+     * @param \Magento\Framework\Search\Request\QueryInterface[]
+     * @param string[] $activeAttributeCodes
+     * @return string[]
+     */
+    private function addActiveAttributeCodes($filters, $activeAttributeCodes)
+    {
+        if (is_array($filters)) {
+            foreach ($filters as $queryFilter) {
+                if ($queryFilter instanceof \Magento\Framework\Search\Request\Query\Filter) {
+                    if ($queryFilter->getName() == 'category') {
+                        $activeAttributeCodes[] = 'category';
+                    } else {
+                        $activeAttributeCodes[] = $queryFilter->getReference()->getField();
+                    }
+                }
+            }
+        }
+        return $activeAttributeCodes;
+    }
 }

@@ -102,6 +102,18 @@
   <preference for="Magento\Catalog\Model\Layer\Filter\Category" type="IntegerNet\Solr\Model\Catalog\Layer\Filter\Category"/>
   -->
 
+  <virtualType name="Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory" type="Magento\Catalog\Model\ResourceModel\Product\CollectionFactory">
+    <arguments>
+      <argument name="instanceName" xsi:type="string">IntegerNet\Solr\Model\ResourceModel\CatalogSearchFulltextCollection</argument>
+    </arguments>
+  </virtualType>
+  <type name="IntegerNet\Solr\Model\ResourceModel\CatalogSearchFulltextCollection">
+    <arguments>
+      <argument name="searchRequestName" xsi:type="string">quick_search_container</argument>
+    </arguments>
+  </type>
+
+
   <!-- IntegerNet_Solr search adapter, only used if HTML is not stored in solr (i.e. we only receive product ids from Solr) -->
   <type name="Magento\Search\Model\AdapterFactory">
     <arguments>

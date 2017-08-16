@@ -35,7 +35,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
         $pluginList = $this->objectManager->create(PluginList::class);
 
         $pluginInfo = $pluginList->get(Layout::class, []);
-        $this->assertSame(LayoutPlugin::class, $pluginInfo['updateLayout']['instance']);
+        $this->assertSame(LayoutPlugin::class, $pluginInfo['integernetSolrUpdateLayout']['instance']);
     }
 
 }

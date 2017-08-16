@@ -39,7 +39,7 @@ class ProductRepository implements ProductRepositoryInterface
     /**
      * @param PagedProductIteratorInterfaceFactory $pagedIteratorFactory
      * @param CollectionFactory $productCollectionFactory
-     * @param ConfigurableType $configurableType
+     * @param MergedProductAssociations $mergedProductAssociations
      */
     public function __construct(PagedProductIteratorInterfaceFactory $pagedIteratorFactory,
                                 CollectionFactory $productCollectionFactory,

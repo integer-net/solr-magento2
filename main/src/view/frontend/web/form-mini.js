@@ -256,6 +256,10 @@ define([
 
             if (value.length >= parseInt(this.options.minSearchLength, 10)) {
                 $.get(this.options.url, {q: value}, $.proxy(function (data) {
+                    if (value != searchField.val()) {
+                        // Looked up keyword doesn't match current keyword any more - don't overwrite.
+                        return;
+                    }
                     dropdown.append(data);
                     this.responseList.indexList = this.autoComplete.html(dropdown)
                         .css(clonePosition)
