@@ -14,6 +14,8 @@ use IntegerNet\SolrCategories\Implementor\Attribute as AttributeInterface;
 use IntegerNet\SolrCategories\Implementor\Category as CategoryInterface;
 use Magento\Catalog\Api\Data\CategoryInterface as MagentoCategoryInterface;
 use Magento\Catalog\Model\Category as MagentoCategory;
+use Magento\Catalog\Model\ResourceModel\Category\Collection as MagentoCategoryCollection;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as MagentoCategoryCollectionFactory;
 use Magento\Framework\Event\ManagerInterface as EventManagerInterface;
 
 class Category implements CategoryInterface
@@ -44,17 +46,25 @@ class Category implements CategoryInterface
      * @var EventManagerInterface
      */
     private $eventManager;
+    /**
+     * @var MagentoCategoryCollectionFactory
+     */
+    private $magentoCategoryCollectionFactory;
 
     /**
      * @param MagentoCategory $magentoCategory
      * @param null|string[] $categoryPathNames
      */
-    public function __construct(MagentoCategory $magentoCategory, EventManagerInterface $eventManager,
-                                $categoryPathNames = null)
-    {
+    public function __construct(
+        MagentoCategory $magentoCategory,
+        EventManagerInterface $eventManager,
+        MagentoCategoryCollectionFactory $magentoCategoryCollectionFactory,
+        $categoryPathNames = null
+    ) {
         $this->magentoCategory = $magentoCategory;
         $this->categoryPathNames = $categoryPathNames;
         $this->eventManager = $eventManager;
+        $this->magentoCategoryCollectionFactory = $magentoCategoryCollectionFactory;
     }
 
     public function getId()
@@ -117,7 +127,7 @@ class Category implements CategoryInterface
         array_shift($pathIds);
         array_pop($pathIds);
         foreach($pathIds as $pathId) {
-            $pathParts[] = $this->magentoCategory->getResource()->getAttributeRawValue($pathId, 'name', $this->getStoreId());
+            $pathParts[] = $this->getCategoryName($pathId);
         }
         return implode($separator, $pathParts);
     }
@@ -199,5 +209,22 @@ class Category implements CategoryInterface
     public function getMagentoCategory()
     {
         return $this->magentoCategory;
+    }
+
+    /**
+     * @param $categoryId
+     * @return string
+     */
+    private function getCategoryName($categoryId)
+    {
+        if ($categoryName = $this->magentoCategory->getResource()->getAttributeRawValue($categoryId, 'name', $this->getStoreId())) {
+            return $categoryName;
+        }
+
+        // Workaround for Magento < 2.2 where "getAttributeRawValue" wasn't implemented correctly for categories.
+        /** @var MagentoCategoryCollection $categoryCollection */
+        $categoryCollection = $this->magentoCategoryCollectionFactory->create();
+        $category = $categoryCollection->addAttributeToSelect('name')->addIdFilter([$categoryId])->getFirstItem();
+        return $category->getData('name');
     }
 }

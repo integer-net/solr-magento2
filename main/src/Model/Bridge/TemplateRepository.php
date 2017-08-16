@@ -11,8 +11,12 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 
+use IntegerNet\Solr\Model\Cache\PsrFileCacheStorageFactory;
 use IntegerNet\SolrSuggest\Implementor\TemplateRepository as TemplateRepositoryInterface;
 use IntegerNet\SolrSuggest\Plain\Block\Template;
+use Magento\Framework\Locale\ResolverInterface as LocaleResolverInterface;
+use Magento\Framework\View\DesignLoader;
+use Magento\Store\Model\App\Emulation;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Design\Theme\ThemeProviderInterface;
 use Magento\Framework\View\DesignInterface;
@@ -33,13 +37,39 @@ class TemplateRepository implements TemplateRepositoryInterface
      * @var ThemeProviderInterface
      */
     private $themeProvider;
+    /**
+     * @var PsrFileCacheStorageFactory
+     */
+    private $cacheStorageFactory;
+    /**
+     * @var Emulation
+     */
+    private $emulation;
+    /**
+     * @var LocaleResolverInterface
+     */
+    private $localeResolver;
+    /**
+     * @var DesignLoader
+     */
+    private $designLoader;
 
-    public function __construct(TemplateFileResolver $templateFileResolver, ScopeConfigInterface $scopeConfig,
-                                ThemeProviderInterface $themeProvider)
-    {
+    public function __construct(
+        TemplateFileResolver $templateFileResolver,
+        ScopeConfigInterface $scopeConfig,
+        ThemeProviderInterface $themeProvider,
+        PsrFileCacheStorageFactory $cacheStorageFactory,
+        Emulation $emulation,
+        LocaleResolverInterface $localeResolver,
+        DesignLoader $designLoader
+    ) {
         $this->templateFileResolver = $templateFileResolver;
         $this->scopeConfig = $scopeConfig;
         $this->themeProvider = $themeProvider;
+        $this->cacheStorageFactory = $cacheStorageFactory;
+        $this->emulation = $emulation;
+        $this->localeResolver = $localeResolver;
+        $this->designLoader = $designLoader;
     }
 
     /**
@@ -48,21 +78,84 @@ class TemplateRepository implements TemplateRepositoryInterface
      */
     public function getTemplateByStoreId($storeId)
     {
-        return new Template(
-            $this->templateFileResolver->getTemplateFileName(
-                'IntegerNet_Solr::autosuggest/index.phtml',
-                [
-                    'area' => 'frontend',
-                    'themeModel' => $this->themeProvider->getThemeById(
-                        $this->scopeConfig->getValue(
-                            DesignInterface::XML_PATH_THEME_ID,
-                            ScopeInterface::SCOPE_STORE,
-                            $storeId
-                        )
-                    )
-                ]
-            )
+        $this->emulation->startEnvironmentEmulation($storeId, \Magento\Framework\App\Area::AREA_FRONTEND, true);
+        // App\Emulation cannot use setLocale() if Backend\LocaleResolver is used, so we have to emulate locale explicitly
+        $this->localeResolver->emulate($storeId);
+        $this->designLoader->load();
+
+        $template = new Template(
+            $this->getTemplateFile($storeId)
         );
+
+        $this->localeResolver->revert();
+        $this->emulation->stopEnvironmentEmulation();
+
+        return $template;
     }
 
+
+    /**
+     * Get absolute path to template
+     *
+     * @param int $storeId
+     * @return string
+     */
+    private function getTemplateFile($storeId)
+    {
+        $templateName = $this->templateFileResolver->getTemplateFileName(
+            'IntegerNet_Solr::autosuggest/index.phtml',
+            [
+                'area' => 'frontend',
+                'themeModel' => $this->themeProvider->getThemeById(
+                    $this->scopeConfig->getValue(
+                        DesignInterface::XML_PATH_THEME_ID,
+                        ScopeInterface::SCOPE_STORE,
+                        $storeId
+                    )
+                )
+            ]
+        );
+
+        $templateContents = file_get_contents($templateName);
+
+        $templateContents = $this->getTranslatedTemplate($templateContents);
+
+        $targetDirname = $this->cacheStorageFactory->rootDir();
+        if (!is_dir($targetDirname)) {
+            mkdir($targetDirname, 0777, true);
+        }
+        $targetFilename = $targetDirname . DIRECTORY_SEPARATOR . 'store__' . $storeId . '.autosuggest.phtml';
+        file_put_contents($targetFilename, $templateContents);
+
+        return $targetFilename;
+    }
+
+
+    /**
+     * Translate all occurences of __('...') with translated text
+     *
+     * @param string $templateContents
+     * @return string
+     */
+    private function getTranslatedTemplate($templateContents)
+    {
+        preg_match_all('$__\(\'(.*)\'$', $templateContents, $results);
+
+        foreach($results[1] as $key => $search) {
+
+            $replace = (string)__($search);
+            $templateContents = str_replace($this->quote($search), $this->quote($replace), $templateContents);
+        }
+
+        return $templateContents;
+    }
+
+    /**
+     * @param string $search
+     * @return string
+     */
+    private function quote($search)
+    {
+        return '\'' . $search . '\'';
+    }
 }
