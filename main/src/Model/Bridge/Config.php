@@ -210,7 +210,7 @@ class Config implements ConfigInterface
                 $this->_getConfig($prefix . 'max_number_cms_page_suggestions'),
                 $this->_getConfigFlag($prefix . 'show_complete_category_path'),
                 $this->_getConfigFlag($prefix . 'category_link_type'),
-                @unserialize($this->_getConfig($prefix . 'attribute_filter_suggestions'))
+                (array)@unserialize($this->_getConfig($prefix . 'attribute_filter_suggestions'))
             );
         }
         return $this->autosuggest;
