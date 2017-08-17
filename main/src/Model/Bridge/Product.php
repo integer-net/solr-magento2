@@ -14,8 +14,10 @@ use IntegerNet\Solr\Implementor\Attribute as AttributeInterface;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use Magento\Catalog\Api\Data\ProductInterface as MagentoProductInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\CatalogInventory\Api\StockItemRepositoryInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Event\ManagerInterface;
 
@@ -48,6 +50,15 @@ class Product implements ProductInterface
      */
     const PARAM_MAGENTO_PRODUCT = 'magentoProduct';
     const PARAM_STORE_ID = 'storeId';
+    /**
+     * @var StockRegistryInterface
+     */
+    private $stockRegistry;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
     /**#@-*/
     /**
      * Note: needs concrete Product model class for attribute frontend model, which expects a data object (Magento 2.0).
@@ -55,15 +66,24 @@ class Product implements ProductInterface
      * @param MagentoProduct $magentoProduct
      * @param AttributeRepository $attributeRepository
      * @param ManagerInterface $eventManager
+     * @param StockRegistryInterface $stockRegistry
+     * @param ScopeConfigInterface $scopeConfig
      * @param int|null $storeId store id for store specific values (null for default)
      */
-    public function __construct(MagentoProduct $magentoProduct, AttributeRepository $attributeRepository,
-                                ManagerInterface $eventManager, $storeId = null)
-    {
+    public function __construct(
+        MagentoProduct $magentoProduct,
+        AttributeRepository $attributeRepository,
+        ManagerInterface $eventManager,
+        StockRegistryInterface $stockRegistry,
+        ScopeConfigInterface $scopeConfig,
+        $storeId = null
+    ) {
         $this->magentoProduct = $magentoProduct;
         $this->attributeRepository = $attributeRepository;
         $this->eventManager = $eventManager;
         $this->storeId = $storeId;
+        $this->stockRegistry = $stockRegistry;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -87,10 +107,6 @@ class Product implements ProductInterface
             return false;
         }
         if (! \in_array($this->magentoProduct->getStore()->getWebsiteId(), $this->magentoProduct->getWebsiteIds())) {
-            return false;
-        }
-        // stock status joined on collection does not give stock item, just is_salable
-        if (! $this->magentoProduct->getData('is_salable')) {
             return false;
         }
         if ($this->getMagentoProduct()->getExtensionAttributes()->getSolrExclude()) {
@@ -127,7 +143,14 @@ class Product implements ProductInterface
 
     public function getSolrBoost()
     {
-        return $this->getMagentoProduct()->getExtensionAttributes()->getSolrBoost();
+        $boost = $this->getMagentoProduct()->getExtensionAttributes()->getSolrBoost();
+        if (!$this->isInStock()) {
+            if ($boost === null) {
+                $boost = 1;
+            }
+            $boost *= floatval($this->scopeConfig->getValue('integernet_solr/results/priority_outofstock', 'stores', $this->storeId));
+        }
+        return $boost;
     }
 
     public function getPrice()
@@ -189,5 +212,15 @@ class Product implements ProductInterface
     public function getSku()
     {
         return $this->getMagentoProduct()->getSku();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInStock()
+    {
+        /** @var StockItemInterface $stockItem */
+        $stockItem = $this->stockRegistry->getStockItem($this->getMagentoProduct()->getId(), $this->storeId);
+        return (bool)$stockItem->getIsInStock();
     }
 }

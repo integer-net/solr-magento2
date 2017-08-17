@@ -10,6 +10,7 @@
         <max_number_results>10</max_number_results>
         <fuzzy_is_active>1</fuzzy_is_active>
         <fuzzy_sensitivity>0.75</fuzzy_sensitivity>
+        <show_outofstock>1</show_outofstock>
       </category>
     </integernet_solr>
   </default>

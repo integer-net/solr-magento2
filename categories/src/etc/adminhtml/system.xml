@@ -36,6 +36,10 @@
           <comment>Value between 0 and 1. Smaller values mean more fuzzy search results.</comment>
           <validate>validate-number validate-zero-or-greater</validate>
         </field>
+        <field id="show_outofstock" translate="label,comment" sortOrder="80" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Show products which are out of stock</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
       </group>
       <group id="autosuggest">
         <field id="max_number_category_suggestions">

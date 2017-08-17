@@ -2,6 +2,20 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Version 1.3.0 (Aug 17, 2017)
+---------------
+
+- Show products which are out of stock depending on the configuration for search results, category pages and autosuggest results
+
+Version 1.2.0 (Aug 17, 2017)
+---------------
+
+- Introduce multiselect filters for search pages and categories
+- Show products which are out of stock depending on the configuration for category pages
+- Fix translation of autosuggest if being generated from frontend
+- Optimize loading of autosuggest so window with outdated information doesn't open and possibly replaces newer window
+- Add additional backend translations (de_DE)
+
 Version 1.1.3 (May 16, 2017)
 ---------------
 
