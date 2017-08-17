@@ -185,3 +185,6 @@
 "Show complete category path","Kompletten Kategorie-Pfad anzeigen"
 "Use HTML from Solr Index","HTML vom Solr-Index verwenden"
 "Advantages: faster search<br />Disadvantages: slower indexing, no user dependant results","Vorteile: schnellere Suche<br />Nachteile: Langsamere Indizierung, keine benutzerabhängigen Suchergebnisse"
+"Show products which are out of stock","Produkte anzeigen, die nicht auf Lager sind"
+"Solr Priority Multiplier for Products being out of Stock","Solr-Prioritäts-Multiplikator für ausverkaufte Produkte"
+"0 = don't show at all, 1 = don't modify, anything between = lower priority","0 = gar nicht anzeigen, 1 = wie Produkte auf Lager, alles dazwischen = niedrigere Priorität"

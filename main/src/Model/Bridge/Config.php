@@ -210,7 +210,8 @@ class Config implements ConfigInterface
                 $this->_getConfig($prefix . 'max_number_cms_page_suggestions'),
                 $this->_getConfigFlag($prefix . 'show_complete_category_path'),
                 $this->_getConfigFlag($prefix . 'category_link_type'),
-                (array)@unserialize($this->_getConfig($prefix . 'attribute_filter_suggestions'))
+                (array)@unserialize($this->_getConfig($prefix . 'attribute_filter_suggestions')),
+                $this->_getConfigFlag($prefix . 'show_outofstock')
             );
         }
         return $this->autosuggest;
@@ -265,7 +266,8 @@ class Config implements ConfigInterface
                 $this->_getConfig($prefix . 'price_step_size'),
                 $this->_getConfig($prefix . 'max_price'),
                 $this->_getConfigFlag($prefix . 'use_custom_price_intervals'),
-                explode(',', $this->_getConfig($prefix . 'custom_price_intervals'))
+                explode(',', $this->_getConfig($prefix . 'custom_price_intervals')),
+                $this->_getConfigFlag($prefix . 'show_outofstock')
             );
         }
         return $this->results;
@@ -307,7 +309,8 @@ class Config implements ConfigInterface
                 $this->_getConfigFlag($prefix . 'use_in_search_results'),
                 $this->_getConfig($prefix . 'max_number_results'),
                 $this->_getConfigFlag($prefix . 'fuzzy_is_active'),
-                $this->_getConfig($prefix . 'fuzzy_sensitivity')
+                $this->_getConfig($prefix . 'fuzzy_sensitivity'),
+                $this->_getConfigFlag($prefix . 'show_outofstock')
             );
         }
         return $this->category;

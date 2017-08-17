@@ -167,6 +167,15 @@
           <comment>1 is default, use higher numbers for higher priority.</comment>
           <validate>validate-number validate-zero-or-greater</validate>
         </field>
+        <field id="show_outofstock" translate="label,comment" sortOrder="27" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Show products which are out of stock</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="priority_outofstock" translate="label,comment" sortOrder="28" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Solr Priority Multiplier for Products being out of Stock</label>
+          <comment>0 = don't show at all, 1 = don't modify, anything between = lower priority</comment>
+          <validate>validate-number validate-zero-or-greater</validate>
+        </field>
         <field id="price_step_size" translate="label,comment" sortOrder="30" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Size of Price Steps</label>
           <comment>i.e. 100</comment>
@@ -244,6 +253,10 @@
           <comment>0 = show all</comment>
           <frontend_model>IntegerNet\Solr\Block\Config\AttributeFilterSuggestions</frontend_model>
           <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+        </field>
+        <field id="show_outofstock" translate="label,comment" sortOrder="90" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Show products which are out of stock</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
       </group>
       <!--
