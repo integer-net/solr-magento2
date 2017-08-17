@@ -56,6 +56,9 @@ class FilterConverter
     }
     private function configureTermFilter(FilterQueryBuilder $fqBuilder, MagentoRequest\Filter\Term $term, $storeId)
     {
+        if ($term->getField() === 'visibility') {
+            return;
+        }
         if ($term->getField() === 'category_ids') {
             $fqBuilder->addCategoryFilter($term->getValue());
         } else {
