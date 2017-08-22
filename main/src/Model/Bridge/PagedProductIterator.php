@@ -10,7 +10,6 @@
 
 namespace IntegerNet\Solr\Model\Bridge;
 
-
 use IntegerNet\Solr\Implementor\PagedProductIterator as PagedProductIteratorInterface;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use IntegerNet\Solr\Implementor\ProductFactory as ProductFactoryInterface;
@@ -20,6 +19,7 @@ use IntegerNet\Solr\Model\Data\ArrayCollection;
 use IntegerNet\Solr\Model\Indexer\ProductCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 
 class PagedProductIterator implements PagedProductIteratorInterface, \OuterIterator
 {
@@ -68,17 +68,28 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
     const PARAM_PRODUCT_ID_CHUNKS = 'productIdChunks';
     const PARAM_STORE_ID = 'storeId';
     /**
+     * @var EventManager
+     */
+    private $eventManager;
+
+    /**
      * @param ProductCollectionFactory $collectionFactory
      * @param ProductFactoryInterface $productFactory
      * @param ProductIdChunks $productIdChunks parent and children product ids to be loaded
      * @param int $storeId
      */
-    public function __construct(ProductCollectionFactory $collectionFactory, ProductFactoryInterface $productFactory, ProductIdChunks $productIdChunks, $storeId = null)
-    {
+    public function __construct(
+        ProductCollectionFactory $collectionFactory,
+        ProductFactoryInterface $productFactory,
+        ProductIdChunks $productIdChunks,
+        EventManager $eventManager,
+        $storeId = null
+    ) {
         $this->productFactory = $productFactory;
         $this->storeId = $storeId;
         $this->collectionFactory = $collectionFactory;
         $this->productIdChunks = $productIdChunks;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -91,7 +102,14 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
         $collection->setCurPage($this->currentChunkId);
         $collection->setPageSize($this->pageSize);
 
+        $this->eventManager->dispatch('integernet_solr_product_collection_load_before', [
+            'collection' => $collection,
+        ]);
         $collection->load();
+        $this->eventManager->dispatch('integernet_solr_product_collection_load_after', [
+            'collection' => $collection,
+        ]);
+
         return $collection;
     }
 
@@ -194,25 +212,19 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
     }
 
     /**
-     * Returns an iterator for a subset of products. The ids must be part of the current chunk, otherwise an
-     * OutOfBoundsException will be thrown
+     * Returns an iterator for a subset of products. If the ID is not part of the current chunk, it will be ignored.
      *
      * @param int[] $ids
      * @return ProductIteratorInterface
-     * @throws \OutOfBoundsException
      */
     public function subset($ids)
     {
         $products = ArrayCollection::fromArray($ids)
-            ->map(function($id) {
-                $product = $this->collection->getItemById($id);
-                if ($product === null) {
-                    throw new \OutOfBoundsException("Item with id $id is not loaded in current chunk");
-                }
-                return $product;
+            ->map(function ($id) {
+                return $this->collection->getItemById($id);
             });
 
-        return new ProductIterator($this->productFactory, $products->getArrayCopy(), $this->storeId);
+        return new ProductIterator($this->productFactory, array_filter($products->getArrayCopy()), $this->storeId);
     }
 
     /**
