@@ -50,8 +50,12 @@ class ProductCollectionFactory
      * @param AttributeRepositoryInterface $attributeRepository
      * @param StockStatusFactory $stockStatusFactory
      */
-    public function __construct(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory, CatalogConfig $catalogConfig, AttributeRepositoryInterface $attributeRepository, StockStatusFactory $stockStatusFactory)
-    {
+    public function __construct(
+        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $collectionFactory,
+        CatalogConfig $catalogConfig,
+        AttributeRepositoryInterface $attributeRepository,
+        StockStatusFactory $stockStatusFactory
+    ) {
         $this->collectionFactory = $collectionFactory;
         $this->catalogConfig = $catalogConfig;
         $this->attributeRepository = $attributeRepository;
