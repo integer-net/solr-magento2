@@ -2,6 +2,12 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Version 1.3.2 (Aug 23, 2017)
+---------------
+
+- Introduction of new events around product collection
+- Skip indexing a product if child product cannot be loaded instead of aborting
+
 Version 1.3.1 (Aug 17, 2017)
 ---------------
 
