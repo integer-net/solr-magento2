@@ -157,11 +157,15 @@
           <source_model>IntegerNet\Solr\Model\Source\SearchOperator</source_model>
         </field>
         <!--
-        <field id="filter_position" translate="label" sortOrder="23" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="filter_position" translate="label" sortOrder="21" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Position of Filters</label>
           <source_model>IntegerNet\Solr\Model\Source\FilterPosition</source_model>
         </field>
         -->
+        <field id="filter_option_sorting" translate="label" sortOrder="23" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Sorting of Filter Options</label>
+          <source_model>\IntegerNet\Solr\Model\Source\FilterOptionSorting</source_model>
+        </field>
         <field id="priority_categories" translate="label,comment" sortOrder="25" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Solr Priority of Category Names</label>
           <comment>1 is default, use higher numbers for higher priority.</comment>
