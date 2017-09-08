@@ -10,34 +10,8 @@
 
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
-use IntegerNet\Solr\Model\Source\FilterOptionSorting as FilterOptionSortingSource;
-use Magento\Catalog\Model\Layer;
-use Magento\Catalog\Model\Layer\Filter\Item\DataBuilder as FilterItemDataBuilder;
-use Magento\Catalog\Model\Layer\Filter\ItemFactory as FilterItemFactory;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Filter\StripTags as StripTagsFilter;
-use Magento\Store\Model\StoreManagerInterface;
-
 class AttributeFilter extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
 {
-
-    /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
-
-    public function __construct(
-        FilterItemFactory $filterItemFactory,
-        StoreManagerInterface $storeManager,
-        Layer $layer,
-        FilterItemDataBuilder $itemDataBuilder,
-        StripTagsFilter $tagFilter,
-        ScopeConfigInterface $scopeConfig,
-        array $data = []
-    ) {
-        parent::__construct($filterItemFactory, $storeManager, $layer, $itemDataBuilder, $tagFilter, $data);
-        $this->scopeConfig = $scopeConfig;
-    }
 
     /**
      * Checks whether the option reduces the number of results
@@ -49,31 +23,5 @@ class AttributeFilter extends \Magento\CatalogSearch\Model\Layer\Filter\Attribut
     protected function isOptionReducesResults($optionCount, $totalSize)
     {
         return true;
-    }
-
-    /**
-     * Sort filter options
-     *
-     * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    protected function _getItemsData()
-    {
-        $itemsData = parent::_getItemsData();
-
-        switch ($this->scopeConfig->getValue('integernet_solr/results/filter_option_sorting')) {
-            case FilterOptionSortingSource::FILTER_SORTING_RESULTS_COUNT:
-                usort($itemsData, function ($a, $b) {
-                    return $b['count'] - $a['count'];
-                });
-                break;
-            case FilterOptionSortingSource::FILTER_SORTING_ALPHABET:
-                usort($itemsData, function ($a, $b) {
-                    return strcasecmp($a['label'], $b['label']);
-                });
-                break;
-        }
-
-        return $itemsData;
     }
 }

@@ -12,7 +12,9 @@ namespace IntegerNet\Solr\Model\Plugin;
 
 use Magento\Catalog\Model\Layer\Filter\ItemFactory as FilterItemFactory;
 use Magento\CatalogSearch\Model\Layer\Filter\Attribute as Subject;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
+use IntegerNet\Solr\Model\Source\FilterOptionSorting as FilterOptionSortingSource;
 
 /**
  * Plugin to display multiple filters for same attribute in state block
@@ -23,10 +25,17 @@ class CatalogsearchFilterAttributePlugin
      * @var FilterItemFactory
      */
     private $filterItemFactory;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
 
-    public function __construct(FilterItemFactory $filterItemFactory)
-    {
+    public function __construct(
+        FilterItemFactory $filterItemFactory,
+        ScopeConfigInterface $scopeConfig
+    ) {
         $this->filterItemFactory = $filterItemFactory;
+        $this->scopeConfig = $scopeConfig;
     }
 
     public function aroundApply(Subject $subject, \Closure $proceed, RequestInterface $request)
@@ -72,6 +81,7 @@ class CatalogsearchFilterAttributePlugin
     /**
      * Create filter item object
      *
+     * @param   Subject $subject
      * @param   string $label
      * @param   mixed $value
      * @param   int $count
@@ -84,5 +94,23 @@ class CatalogsearchFilterAttributePlugin
             ->setLabel($label)
             ->setValue($value)
             ->setCount($count);
+    }
+
+    public function afterGetItems(Subject $subject, array $items)
+    {
+        switch ($this->scopeConfig->getValue('integernet_solr/results/filter_option_sorting')) {
+            case FilterOptionSortingSource::FILTER_SORTING_RESULTS_COUNT:
+                usort($items, function ($a, $b) {
+                    return $b['count'] - $a['count'];
+                });
+                break;
+            case FilterOptionSortingSource::FILTER_SORTING_ALPHABET:
+                usort($items, function ($a, $b) {
+                    return strcasecmp($a['label'], $b['label']);
+                });
+                break;
+        }
+
+        return $items;
     }
 }
