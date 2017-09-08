@@ -15,6 +15,9 @@ use IntegerNet\Solr\Indexer\Data\ProductIdChunks;
 use IntegerNet\Solr\Model\Indexer\ProductCollectionFactory;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\CatalogInventory\Model\StockRegistry;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
 
 /**
@@ -37,6 +40,7 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
             $this->mockCollectionFactory($storeId, $expectedPageCount, $chunks, $productsById),
             $this->mockProductFactory($productIds),
             $chunks,
+            $this->getEventManagerStub(),
             $storeId
         );
         $iterator->setPageCallback($this->mockCallback($expectedPageCount));
@@ -85,6 +89,7 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
             ),
             $this->mockProductFactory($expectedException ? [] : $subsetIds),
             ProductIdChunks::withAssociationsTogether($allIds, [], $chunkSize),
+            $this->getEventManagerStub(),
             $storeId
         );
         $iterator->setPageCallback($this->mockCallback($currentChunkId));
@@ -180,6 +185,29 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return StockRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getStockRegistryStub()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|StockRegistry $stockRegistry */
+        $stockRegistry = $this->getMockBuilder(StockRegistry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $stockRegistry;
+    }
+
+    /**
+     * @return ScopeConfigInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getScopeConfigMock()
+    {
+        $scopeConfig = $this->getMockBuilder(ScopeConfigInterface::class)
+            ->setMethods(['getValue', 'isSetFlag'])
+            ->getMockForAbstractClass();
+        return $scopeConfig;
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ManagerInterface
      */
     private function getEventManagerStub()
@@ -205,6 +233,8 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
                     $arguments[Product::PARAM_MAGENTO_PRODUCT],
                     $this->getAttributeRepositoryStub(),
                     $this->getEventManagerStub(),
+                    $this->getStockRegistryStub(),
+                    $this->getScopeConfigMock(),
                     $arguments[Product::PARAM_STORE_ID]);
             });
         return $productFactory;
