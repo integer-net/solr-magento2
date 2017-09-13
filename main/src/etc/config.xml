@@ -30,6 +30,7 @@
         <use_html_from_solr>0</use_html_from_solr>
         <search_operator>AND</search_operator>
         <filter_position>1</filter_position>
+        <filter_option_sorting>position</filter_option_sorting>
         <priority_categories>2</priority_categories>
         <show_outofstock>1</show_outofstock>
         <priority_outofstock>1</priority_outofstock>

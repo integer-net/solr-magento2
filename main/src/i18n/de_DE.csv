@@ -188,3 +188,7 @@
 "Show products which are out of stock","Produkte anzeigen, die nicht auf Lager sind"
 "Solr Priority Multiplier for Products being out of Stock","Solr-Prioritäts-Multiplikator für ausverkaufte Produkte"
 "0 = don't show at all, 1 = don't modify, anything between = lower priority","0 = gar nicht anzeigen, 1 = wie Produkte auf Lager, alles dazwischen = niedrigere Priorität"
+"Result Count","Nach Trefferanzahl"
+"Alphabet","Alphabetisch"
+"Option position (Magento default)","Nach Position (Magento-Standard)"
+"Sorting of Filter Options","Sortierung von Filteroptionen"
