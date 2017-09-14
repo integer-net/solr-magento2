@@ -1,17 +1,22 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
-  <default>
-    <integernet_solr>
-      <category>
-        <is_active>0</is_active>
-        <filter_position>1</filter_position>
-        <is_indexer_active>0</is_indexer_active>
-        <use_in_search_results>1</use_in_search_results>
-        <max_number_results>10</max_number_results>
-        <fuzzy_is_active>1</fuzzy_is_active>
-        <fuzzy_sensitivity>0.75</fuzzy_sensitivity>
-        <show_outofstock>1</show_outofstock>
-      </category>
-    </integernet_solr>
-  </default>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <integernet_solr>
+            <category>
+                <is_active>0</is_active>
+                <filter_position>1</filter_position>
+                <is_indexer_active>0</is_indexer_active>
+                <use_in_search_results>1</use_in_search_results>
+                <max_number_results>10</max_number_results>
+                <fuzzy_is_active>1</fuzzy_is_active>
+                <fuzzy_sensitivity>0.75</fuzzy_sensitivity>
+                <show_outofstock>1</show_outofstock>
+            </category>
+            <autosuggest>
+                <fuzzy_is_active_for_categories>1</fuzzy_is_active_for_categories>
+                <fuzzy_sensitivity_for_categories>0.8</fuzzy_sensitivity_for_categories>
+            </autosuggest>
+        </integernet_solr>
+    </default>
 </config>
