@@ -6,6 +6,9 @@
     <type name="Magento\Catalog\Model\Layer\Filter\Item">
         <plugin name="integernetSolrFilterItemUrl" type="IntegerNet\Solr\Model\Plugin\FilterItemPlugin" />
     </type>
+    <type name="\Magento\Catalog\Model\Layer\Search\Filter\Attribute">
+        <plugin name="integernetSolrFilterAttribute" type="IntegerNet\Solr\Model\Plugin\CatalogFilterAttributePlugin" />
+    </type>
     <type name="Magento\CatalogSearch\Model\Layer\Filter\Attribute">
         <plugin name="integernetSolrFilterAttribute" type="IntegerNet\Solr\Model\Plugin\CatalogsearchFilterAttributePlugin" />
     </type>
