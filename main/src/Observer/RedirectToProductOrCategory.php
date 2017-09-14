@@ -278,8 +278,25 @@ class RedirectToProductOrCategory implements ObserverInterface
             if (!$attributeCode) {
                 continue;
             }
-            $filters[] = ['attribute' => $attributeCode, 'like' => '%' . $query . '%'];
+
+            $filters[] = ['attribute' => $attributeCode, 'like' => '%' . $this->escapeLikeQuery($query) . '%'];
         }
         return $filters;
+    }
+
+    /**
+     * Taken from https://stackoverflow.com/a/3683868/3141504 and adjusted
+     *
+     * @param $string
+     * @param string $escapeCharacter
+     * @return string
+     */
+    private function escapeLikeQuery($string, $escapeCharacter = '\\')
+    {
+        return str_replace(
+            [$escapeCharacter, '_', '%'],
+            [$escapeCharacter . $escapeCharacter, $escapeCharacter . '_', $escapeCharacter . '%'],
+            $string
+        );
     }
 }
