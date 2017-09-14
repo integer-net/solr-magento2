@@ -191,6 +191,9 @@ class RedirectToProductOrCategory implements ObserverInterface
     }
 
     /**
+     * Return category URL if there is exactly one category matching the query
+     * AND no other categories containing the query.
+     *
      * @param string $query
      * @return string|false;
      */
@@ -200,6 +203,59 @@ class RedirectToProductOrCategory implements ObserverInterface
         if (!sizeof($matchingCategoryAttributeCodes) || (sizeof($matchingCategoryAttributeCodes) && !current($matchingCategoryAttributeCodes))) {
             return false;
         }
+        $filters = $this->getFiltersForCategoriesMatchingQuery($query, $matchingCategoryAttributeCodes);
+
+        if (!sizeof($filters)) {
+            return false;
+        }
+
+        $exactlyMatchingCategoryCollection = $this->getCategoryCollection($filters);
+
+        if ($exactlyMatchingCategoryCollection->getSize() == 1) {
+
+            $filters = $this->getFiltersForCategoriesContainingQuery($query, $matchingCategoryAttributeCodes);
+
+            $categoryContainingQueryCollection = $this->getCategoryCollection($filters);
+            if ($categoryContainingQueryCollection->getSize() != 1) {
+                return false;
+            }
+
+            /** @var Category $category */
+            $category = $exactlyMatchingCategoryCollection->getFirstItem();
+            return $category->getUrl();
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $filters
+     * @return CategoryCollection
+     */
+    private function getCategoryCollection($filters)
+    {
+        /** @var Store $store */
+        $store = $this->storeManager->getStore();
+        $rootCategoryId = $store->getRootCategoryId();
+
+        /** @var CategoryCollection $categoryCollection */
+        $categoryCollection = $this->categoryCollectionFactory->create();
+        $categoryCollection
+            ->setStoreId($store->getId())
+            ->addAttributeToFilter($filters)
+            ->addAttributeToFilter('is_active', 1)
+            ->addAttributeToFilter('path', ['like' => '1/' . $rootCategoryId . '/%'])
+            ->addAttributeToSelect('url_key');
+        return $categoryCollection;
+    }
+
+    /**
+     * @param string $query
+     * @param string[] $matchingCategoryAttributeCodes
+     * @return array
+     */
+    private function getFiltersForCategoriesMatchingQuery($query, $matchingCategoryAttributeCodes)
+    {
         $filters = [];
         foreach ($matchingCategoryAttributeCodes as $attributeCode) {
             if (!$attributeCode) {
@@ -207,30 +263,23 @@ class RedirectToProductOrCategory implements ObserverInterface
             }
             $filters[] = ['attribute' => $attributeCode, 'eq' => $query];
         }
+        return $filters;
+    }
 
-        if (!sizeof($filters)) {
-            return false;
+    /**
+     * @param string $query
+     * @param string[] $matchingCategoryAttributeCodes
+     * @return array
+     */
+    private function getFiltersForCategoriesContainingQuery($query, $matchingCategoryAttributeCodes)
+    {
+        $filters = [];
+        foreach ($matchingCategoryAttributeCodes as $attributeCode) {
+            if (!$attributeCode) {
+                continue;
+            }
+            $filters[] = ['attribute' => $attributeCode, 'like' => '%' . $query . '%'];
         }
-
-        /** @var Store $store */
-        $store = $this->storeManager->getStore();
-        $rootCategoryId = $store->getRootCategoryId();
-
-        /** @var CategoryCollection $matchingCategoryCollection */
-        $matchingCategoryCollection = $this->categoryCollectionFactory->create();
-        $matchingCategoryCollection
-            ->setStoreId($store->getId())
-            ->addAttributeToFilter($filters)
-            ->addAttributeToFilter('is_active', 1)
-            ->addAttributeToFilter('path', ['like' => '1/' . $rootCategoryId . '/%'])
-            ->addAttributeToSelect('url_key');
-
-        if ($matchingCategoryCollection->getSize() == 1) {
-            /** @var Category $category */
-            $category = $matchingCategoryCollection->getFirstItem();
-            return $category->getUrl();
-        }
-
-        return false;
+        return $filters;
     }
 }
