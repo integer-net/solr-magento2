@@ -2,6 +2,11 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Upcoming
+---------------
+
+- Add configuration to enable/disable fuzzy for categories search in autosuggest
+
 Version 1.3.2 (Aug 23, 2017)
 ---------------
 
