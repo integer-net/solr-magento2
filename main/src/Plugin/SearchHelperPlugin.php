@@ -8,7 +8,7 @@
 
 namespace IntegerNet\Solr\Plugin;
 
-use Magento\Search\Helper\Data as Subject;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 class SearchHelperPlugin
@@ -17,10 +17,15 @@ class SearchHelperPlugin
      * @var StoreManagerInterface
      */
     private $storeManager;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
 
-    public function __construct(StoreManagerInterface $storeManager)
+    public function __construct(StoreManagerInterface $storeManager, ScopeConfigInterface $scopeConfig)
     {
         $this->storeManager = $storeManager;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -30,6 +35,6 @@ class SearchHelperPlugin
     {
         /** @var \Magento\Store\Model\Store $store */
         $store = $this->storeManager->getStore();
-        return $store->getBaseUrl() . 'autosuggest.php?store_id=' . $store->getId();
+        return $this->scopeConfig->getValue('web/unsecure/base_url') . 'autosuggest.php?store_id=' . $store->getId();
     }
 }
