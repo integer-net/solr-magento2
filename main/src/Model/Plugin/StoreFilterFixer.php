@@ -20,6 +20,22 @@ class StoreFilterFixer
      */
     public function aroundAddFieldToFilter(ProductCollection $subject, \Closure $proceed, $fields, $condition = null)
     {
+        if (!is_array($condition)) {
+            return $proceed($fields, $condition);
+        }
+
+        /*
+         * This is to fix a bug in the original code, the third parameter "$strict = true"
+         * is missing in 2.1.x. Thus, if we have numerical keys, they are interpreted as
+         * belonging to ['from', 'to']. We convert the keys to string explicitly to avoid that.
+         */
+        if (!in_array(key($condition), ['from', 'to'], true)) {
+            $newCondition = [];
+            foreach($condition as $key => $value) {
+                $newCondition['key' . $key] = $value;
+            }
+            return $proceed($fields, $newCondition);
+        }
         if (is_array($fields)) {
             foreach ($fields as $key => $filter) {
                 if ($filter['attribute'] == 'website_id' && isset($filter['eq'])) {
