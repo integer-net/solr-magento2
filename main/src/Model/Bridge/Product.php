@@ -19,7 +19,7 @@ use Magento\CatalogInventory\Api\StockItemRepositoryInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ObjectManager;
-use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Event\ManagerInterface as EventManagerInterface;
 
 class Product implements ProductInterface
 {
@@ -41,7 +41,7 @@ class Product implements ProductInterface
      */
     private $attributeRepository;
     /**
-     * @var ManagerInterface
+     * @var EventManagerInterface
      */
     private $eventManager;
 
@@ -65,7 +65,7 @@ class Product implements ProductInterface
      *
      * @param MagentoProduct $magentoProduct
      * @param AttributeRepository $attributeRepository
-     * @param ManagerInterface $eventManager
+     * @param EventManagerInterface $eventManager
      * @param StockRegistryInterface $stockRegistry
      * @param ScopeConfigInterface $scopeConfig
      * @param int|null $storeId store id for store specific values (null for default)
@@ -73,7 +73,7 @@ class Product implements ProductInterface
     public function __construct(
         MagentoProduct $magentoProduct,
         AttributeRepository $attributeRepository,
-        ManagerInterface $eventManager,
+        EventManagerInterface $eventManager,
         StockRegistryInterface $stockRegistry,
         ScopeConfigInterface $scopeConfig,
         $storeId = null
