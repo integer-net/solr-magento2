@@ -12,6 +12,9 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 use IntegerNet\Solr\Implementor\ProductFactory;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\CatalogInventory\Api\Data\StockItemInterface;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
 
 /**
@@ -111,6 +114,8 @@ class ProductIteratorTest extends \PHPUnit_Framework_TestCase
                     $arguments[Product::PARAM_MAGENTO_PRODUCT],
                     $this->getAttributeRepositoryStub(),
                     $this->getEventManagerStub(),
+                    $this->getStockRegistryStub(),
+                    $this->getScopeConfigStub(),
                     $arguments[Product::PARAM_STORE_ID]);
             });
         return $productFactory;
@@ -126,5 +131,49 @@ class ProductIteratorTest extends \PHPUnit_Framework_TestCase
             return $this->getProductStub($productId);
         }, $productIds);
         return $products;
+    }
+
+    /**
+     * @return StockRegistryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getStockRegistryStub()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|StockRegistryInterface$stockRegistry */
+        $stockRegistry = $this->getMockBuilder(StockRegistryInterface::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getStockItem'])
+            ->getMockForAbstractClass();
+        $stockRegistry
+            ->method('getStockItem')
+            ->willReturn($this->getStockItemStub());
+
+        return $stockRegistry;
+    }
+
+    /**
+     * @return StockItemInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getStockItemStub()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|StockItemInterface $stockItem */
+        $stockItem = $this->getMockBuilder(StockItemInterface::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getIsInStock'])
+            ->getMockForAbstractClass();
+        $stockItem
+            ->method('getIsInStock')
+            ->willReturn(true);
+
+        return $stockItem;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ScopeConfigInterface
+     */
+    private function getScopeConfigStub()
+    {
+        return $this->getMockBuilder(ScopeConfigInterface::class)
+            ->setMethods(['getValue', 'isSetFlag'])
+            ->getMockForAbstractClass();
     }
 }
