@@ -4,26 +4,36 @@
  *
  * @category   IntegerNet
  * @package    IntegerNet_Solr
- * @copyright  Copyright (c) 2016 integer_net GmbH (http://www.integer-net.de/)
+ * @copyright  Copyright (c) 2017 integer_net GmbH (http://www.integer-net.de/)
  * @author     Fabian Schmengler <fs@integer-net.de>
+ * @author     Andreas von Studnitz <avs@integer-net.de>
  */
 namespace IntegerNet\Solr\Model\Indexer;
 
 use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\Solr\Plugin\UrlFactoryPlugin;
 use Magento\Framework\Indexer\ActionInterface;
 use Magento\Framework\Mview\ActionInterface as MviewActionInterface;
 
 class Fulltext implements ActionInterface, MviewActionInterface
 {
-    /** @var ProductIndexer */
+    /**
+     * @var ProductIndexer
+     */
     private $solrIndexer;
+    /**
+     * @var UrlFactoryPlugin
+     */
+    private $urlFactoryPlugin;
 
     /**
      * @param ProductIndexerFactory $solrIndexerFactory
+     * @param UrlFactoryPlugin $urlFactoryPlugin
      */
-    public function __construct(ProductIndexerFactory $solrIndexerFactory)
+    public function __construct(ProductIndexerFactory $solrIndexerFactory, UrlFactoryPlugin $urlFactoryPlugin)
     {
         $this->solrIndexer = $solrIndexerFactory->create();
+        $this->urlFactoryPlugin = $urlFactoryPlugin;
     }
 
     /**
@@ -33,7 +43,9 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeFull()
     {
+        $this->urlFactoryPlugin->setForceFrontend(true);
         $this->solrIndexer->reindex(null, true);
+        $this->urlFactoryPlugin->setForceFrontend(false);
     }
 
     /**
@@ -44,7 +56,9 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeList(array $ids)
     {
+        $this->urlFactoryPlugin->setForceFrontend(true);
         $this->solrIndexer->reindex($ids);
+        $this->urlFactoryPlugin->setForceFrontend(false);
     }
 
     /**

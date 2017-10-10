@@ -34,7 +34,12 @@ class FulltextTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['create'])
             ->getMock();
         $indexerFactoryStub->method('create')->willReturn($this->solrIndexerMock);
-        $this->fulltext = new Fulltext($indexerFactoryStub);
+
+        $urlFactoryPluginStub = $this->getMockBuilder(\IntegerNet\Solr\Plugin\UrlFactoryPlugin::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['setForceFrontend'])
+            ->getMock();
+        $this->fulltext = new Fulltext($indexerFactoryStub, $urlFactoryPluginStub);
     }
     public function testExecuteFull()
     {

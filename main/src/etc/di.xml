@@ -88,6 +88,9 @@
   <type name="Magento\Catalog\Model\Layer\ItemCollectionProviderInterface">
     <plugin name="replaceCollections" type="IntegerNet\Solr\Model\Plugin\CollectionProviderPlugin" />
   </type>
+  <type name="Magento\Framework\UrlFactory">
+    <plugin name="integernet_solr_replace_url_instance" type="IntegerNet\Solr\Plugin\UrlFactoryPlugin" />
+  </type>
 
   <!--
   <preference for="Magento\Catalog\Model\ResourceModel\Layer\Filter\Attribute" type="IntegerNet\Solr\Model\Resource\Catalog\Layer\Filter\Attribute"/>
