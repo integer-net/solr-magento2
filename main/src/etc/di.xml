@@ -88,6 +88,9 @@
   <type name="Magento\Catalog\Model\Layer\ItemCollectionProviderInterface">
     <plugin name="replaceCollections" type="IntegerNet\Solr\Model\Plugin\CollectionProviderPlugin" />
   </type>
+  <type name="Magento\Framework\UrlFactory">
+    <plugin name="integernet_solr_replace_url_instance" type="IntegerNet\Solr\Plugin\UrlFactoryPlugin" />
+  </type>
 
   <!--
   <preference for="Magento\Catalog\Model\ResourceModel\Layer\Filter\Attribute" type="IntegerNet\Solr\Model\Resource\Catalog\Layer\Filter\Attribute"/>
@@ -150,7 +153,11 @@
   <!-- Magento bugfixes -->
 
   <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
-    <plugin name="storeFilterFixer" type="IntegerNet\Solr\Model\Plugin\StoreFilterFixer" />
+    <plugin name="integernetSolrProductCollection" type="IntegerNet\Solr\Model\Plugin\ProductCollectionPlugin" />
+  </type>
+
+  <type name="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
+    <plugin name="integernetSolrProductCollection" type="IntegerNet\Solr\Model\Plugin\ProductCollectionPlugin" />
   </type>
 
   <type name="Magento\Eav\Model\AttributeRepository">
