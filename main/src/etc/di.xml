@@ -153,6 +153,10 @@
     <plugin name="storeFilterFixer" type="IntegerNet\Solr\Model\Plugin\StoreFilterFixer" />
   </type>
 
+  <type name="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
+    <plugin name="storeFilterFixer" type="IntegerNet\Solr\Model\Plugin\StoreFilterFixer" />
+  </type>
+
   <type name="Magento\Eav\Model\AttributeRepository">
     <plugin name="attributeFilterFixer" type="IntegerNet\Solr\Model\Plugin\AttributeFilterFixer" />
   </type>
