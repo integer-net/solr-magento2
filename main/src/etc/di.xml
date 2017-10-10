@@ -153,11 +153,11 @@
   <!-- Magento bugfixes -->
 
   <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
-    <plugin name="storeFilterFixer" type="IntegerNet\Solr\Model\Plugin\StoreFilterFixer" />
+    <plugin name="integernetSolrProductCollection" type="IntegerNet\Solr\Model\Plugin\ProductCollectionPlugin" />
   </type>
 
   <type name="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
-    <plugin name="storeFilterFixer" type="IntegerNet\Solr\Model\Plugin\StoreFilterFixer" />
+    <plugin name="integernetSolrProductCollection" type="IntegerNet\Solr\Model\Plugin\ProductCollectionPlugin" />
   </type>
 
   <type name="Magento\Eav\Model\AttributeRepository">
