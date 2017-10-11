@@ -162,8 +162,9 @@
           <source_model>IntegerNet\Solr\Model\Source\FilterPosition</source_model>
         </field>
         -->
-        <field id="filter_option_sorting" translate="label" sortOrder="23" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="filter_option_sorting" translate="label,comment" sortOrder="23" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Sorting of Filter Options</label>
+          <comment>These changes are also applied to filters on category pages</comment>
           <source_model>\IntegerNet\Solr\Model\Source\FilterOptionSorting</source_model>
         </field>
         <field id="priority_categories" translate="label,comment" sortOrder="25" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
