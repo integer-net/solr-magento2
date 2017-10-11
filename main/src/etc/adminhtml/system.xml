@@ -16,12 +16,10 @@
           <label>Is active</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
-        <!--
         <field id="license_key" translate="label,comment" sortOrder="20" type="text" showInDefault="1">
           <label>License Key</label>
           <comment>Example: AAAAA-BBBBB. Will be necessary two weeks after install.</comment>
         </field>
-        -->
         <field id="log" translate="label,comment" sortOrder="30" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Activate Logging</label>
           <comment>The logs can be found at var/log/solr.log. Make sure to have logging activated.</comment>
@@ -157,11 +155,16 @@
           <source_model>IntegerNet\Solr\Model\Source\SearchOperator</source_model>
         </field>
         <!--
-        <field id="filter_position" translate="label" sortOrder="23" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="filter_position" translate="label" sortOrder="21" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Position of Filters</label>
           <source_model>IntegerNet\Solr\Model\Source\FilterPosition</source_model>
         </field>
         -->
+        <field id="filter_option_sorting" translate="label,comment" sortOrder="23" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Sorting of Filter Options</label>
+          <comment>These changes are also applied to filters on category pages</comment>
+          <source_model>\IntegerNet\Solr\Model\Source\FilterOptionSorting</source_model>
+        </field>
         <field id="priority_categories" translate="label,comment" sortOrder="25" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Solr Priority of Category Names</label>
           <comment>1 is default, use higher numbers for higher priority.</comment>
@@ -240,10 +243,12 @@
           <validate>validate-number validate-zero-or-greater</validate>
         </field>
         -->
+        <!--
         <field id="show_complete_category_path" translate="label" sortOrder="60" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Show complete category path</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
+        -->
         <field id="category_link_type" translate="label" sortOrder="70" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Type of Category Links</label>
           <source_model>IntegerNet\Solr\Model\Source\CategoryLinkType</source_model>

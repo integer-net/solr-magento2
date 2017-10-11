@@ -77,7 +77,9 @@ class Category implements CategoryInterface
      */
     public function getUrl()
     {
-        return $this->magentoCategory->getUrl();
+        $category = $this->magentoCategory;
+        $category->getUrlInstance()->setScope($this->getStoreId());
+        return $category->getUrl();
     }
 
     /**

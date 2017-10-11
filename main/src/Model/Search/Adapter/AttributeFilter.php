@@ -10,13 +10,9 @@
 
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
-use Magento\Catalog\Model\ResourceModel\Category\Collection as CategoryCollection;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Store\Model\Store;
-
 class AttributeFilter extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
 {
+
     /**
      * Checks whether the option reduces the number of results
      *

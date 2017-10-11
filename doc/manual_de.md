@@ -45,7 +45,7 @@ Features
 
 Systemvoraussetzungen
 ------------
-- **Magento Community Edition** 2.1.x
+- **Magento Community Edition** 2.1.x und 2.2.x
 - **Solr** 4.x bis 6.x
 - **PHP** 5.6 bis 7.0
 
@@ -279,10 +279,24 @@ Gibt es für Filter sehr viele Filteroptionen, kann aus Gründen der Übersichtl
 
 Normalerweise werden die Filteroptionen nach der Anzahl der Treffer sortiert. In einigen Fällen ist es sinnvoll, sie stattdessen alphabetisch zu sortieren. Die alphabetische Sortierung kann über dieses Feld aktiviert werden.-->
 
+#### Sortierung von Filteroptionen
+
+In Magento werden die Filterwerte standardmäßig anhand der Position in der Attributkonfiguration auch im Frontend in der Filternavigation angezeigt. Sie können alternativ alphabetisch oder anhand der Trefferanzahl absteigend sortiert werden.
+
+Bitte beachten Sie, dass diese Konfiguration sowohl für die Filternavigation auf Suchergebnisseiten als auch auf Kategorieseiten gilt.
+
 #### Solr-Priorität von Kategorienamen
 
 Hier können Sie einstellen, mit welcher Priorität Kategorienamen im Solr-Index verarbeitet werden. Ein Beispiel: Wenn der Suchbegriff "schwarze Shirts" hauptsächlich solche Artikel im Suchergebnis anzeigen soll, die in der Kategorie "Shirts" enthalten sind, tragen Sie hier einen höheren Wert ein.
 Der Standardwert ist 1. Wenn Sie einen höheren Wert eintragen, werden Kategorienamen im Solr-Index stärker beachtet.
+
+#### Produkte anzeigen, die nicht auf Lager sind
+
+Als Standardeinstellung werden auch Produkte, die nicht auf Lager sind, in den Suchergebnissen angezeigt. Um ausverkaufte Produkte auf den Suchergebnisseiten auszublenden, wählen Sie "Nein".
+
+#### Solr-Prioritäts-Multiplikator für ausverkaufte Produkte
+
+Dieser Faktor beeinflusst, wie sich der Lagerstatus des Produkts auf das Ranking in den Suchergebnissen auswirkt. Wenn Sie es bevorzugen, ausverkaufte Produkte in der Suchergebnisliste anzuzeigen, wählen Sie einen Wert, der größer als 0 ist. Um ausverkaufte Produkte ans Ende der Ergebnisliste zu setzen, geben Sie "0.1" ein. Der Wert "1" bedeutet, dass der Lagerstatus keinen Einfluss auf das Suchergebnis-Ranking hat.
 
 #### Größe der Preis-Schritte
 
@@ -319,13 +333,13 @@ Wird diese Funktion aktiviert, ist danach eine Reindizierung des Solr Suchindex 
 
 Wenn diese Funktion aktiviert ist, werden Kategorien in den Suchvorschlägen angezeigt, deren Namen oder Beschreibungen zum Suchbegriff passen. Für eine feinere Einstellung der vorgeschlagenen Kategorien können Sie einzelne Kategorien vom Index ausschließen.
 
-#### Maximale Anzahl der Suchergebnisse
-
-Wenn ein Suchbegriff zu viele Kategorien als Suchergebnis angeibt, kann hier die Anzahl der anzuzeigenden Treffer bestimmt werden. Geben Sie dafür eine ganze Zahl ein.
-
 #### Kategorien als Suchergebnisse anzeigen
 
 Hier können Sie entscheiden, ob Kategorien, die ein Treffer für den Suchbegriff sind, in den Suchergebnissen als Treffer angezeigt werden sollen. Sie werden in einem separaten Tab angezeigt: ein Tab für passende Produkte, ein Tab für passende Kategorien.
+
+#### Maximale Anzahl der Suchergebnisse
+
+Wenn ein Suchbegriff zu viele Kategorien als Suchergebnis angeibt, kann hier die Anzahl der anzuzeigenden Treffer bestimmt werden. Geben Sie dafür eine ganze Zahl ein.
 
 #### Unscharfe Suche aktivieren
 
@@ -334,6 +348,10 @@ Wie die unscharfe Suche bei den Suchvorschlägen und der Produktsuche können Si
 #### Sensibilität für Suche
 
 Wenn die unscharfe Suche für Kategorieseiten aktiviert ist, können Sie in diesem Feld die Feinjustierung der unscharfen Suche vornehmen. Tragen Sie einen Wert zwischen 0 und 1 ein. Kleinere Werte, z.B. 0.5, führen zu mehr unscharfen Ergebnissen.
+
+#### Produkte anzeigen, die nicht auf Lager sind
+
+Als Standardeinstellung werden auch Produkte, die nicht auf Lager sind, in den Produktlisten der Kategorieseiten angezeigt. Um ausverkaufte Produkte auf den Kategorieseiten auszublenden, wählen Sie "Nein".
 
 <!-- ### CMS
 
@@ -369,9 +387,17 @@ Die Anzahl der in der Suchvorschau angezeigten Kategorien. Wenn die Funktion "So
 
 Die Anzahl der in der Suchvorschau angezeigten CMS-Seiten. Diese Vorschläge können nur dann angezeigt werden, wenn für die Funktion "Solr für die Indizierung von CMS-Seiten verwenden" der Wert auf "Ja" gesetzt ist.-->
 
-#### Kompletten Kategorie-Pfad anzeigen
+#### Unscharfe Suche ist aktiv für Kategorien
 
-Ist diese Einstellung aktiv, werden nicht nur die Kategorienamen angezeigt, sondern auch deren Elternkategorien als Pfad, beispielsweise "Electronics > Cameras > Accessories" statt nur "Accessoires".
+Sie können hier einstellen, ob Kategorievorschläge auch unscharfe Treffer anzeigen sollen. Bei sehr spezifischen Kategorienamen (z. B. mit Ziffern für Größen), kann es besser sein, die unscharfen Kategorievorschläge zu deaktivieren.
+
+#### Sensibilität für Kategorien
+
+Ist die unscharfe Suche für Kategorien in den Suchvorschlägen aktiviert, lässt sich hier die Sensibilität der unscharfen Ergebnisse anpassen. Je größer der Wert, desto exakter sind die Ergebnisse.
+
+<!-- #### Kompletten Kategorie-Pfad anzeigen
+
+Ist diese Einstellung aktiv, werden nicht nur die Kategorienamen angezeigt, sondern auch deren Elternkategorien als Pfad, beispielsweise "Electronics > Cameras > Accessories" statt nur "Accessoires".-->
 
 #### Typ von Kategorie-Links
 
@@ -383,6 +409,10 @@ Hier geht es um den Link, der hinter den angezeigten Kategorien steht. Die Optio
 
 Hier können Sie beliebig viele Attribute eintragen, die in der Suchvorschau mit den am häufigsten vorkommenden Optionen dargestellt werden. Sie können jeweils das Attribut auswählen und die Anzahl der angezeigten Optionen definieren. Außerdem können Sie die Reihenfolge der Attribute bestimmen - das Attribut mit dem kleinsten Wert bei "Sortierung" wird zuoberst angezeigt.
 Es stehen nur Attribute zur Auswahl, die die Eigenschaft "Filternavigation auf Suchergebnisseiten verwenden" haben.
+
+#### Produkte anzeigen, die nicht auf Lager sind
+
+Als Standardeinstellung werden ausschließlich Produkte, die auf Lager sind, in den Suchvorschlägen angezeigt. Um auch ausverkaufte Produkte in der Suchvorschlagsbox anzuzeigen, wählen Sie "Ja".
 
 <!-- ### SEO
 

@@ -30,7 +30,7 @@ Features
 - Multiple selection of filter values
 - Search results from Solr for better speed and quality
 - Prerendered product HTML blocks for faster rendering (optional)
-- Configurable the price filter steps
+- Configurable price filter steps
 - Automatic update of Solr index on create/edit/delete of products
 
 #### Modification of search results
@@ -45,7 +45,7 @@ Features
 
 Requirements
 ------------
-- **Magento Community Edition** 2.1.x
+- **Magento Community Edition** 2.1.x and 2.2.x
 - **Solr** 4.x to 6.x
 - **PHP** 5.6 to 7.0
 
@@ -268,10 +268,24 @@ You can choose between *AND* and *OR*. The search operator is used if there is m
 When using *OR*, results which match only one of the search words will be displayed.
 In most cases, *AND* is the better setting.
 
+#### Sorting of Filter Options
+
+By default, Magento uses the attribute options' positions to sort them in the layered navigation. If you prefer to sort the available filter values in a different way, you can switch to "Alphabet" for an alphabetic order or "Result Count" to put filter values with many results at the top of the list in the filter.
+
+Please note that this configuration applies to filters on both search results pages and category pages.
+
 #### Solr Priority of Category Names
 
 Configure with which priority category names are handled in the Solr index. For example, if the search term "black shirts" should primarily return those products as search results which are contained in a category named "shirts", you might want to enter a higher value than 1.
 The default value is 1. If you enter a higher value, category names have a higher priority in the Solr index.
+
+#### Show products which are out of stock
+
+In the default setting, even products which are not in stock are shown on the search results page. To keep your search results clear from items which are out of stock, select "No".
+
+#### Solr Priority Multiplier for Products being out of Stock
+
+This is a factor which manipulates the ranking of search results depending on the product's stock status. If you prefer to have items which are out of stock in the list of search results, select a value that is greater than 0. To put sold out products at the very bottom of the search results, enter "0.1".  The value "1" means that the stock status has no impact on the search results ranking. 
 
 <!-- #### Position of Filters
 
@@ -317,13 +331,13 @@ If you activate this setting, Solr will be used to displayed products on categor
 
 When you activate this setting, categories that match the search term will be displayed in the autosuggest box. To finetune suggested categories, you can exclude single categories from being indexed.
 
-#### Maximum number of results
-
-If search terms return too many categories as search results, you can limit the amount of displayed category results. Enter any positive value in whole numbers.
-
 #### Display categories as search results
 
 Here you can decide if categories, which match the search term, should be displayed in the search results as a new tab - one tab for matching products, one tab for matching categories.
+
+#### Maximum number of results
+
+If search terms return too many categories as search results, you can limit the amount of displayed category results. Enter any positive value in whole numbers.
 
 #### Fuzzy Search is active
 
@@ -332,6 +346,10 @@ Like the fuzzy search for autosuggest and product search, you are able to define
 #### Sensitivity for Search
 
 Fuzzy search for category pages is set to "yes", this field is used to finetune the sensitivity of fuzzy search results. Enter any value between 0 and 1. Smaller values, e.g. 0.5 lead to more fuzzy results.
+
+#### Show products which are out of stock
+
+In the default setting, products which are not in stock are shown in the product list on category pages. To remove sold out products from category pages, select "No".
 
 <!-- #### Position of Filter
 
@@ -370,10 +388,18 @@ The number of categories which will be displayed in the autosuggest window. If "
 
 The number of CMS pages which will be displayed in the autosuggest window. This feature only works, if "Use Solr to index cms pages" is set to "Yes".-->
 
-#### Show complete category path
+#### Fuzzy Search is active for Categories
+
+You can set here separately for category suggestions if these should show fuzzy matches, too. If your category names are very specific (e.g. with numbers used for sizes), it might be better to turn off fuzzy suggestions for categories.
+
+#### Sensitivity for Categories
+
+If fuzzy search is active for categories in autosuggest, you can finetune the sensitivity of the fuzzy search here. A bigger value leads to less fuzzy results. 
+
+<!-- #### Show complete category path
 
 If this setting is active, not only the category names will be displayed, but their parent categories as a path as well.
-For example, this will be "Electronics > Cameras > Accessories" instead of "Accessories".
+For example, this will be "Electronics > Cameras > Accessories" instead of "Accessories".-->
 
 #### Type of Category Links
 
@@ -386,6 +412,10 @@ The link which is behind the displayed categories. It can be:
 You can enter an arbitrary number of attributes here which will be displayed in the autosuggest window, including the options which are contained in most of the corresponding products. For every row you can select the attribute and the number of displayed options. Additionally you can define the sorting of the attributes - the attribute with the lowest value in the "Sorting" field will be shown first.
 
 Only attributes with the property "Use In Search Results Layered Navigation" are selectable.
+
+#### Show products which are out of stock
+
+In the default setting, products which are not in stock are hidden from search suggestions. To show sold out products in the autosuggest box, select "Yes".
 
 <!--### SEO
 

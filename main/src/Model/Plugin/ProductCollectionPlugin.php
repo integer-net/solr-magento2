@@ -4,9 +4,10 @@ namespace IntegerNet\Solr\Model\Plugin;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 
 /**
- * This plugin fixes issue with filtration by store/website ID in \Magento\Catalog\Model\ProductRepository::getList()
+ * Among other problems, this plugin fixes issue with filtration by store/website ID in
+ * \Magento\Catalog\Model\ProductRepository::getList()
  */
-class StoreFilterFixer
+class ProductCollectionPlugin
 {
     /**
      * Enable filtration by store_id or website_id. The only supported condition is 'eq'
@@ -33,5 +34,27 @@ class StoreFilterFixer
         }
         /** Do not try to pass empty $fields to addFieldToFilter, it will cause exception */
         return $fields? $proceed($fields, $condition) : $subject;
+    }
+
+    /**
+     * Fix filter in collection by changing "eq" to "in" if the value is an array.
+     * This was an issue if there were multiple values for a swatches attribute filter.
+     *
+     * @param ProductCollection $subject
+     * @param \Magento\Eav\Model\Entity\Attribute\AbstractAttribute|string $attribute
+     * @param array $condition
+     * @param string $joinType
+     * @return array
+     */
+    public function beforeAddAttributeToFilter(
+        ProductCollection $subject,
+        $attribute,
+        $condition = null,
+        $joinType = 'inner'
+    ) {
+        if (is_array($condition) && isset($condition['eq']) && is_array($condition['eq'])) {
+            $condition = ['in' => $condition['eq']];
+        }
+        return [$attribute, $condition, $joinType];
     }
 }

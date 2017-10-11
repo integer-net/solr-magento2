@@ -2,6 +2,15 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Version 1.4.0 (Oct 11, 2017)
+---------------
+
+- Add configuration to enable/disable fuzzy for categories search in autosuggest
+- Add configuration to choose sorting of filter options (by alphabet / by number results / by admin sorting)
+- Fix filters for swatches attributes
+- Fix URLs in autosuggest for multiple store views
+- Fix display of category suggestions in case of more than one category with the same name
+
 Version 1.3.2 (Aug 23, 2017)
 ---------------
 
