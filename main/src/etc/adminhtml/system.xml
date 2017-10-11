@@ -16,12 +16,10 @@
           <label>Is active</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
-        <!--
         <field id="license_key" translate="label,comment" sortOrder="20" type="text" showInDefault="1">
           <label>License Key</label>
           <comment>Example: AAAAA-BBBBB. Will be necessary two weeks after install.</comment>
         </field>
-        -->
         <field id="log" translate="label,comment" sortOrder="30" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Activate Logging</label>
           <comment>The logs can be found at var/log/solr.log. Make sure to have logging activated.</comment>
