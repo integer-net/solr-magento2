@@ -245,10 +245,12 @@
           <validate>validate-number validate-zero-or-greater</validate>
         </field>
         -->
+        <!--
         <field id="show_complete_category_path" translate="label" sortOrder="60" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Show complete category path</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
+        -->
         <field id="category_link_type" translate="label" sortOrder="70" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Type of Category Links</label>
           <source_model>IntegerNet\Solr\Model\Source\CategoryLinkType</source_model>
