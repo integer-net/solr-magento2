@@ -66,8 +66,8 @@ class ProductTest extends \PHPUnit_Framework_TestCase
      */
     public function testCoreAttributes($storeId, $productData, $expectedHasSpecialPrice)
     {
-        $extensionAttributesStub = $this->getMockBuilder(ProductExtensionInterface::class)
-            ->setMethods(['getSolrBoost'])
+        $customAttributeStub = $this->getMockBuilder(\Magento\Framework\Api\AttributeInterface::class)
+            ->setMethods(['getValue'])
             ->getMockForAbstractClass();
 
         $this->magentoProductStub->method('getId')->willReturn($productData['id']);
@@ -75,8 +75,8 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $finalPrice = isset($productData['special_price']) ? $productData['special_price'] : $productData['price'];
         $this->magentoProductStub->method('getFinalPrice')->willReturn($finalPrice);
         $this->magentoProductStub->method('getStoreId')->willReturn($storeId);
-        $this->magentoProductStub->method('getExtensionAttributes')->willReturn($extensionAttributesStub);
-        $extensionAttributesStub->method('getSolrBoost')->willReturn($productData['solr_boost']);
+        $this->magentoProductStub->method('getCustomAttribute')->willReturn($customAttributeStub);
+        $customAttributeStub->method('getValue')->willReturn($productData['solr_boost']);
         $this->magentoProductStub->method('getCategoryIds')->willReturn($productData['category_ids']);
         $productBridge = $this->makeProductBridge($storeId);
 
@@ -176,16 +176,16 @@ class ProductTest extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
         $storeStub->method('getWebsiteId')->willReturn($storeAndWebsiteId);
 
-        $extensionAttributesStub = $this->getMockBuilder(ProductExtensionInterface::class)
-            ->setMethods(['getStockItem', 'getSolrExclude'])
+        $customAttributeStub = $this->getMockBuilder(\Magento\Framework\Api\AttributeInterface::class)
+            ->setMethods(['getValue'])
             ->getMockForAbstractClass();
-        $extensionAttributesStub->method('getSolrExclude')->willReturn($solrExclude);
+        $customAttributeStub->method('getValue')->willReturn($solrExclude);
 
         $this->magentoProductStub->method('getStatus')->willReturn($status);
         $this->magentoProductStub->method('getVisibility')->willReturn($visibility);
         $this->magentoProductStub->method('getStore')->willReturn($storeStub);
         $this->magentoProductStub->method('getWebsiteIds')->willReturn($websiteIds);
-        $this->magentoProductStub->method('getExtensionAttributes')->willReturn($extensionAttributesStub);
+        $this->magentoProductStub->method('getCustomAttribute')->willReturn($customAttributeStub);
         $this->magentoProductStub->method('getData')->with('is_salable')->willReturn($inStock);
 
         $productBridge = $this->makeProductBridge($storeAndWebsiteId);
