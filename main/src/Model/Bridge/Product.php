@@ -109,8 +109,10 @@ class Product implements ProductInterface
         if (! \in_array($this->magentoProduct->getStore()->getWebsiteId(), $this->magentoProduct->getWebsiteIds())) {
             return false;
         }
-        if ($this->getMagentoProduct()->getExtensionAttributes()->getSolrExclude()) {
-            return false;
+        if ($solrExcludeCustomAttribute = $this->getMagentoProduct()->getCustomAttribute('solr_exclude')) {
+            if ($solrExcludeCustomAttribute->getValue()) {
+                return false;
+            }
         }
         return true;
     }
@@ -143,7 +145,10 @@ class Product implements ProductInterface
 
     public function getSolrBoost()
     {
-        $boost = $this->getMagentoProduct()->getExtensionAttributes()->getSolrBoost();
+        $boost = 1;
+        if ($solrBoostCustomAttribute = $this->getMagentoProduct()->getCustomAttribute('solr_boost')) {
+            $boost = $solrBoostCustomAttribute->getValue();
+        }
         if (!$this->isInStock()) {
             if ($boost === null) {
                 $boost = 1;
