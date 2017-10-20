@@ -2,6 +2,12 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Version 1.4.1 (Oct 20, 2017)
+---------------
+
+- Fix behavior of product attributes "Solr Priority" and "Exclude this Product from Solr Index"
+- Compatibility for final Magento 2.2.0 defined in composer.json
+
 Version 1.4.0 (Oct 11, 2017)
 ---------------
 
