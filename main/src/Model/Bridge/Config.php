@@ -207,7 +207,7 @@ class Config implements ConfigInterface
                 $this->_getConfig($prefix . 'max_number_category_suggestions'),
                 $this->_getConfig($prefix . 'max_number_cms_page_suggestions'),
                 $this->_getConfigFlag($prefix . 'show_complete_category_path'),
-                $this->_getConfigFlag($prefix . 'category_link_type'),
+                $this->_getConfig($prefix . 'category_link_type'),
                 (array)@unserialize($this->_getConfig($prefix . 'attribute_filter_suggestions')),
                 $this->_getConfigFlag($prefix . 'show_outofstock'),
                 $this->_getConfigFlag($prefix . 'fuzzy_is_active_for_categories'),
