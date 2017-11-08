@@ -6,6 +6,7 @@ Upcoming
 --------------
 
 - Fix Category URLs in autosuggest if links to category pages are activated.
+- Show complete category path in autosuggest if activated in configuration
 
 Version 1.4.1 (Oct 20, 2017)
 ---------------
