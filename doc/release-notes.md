@@ -2,11 +2,17 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Upcoming
+--------------
+
+- Fix Category URLs in autosuggest if links to category pages are activated.
+- Show complete category path in autosuggest if activated in configuration
+
 Version 1.4.1 (Oct 20, 2017)
 ---------------
 
 - Fix behavior of product attributes "Solr Priority" and "Exclude this Product from Solr Index"
-- Compatibility for final Magento 2.2.0 defined in composer.json
+- Define compatibility to final Magento 2.2.0 in composer.json
 
 Version 1.4.0 (Oct 11, 2017)
 ---------------
@@ -21,7 +27,7 @@ Version 1.3.2 (Aug 23, 2017)
 ---------------
 
 - Introduction of new events around product collection
-- Skip indexing a product if child product cannot be loaded instead of aborting
+- Skip indexing a product instead of aborting if child product cannot be loaded 
 
 Version 1.3.1 (Aug 17, 2017)
 ---------------
