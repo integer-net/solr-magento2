@@ -59,11 +59,11 @@ class Attribute implements AttributeInterface
      */
     public function getSolrBoost()
     {
-        $solrBoost = $this->magentoAttribute->getData('solr_boost');
+        $solrBoost = $this->magentoAttribute->getData('search_weight');
         if ($solrBoost === null) {
             return 1.0;
         }
-        return $solrBoost;
+        return (float) $solrBoost;
     }
 
     /**
