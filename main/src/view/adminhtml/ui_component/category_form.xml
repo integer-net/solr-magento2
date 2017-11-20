@@ -67,5 +67,16 @@
                 </item>
             </argument>
         </field>
+        <field name="solr_boost">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">30</item>
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="label" xsi:type="string" translate="true">Solr Priority</item>
+                    <item name="additionalInfo" xsi:type="string" translate="true">1 is default, use higher numbers for higher priority.</item>
+                </item>
+            </argument>
+        </field>
     </fieldset>
 </form>
