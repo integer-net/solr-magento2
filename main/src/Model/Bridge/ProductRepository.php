@@ -20,6 +20,7 @@ use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\CatalogInventory\Model\ResourceModel\Stock\Status as StockStatus;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable as ConfigurableType;
+use Magento\Store\Model\StoreManager;
 
 class ProductRepository implements ProductRepositoryInterface
 {
@@ -35,19 +36,26 @@ class ProductRepository implements ProductRepositoryInterface
      * @var MergedProductAssociations
      */
     private $productAssociationsResource;
+    /**
+     * @var StoreManager
+     */
+    private $storeManager;
 
     /**
      * @param PagedProductIteratorInterfaceFactory $pagedIteratorFactory
      * @param CollectionFactory $productCollectionFactory
      * @param MergedProductAssociations $mergedProductAssociations
+     * @param StoreManager $storeManager
      */
     public function __construct(PagedProductIteratorInterfaceFactory $pagedIteratorFactory,
                                 CollectionFactory $productCollectionFactory,
-                                MergedProductAssociations $mergedProductAssociations)
+                                MergedProductAssociations $mergedProductAssociations,
+                                StoreManager $storeManager)
     {
         $this->pagedIteratorFactory = $pagedIteratorFactory;
         $this->productCollectionFactory = $productCollectionFactory;
         $this->productAssociationsResource = $mergedProductAssociations;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -74,6 +82,8 @@ class ProductRepository implements ProductRepositoryInterface
     {
         /** @var ProductCollection $productCollection */
         $productCollection = $this->productCollectionFactory->create();
+
+        $productCollection->addStoreFilter($this->storeManager->getStore());
 
         if ((!is_null($sliceId)) && (!is_null($totalNumberSlices))) {
             if ($sliceId == $totalNumberSlices) {
