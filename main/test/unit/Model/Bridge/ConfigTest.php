@@ -20,6 +20,7 @@ use IntegerNet\Solr\Config\ServerConfig;
 use IntegerNet\Solr\Config\StoreConfig;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Url\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -41,6 +42,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject|DirectoryList
      */
     private $directoryListMock;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|SerializerInterface
+     */
+    private $serializerMock;
 
     protected function setUp()
     {
@@ -57,7 +62,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(['getPath'])
             ->getMock();
-
+        $this->serializerMock = $this->getMockBuilder(SerializerInterface::class)
+            ->getMockForAbstractClass();
     }
 
     /**
@@ -68,7 +74,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         $this->storeManagerMock->method('getStore')->with($storeId)->willReturn($this->urlScopeMock);
 
-        $config = new Config($this->scopeConfigMock, $this->storeManagerMock, $this->directoryListMock, $storeId);
+        $config = new Config(
+            $this->scopeConfigMock,
+            $this->storeManagerMock,
+            $this->directoryListMock,
+            $storeId,
+            $this->serializerMock
+        );
 
         $this->assertInstanceOf(GeneralConfig::class, $config->getGeneralConfig());
         $this->assertInstanceOf(ServerConfig::class, $config->getServerConfig());
