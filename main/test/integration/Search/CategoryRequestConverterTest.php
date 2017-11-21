@@ -23,8 +23,9 @@ use Magento\Framework\App\RequestInterface as MagentoRequestInterface;
 use Magento\Framework\Search\Request as MagentoRequest;
 use Magento\Framework\Search\RequestInterface;
 use Magento\Search\Model\QueryFactory;
+use PHPUnit\Framework\TestCase;
 
-class CategoryRequestConverterTest extends \PHPUnit_Framework_TestCase
+class CategoryRequestConverterTest extends TestCase
 {
     /**
      * @var CategoryRequestConverter

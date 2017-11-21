@@ -16,8 +16,9 @@ use IntegerNet\Solr\Model\Config\CurrentStoreConfig;
 use IntegerNet\Solr\Model\Config\AllStoresConfig;
 use IntegerNet\Solr\Model\Config\FrontendStoresConfig;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends TestCase
 {
     /** @var  ObjectManager */
     protected $objectManager;

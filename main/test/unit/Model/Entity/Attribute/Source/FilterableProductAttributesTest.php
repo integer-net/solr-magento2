@@ -4,11 +4,12 @@ namespace IntegerNet\Solr\Model\Entity\Attribute\Source;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Implementor\Stub\AttributeStub;
 use Magento\Store\Model\Store;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \IntegerNet\Solr\Model\Source\FilterabeProductAttribute
  */
-class FilterableProductAttributeTest extends \PHPUnit_Framework_TestCase
+class FilterableProductAttributeTest extends TestCase
 {
     /**
      * @dataProvider dataAttributes

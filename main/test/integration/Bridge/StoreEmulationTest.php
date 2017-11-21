@@ -17,8 +17,9 @@ use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Store;
 use Magento\TestFramework\Helper\Bootstrap;
+use PHPUnit\Framework\TestCase;
 
-class StoreEmulationTest extends \PHPUnit_Framework_TestCase
+class StoreEmulationTest extends TestCase
 {
     /** @var StoreEmulation */
     private $storeEmulation;

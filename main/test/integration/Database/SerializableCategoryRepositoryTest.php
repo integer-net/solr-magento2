@@ -15,8 +15,9 @@ use IntegerNet\SolrSuggest\Implementor\SerializableCategoryRepository as Seriali
 use Magento\Framework\Session\SidResolverInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class SerializableCategoryRepositoryTest extends \PHPUnit_Framework_TestCase
+class SerializableCategoryRepositoryTest extends TestCase
 {
     /**
      * @var ObjectManager

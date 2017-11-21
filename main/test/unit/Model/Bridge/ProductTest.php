@@ -21,11 +21,12 @@ use Magento\Framework\Api\AttributeValue;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Store\Api\Data\StoreInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers Product
  */
-class ProductTest extends \PHPUnit_Framework_TestCase
+class ProductTest extends TestCase
 {
 
     /**

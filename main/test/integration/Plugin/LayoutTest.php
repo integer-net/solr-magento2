@@ -13,8 +13,9 @@ use IntegerNet\Solr\Model\Plugin\LayoutPlugin;
 use Magento\Framework\View\Result\Layout;
 use Magento\TestFramework\Interception\PluginList;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class LayoutTest extends \PHPUnit_Framework_TestCase
+class LayoutTest extends TestCase
 {
     /**
      * @var ObjectManager

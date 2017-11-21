@@ -12,7 +12,7 @@ namespace IntegerNet\Solr\Indexer;
 use IntegerNet\Solr\Model\Indexer\Fulltext;
 use Magento\TestFramework\ObjectManager;
 
-class IndexerTest extends \PHPUnit_Framework_TestCase
+class IndexerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ObjectManager

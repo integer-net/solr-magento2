@@ -12,8 +12,9 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 
 use Magento\Search\Model\QueryFactory;
+use PHPUnit\Framework\TestCase;
 
-class SearchRequestTest extends \PHPUnit_Framework_TestCase
+class SearchRequestTest extends TestCase
 {
     private $queryStub;
     /**

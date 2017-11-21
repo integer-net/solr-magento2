@@ -12,9 +12,9 @@ namespace IntegerNet\Solr\Bridge;
 
 use Magento\TestFramework\ObjectManager;
 use IntegerNet\Solr\Model\Bridge\TemplateRepository;
+use PHPUnit\Framework\TestCase;
 
-
-class TemplateRepositoryTest extends \PHPUnit_Framework_TestCase
+class TemplateRepositoryTest extends TestCase
 {
     /** @var  ObjectManager */
     protected $objectManager;
