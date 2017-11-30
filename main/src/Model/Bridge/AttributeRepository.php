@@ -11,11 +11,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 class AttributeRepository implements AttributeRepositoryInterface
 {
-    private $filterableInSearchAttributes;
-    private $filterableInCatalogAttributes;
-    private $filterableInCatalogOrSearchAttributes;
-    private $sortableAttributes;
-    private $searchableAttributes;
     /**
      * Holds attribute instances with their Magento attributes as attached data
      *
@@ -53,11 +48,7 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getSearchableAttributes($storeId)
     {
-        if ($this->searchableAttributes === null) {
-            $this->searchableAttributes = $this->loadAttributes($storeId, $this->searchCriteriaBuilder->searchable());
-        }
-
-        return $this->searchableAttributes;
+        return $this->loadAttributes($storeId, $this->searchCriteriaBuilder->searchable());
     }
 
     /**
@@ -67,15 +58,11 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getFilterableInSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        if ($this->filterableInSearchAttributes === null) {
-            $attributeSearchCriteriaBuilder = $this->searchCriteriaBuilder->filterableInSearch();
-            if ($useAlphabeticalSearch) {
-                $this->filterableInSearchAttributes = $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByLabel());
-            } else {
-                $this->filterableInSearchAttributes = $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByPosition());
-            }
+        $attributeSearchCriteriaBuilder = $this->searchCriteriaBuilder->filterableInSearch();
+        if ($useAlphabeticalSearch) {
+            return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByLabel());
         }
-        return $this->filterableInSearchAttributes;
+        return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByPosition());
     }
 
     /**
@@ -85,15 +72,11 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getFilterableInCatalogAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        if ($this->filterableInCatalogAttributes === null) {
-            $attributeSearchCriteriaBuilder = $this->searchCriteriaBuilder->filterable();
-            if ($useAlphabeticalSearch) {
-                $this->filterableInCatalogAttributes = $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByLabel());
-            } else {
-                $this->filterableInCatalogAttributes = $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByPosition());
-            }
+        $attributeSearchCriteriaBuilder = $this->searchCriteriaBuilder->filterable();
+        if ($useAlphabeticalSearch) {
+            return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByLabel());
         }
-        return $this->filterableInCatalogAttributes;
+        return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByPosition());
     }
 
     /**
@@ -103,16 +86,11 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getFilterableInCatalogOrSearchAttributes($storeId, $useAlphabeticalSearch = true)
     {
-        if ($this->filterableInCatalogOrSearchAttributes === null) {
-            $attributeSearchCriteriaBuilder = $this->searchCriteriaBuilder->filterableInCatalogOrSearch();
-            if ($useAlphabeticalSearch) {
-                $this->filterableInCatalogOrSearchAttributes = $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByLabel());
-            } else {
-                $this->filterableInCatalogOrSearchAttributes = $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByPosition());
-            }
+        $attributeSearchCriteriaBuilder = $this->searchCriteriaBuilder->filterableInCatalogOrSearch();
+        if ($useAlphabeticalSearch) {
+            return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByLabel());
         }
-
-        return $this->filterableInCatalogOrSearchAttributes;
+        return $this->loadAttributes($storeId, $attributeSearchCriteriaBuilder->sortedByPosition());
     }
 
     /**
@@ -121,10 +99,7 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getSortableAttributes($storeId)
     {
-        if ($this->sortableAttributes === null) {
-            $this->sortableAttributes = $this->loadAttributes($storeId, $this->searchCriteriaBuilder->sortable());
-        }
-        return $this->sortableAttributes;
+        return $this->loadAttributes($storeId, $this->searchCriteriaBuilder->sortable());
     }
 
     /**
