@@ -110,7 +110,7 @@ class Product implements ProductInterface
             return false;
         }
         if ($solrExcludeValue = $this->magentoProduct->getData('solr_exclude')) {
-            return true;
+            return false;
         }
         return true;
     }
