@@ -11,8 +11,9 @@ namespace IntegerNet\Solr\Indexer;
 
 use IntegerNet\Solr\Model\Indexer\Fulltext;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class IndexerTest extends \PHPUnit\Framework\TestCase
+class IndexerTest extends TestCase
 {
     /**
      * @var ObjectManager
