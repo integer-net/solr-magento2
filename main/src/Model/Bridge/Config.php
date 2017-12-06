@@ -23,6 +23,7 @@ use IntegerNet\Solr\Config\CmsConfig;
 use IntegerNet\Solr\Implementor\Config as ConfigInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Url\ScopeInterface as UrlScopeInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -94,17 +95,28 @@ class Config implements ConfigInterface
 
     const PARAM_STORE_ID = 'storeId';
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
      * @param DirectoryList $directoryList
      * @param int $storeId
      */
-    public function __construct(ScopeConfigInterface $scopeConfig, StoreManagerInterface $storeManager, DirectoryList $directoryList, $storeId)
-    {
+    public function __construct(
+        ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager,
+        DirectoryList $directoryList,
+        $storeId,
+        SerializerInterface $serializer
+    ) {
         $this->storeId = $storeId;
         $this->urlScope = $storeManager->getStore($this->storeId);
         $this->scopeConfig = $scopeConfig;
         $this->directoryList = $directoryList;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -208,7 +220,7 @@ class Config implements ConfigInterface
                 $this->_getConfig($prefix . 'max_number_cms_page_suggestions'),
                 $this->_getConfigFlag($prefix . 'show_complete_category_path'),
                 $this->_getConfig($prefix . 'category_link_type'),
-                (array)@unserialize($this->_getConfig($prefix . 'attribute_filter_suggestions')),
+                (array)$this->serializer->unserialize($this->_getConfig($prefix . 'attribute_filter_suggestions')),
                 $this->_getConfigFlag($prefix . 'show_outofstock'),
                 $this->_getConfigFlag($prefix . 'fuzzy_is_active_for_categories'),
                 (float)$this->_getConfig($prefix . 'fuzzy_sensitivity_for_categories')

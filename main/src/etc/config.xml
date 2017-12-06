@@ -50,7 +50,7 @@
         <max_number_cms_page_suggestions>0</max_number_cms_page_suggestions>
         <show_complete_category_path>0</show_complete_category_path>
         <category_link_type>filter</category_link_type>
-        <attribute_filter_suggestions>a:0:{}</attribute_filter_suggestions>
+        <attribute_filter_suggestions>{}</attribute_filter_suggestions>
         <show_outofstock>1</show_outofstock>
       </autosuggest>
       <seo>

@@ -56,4 +56,20 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(1, $frontendStoresConfig, 'main store config should be loaded');
     }
 
+    /**
+     * @magentoAppArea frontend
+     * @magentoAppIsolation enabled
+     * @magentoConfigFixture current_store integernet_solr/autosuggest/attribute_filter_suggestions {"attribute_code": "color", "max_number_suggestions": 3, "sorting": 1}
+     */
+    public function testUnserializedFilterSuggestions()
+    {
+        /** @var CurrentStoreConfig $currentStoreConfig */
+        $currentStoreConfig = $this->objectManager->create(CurrentStoreConfig::class);
+
+        $this->assertEquals(
+            ['attribute_code' => 'color', 'max_number_suggestions' => 3, 'sorting' => 1],
+            $currentStoreConfig->getAutosuggestConfig()->getAttributeFilterSuggestions()
+        );
+    }
+
 }
