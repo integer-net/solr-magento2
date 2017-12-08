@@ -9,33 +9,69 @@
  * @var \IntegerNet\Solr\Model\Search\Adapter\FilterItem[] $filterItems
  */
 ?>
+<?php if(current($filterItems)->getData('filter') instanceof \Magento\CatalogSearch\Model\Layer\Filter\Price): ?>
+<?php $attribute = current($filterItems)->getData('filter')->getData('attribute_model')->getFrontendInput() ?>
+    <span class="filter-label"><?php echo __('Price') ?></span>
+    <span class="filter-value">0€ - 100 €</span>
+    <br><br>
+    <div class="ui-slider-wrapper">
+        <div class="filter-options-slider"></div>
+    </div>
 
-<ol class="items">
-    <?php foreach ($filterItems as $filterItem): ?>
-        <li class="item">
-            <?php if ($filterItem->getCount() > 0): ?>
-                <a class="filter-options-link" href="<?php echo $block->escapeUrl($filterItem->getUrl()) ?>">
-                    <label class="tickbox<?php if ($filterItem->isActive()): ?> tickbox--active<?php endif ?>" for="">
-                        <input class="tickbox__field" type="checkbox" >
-                    </label>
+    <script>
+        require([
+            'jquery',
+            'jquery/ui',
+            'jQueryUiSlider'
+        ], function ($, _ui, slider) {
+
+            var valueContainer = $('.filter-value');
+
+            $('.filter-options-slider').slider({
+                range: true,
+                min: 0,
+                max: 100,
+                values: [ 30, 70 ],
+                slide: function( event, ui ) {
+                    var newValue = ui.values[0] + '€ - ' + ui.values[1] + '€';
+
+                    valueContainer.html(newValue);
+                }
+            });
+        });
+    </script>
+<?php else: ?>
+    <ol class="items">
+        <?php foreach ($filterItems as $filterItem): ?>
+            <li class="item">
+                <?php if ($filterItem->getCount() > 0): ?>
+                    <?php if ($filterItem->getName() === '_Price'): ?>
+                        <div class="filter-options-slider"></div>
+                    <?php else: ?>
+                        <a class="filter-options-link" href="<?php echo $block->escapeUrl($filterItem->getUrl()) ?>">
+                            <label class="tickbox<?php if ($filterItem->isActive()): ?> tickbox--active<?php endif ?>" for="">
+                                <input class="tickbox__field" type="checkbox" >
+                            </label>
+                            <?php /* @escapeNotVerified */ echo $filterItem->getLabel() ?>
+                            <?php if ($this->helper('\Magento\Catalog\Helper\Data')->shouldDisplayProductCountOnLayer()): ?>
+                                <span class="count"><?php /* @escapeNotVerified */ echo $filterItem->getCount()?><span class="filter-count-label">
+                            <?php if ($filterItem->getCount() == 1):?> <?php /* @escapeNotVerified */ echo __('item')?><?php else:?> <?php /* @escapeNotVerified */ echo __('items') ?><?php endif;?></span></span>
+                            <?php endif; ?>
+                        </a>
+                    <?php endif; ?>
+
+                <?php else:?>
                     <?php /* @escapeNotVerified */ echo $filterItem->getLabel() ?>
                     <?php if ($this->helper('\Magento\Catalog\Helper\Data')->shouldDisplayProductCountOnLayer()): ?>
                         <span class="count"><?php /* @escapeNotVerified */ echo $filterItem->getCount()?><span class="filter-count-label">
-                            <?php if ($filterItem->getCount() == 1):?> <?php /* @escapeNotVerified */ echo __('item')?><?php else:?> <?php /* @escapeNotVerified */ echo __('items') ?><?php endif;?></span></span>
-                    <?php endif; ?>
-                </a>
-            <?php else:?>
-                <?php /* @escapeNotVerified */ echo $filterItem->getLabel() ?>
-                <?php if ($this->helper('\Magento\Catalog\Helper\Data')->shouldDisplayProductCountOnLayer()): ?>
-                    <span class="count"><?php /* @escapeNotVerified */ echo $filterItem->getCount()?><span class="filter-count-label">
                         <?php if ($filterItem->getCount() == 1):?><?php /* @escapeNotVerified */ echo __('item')?><?php else:?><?php /* @escapeNotVerified */ echo __('items') ?><?php endif;?></span></span>
+                    <?php endif; ?>
                 <?php endif; ?>
-            <?php endif; ?>
-        </li>
-    <?php endforeach ?>
-</ol>
+            </li>
+        <?php endforeach ?>
+    </ol>
 
-<script>
+    <script type="custom">
     jQuery(document).ready(function(){
         var filter = jQuery('.filter-options-link');
 
@@ -49,3 +85,4 @@
         })
     })
 </script>
+<?php endif; ?>
