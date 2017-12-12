@@ -93,7 +93,12 @@ class ModuleTest extends TestCase
     {
         /** @var IndexerCollection $indexerCollection */
         $indexerCollection = $this->objectManager->create(IndexerCollection::class);
-        $this->assertContains('integernet_solr', $indexerCollection->getColumnValues('indexer_id'));
+        $indexerIds = $indexerCollection->getAllIds();
+        $this->assertContains(
+            'integernet_solr',
+            $indexerIds,
+            "Indexer should contain 'integernet_solr'. Actual values: " . implode(',', $indexerIds)
+        );
     }
 
     public function testProductAttributesAreCreated()

@@ -19,41 +19,60 @@ use IntegerNet\Solr\Model\Bridge\Product;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\TestFramework\ObjectManager;
 use PHPUnit\Framework\TestCase;
+use TddWizard\Fixtures\Catalog\ProductBuilder;
+use TddWizard\Fixtures\Catalog\ProductFixture;
+use TddWizard\Fixtures\Catalog\ProductFixtureRollback;
 
 class ProductRepositoryTest extends TestCase
 {
     /** @var  ObjectManager */
     protected $objectManager;
 
+    /** @var ProductRepository */
+    private $productRepository;
+
+    /** @var ProductFixture[] */
+    private $products = [];
+
     protected function setUp()
     {
         $this->objectManager = ObjectManager::getInstance();
+        $this->productRepository = $this->objectManager->create(ProductRepository::class);
+    }
+
+    protected function tearDown()
+    {
+        ProductFixtureRollback::create()->execute(...$this->products);
     }
 
     /**
-     * @magentoDataFixture loadProductsFixture
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
      */
     public function testItReturnsProductsWithStoreSpecificValues()
     {
         $storeId = 1;
-        $sku = 'product-1';
+        $globalName = 'Global name';
+        $storeSpecificName = 'Store specific name';
+        $simpleProduct = new ProductFixture(
+            ProductBuilder::aSimpleProduct()
+                ->withName($globalName)
+                ->withName($storeSpecificName, $storeId)
+                ->build()
+        );
+        $this->products[] = $simpleProduct;
 
-        /** @var MagentoProduct $productModel */
-        $productModel = $this->objectManager->create(\Magento\Catalog\Model\Product::class);
-        $productIds = [ $productModel->getIdBySku($sku) ];
-
-        /** @var ProductRepository $productRepository */
-        $productRepository = $this->objectManager->create(ProductRepository::class);
-        $this->assertInstanceOf(\IntegerNet\Solr\Model\Bridge\ProductRepository::class, $productRepository);
-        $products = $productRepository->getProductsInChunks($storeId, ProductIdChunks::withAssociationsTogether($productIds, [], 1000));
+        $this->assertInstanceOf(\IntegerNet\Solr\Model\Bridge\ProductRepository::class, $this->productRepository);
+        $products = $this->productRepository->getProductsInChunks(
+            $storeId,
+            ProductIdChunks::withAssociationsTogether([ $simpleProduct->getId() ], [], 1000)
+        );
 
         $products->rewind();
         $this->assertTrue($products->valid());
         $product = $products->current();
         $this->assertInstanceOf(Product::class, $product);
-        $this->assertEquals('Product name in store', $product->getAttributeValue($this->getAttribute('name')));
+        $this->assertEquals($storeSpecificName, $product->getAttributeValue($this->getAttribute('name')));
     }
     /**
      * @magentoDataFixture loadConfigurableProductsFixture
@@ -62,9 +81,7 @@ class ProductRepositoryTest extends TestCase
      */
     public function testItReturnsConfigurableProductAssociations()
     {
-        /** @var ProductRepository $productRepository */
-        $productRepository = $this->objectManager->create(ProductRepository::class);
-        $actualAssociations = $productRepository->getProductAssociations([1]);
+        $actualAssociations = $this->productRepository->getProductAssociations([1]);
         $this->assertEquals([
             1 => new ProductAssociation(1, [10, 20])
         ], $actualAssociations);
@@ -76,16 +93,10 @@ class ProductRepositoryTest extends TestCase
      */
     public function testItReturnsGroupedProductAssociations()
     {
-        /** @var ProductRepository $productRepository */
-        $productRepository = $this->objectManager->create(ProductRepository::class);
-        $actualAssociations = $productRepository->getProductAssociations([22]);
+        $actualAssociations = $this->productRepository->getProductAssociations([22]);
         $this->assertEquals([
             22 => new ProductAssociation(22, [1, 21])
         ], $actualAssociations);
-    }
-    public static function loadProductsFixture()
-    {
-        include __DIR__ . '/../_files/products.php';
     }
     public static function loadConfigurableProductsFixture()
     {

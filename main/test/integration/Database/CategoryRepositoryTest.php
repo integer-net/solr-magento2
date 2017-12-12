@@ -16,31 +16,61 @@ use IntegerNet\Solr\Model\Bridge\ProductFactory;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\TestFramework\ObjectManager;
 use PHPUnit\Framework\TestCase;
+use TddWizard\Fixtures\Catalog\CategoryBuilder;
+use TddWizard\Fixtures\Catalog\CategoryFixture;
+use TddWizard\Fixtures\Catalog\CategoryFixtureRollback;
+use TddWizard\Fixtures\Catalog\ProductBuilder;
+use TddWizard\Fixtures\Catalog\ProductFixture;
+use TddWizard\Fixtures\Catalog\ProductFixtureRollback;
+use Magento\Catalog\Model\Category;
 
 class CategoryRepositoryTest extends TestCase
 {
     /** @var  ObjectManager */
     protected $objectManager;
 
+    /**
+     * @var ProductFixture
+     */
+    private $product;
+
+    /**
+     * @var CategoryFixture
+     */
+    private $category;
+
     protected function setUp()
     {
         $this->objectManager = ObjectManager::getInstance();
+        $this->product = new ProductFixture(
+            ProductBuilder::aSimpleProduct()->build()
+        );
+        $this->category = new CategoryFixture(
+            CategoryBuilder::topLevelCategory()->withProducts(
+                [
+                    $this->product->getSku()
+                ]
+            )->build()
+        );
+    }
+
+    protected function tearDown()
+    {
+        ProductFixtureRollback::create()->execute($this->product);
+        CategoryFixtureRollback::create()->execute($this->category);
     }
 
     /**
-     * @magentoDataFixture loadFixture
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      */
     public function testItLoadsCategoryIdsForProduct()
     {
         $storeId = 1;
-        $sku = 'product-1';
-        $expectedResult = [333];
+        $expectedResult = [$this->category->getId()];
 
         /** @var MagentoProduct $magentoProduct */
         $magentoProduct = $this->objectManager->create(\Magento\Catalog\Model\Product::class);
-        $magentoProduct->load($magentoProduct->getIdBySku($sku));
+        $magentoProduct->load($this->product->getId());
 
         /** @var ProductFactory $productFactory */
         $productFactory = $this->objectManager->create(ProductFactory::class);
@@ -56,8 +86,6 @@ class CategoryRepositoryTest extends TestCase
 
         $this->assertEquals($expectedResult, $actualResult);
     }
-    public static function loadFixture()
-    {
-        include __DIR__ . '/../_files/products.php';
-    }
+
 }
+

@@ -35,5 +35,6 @@ class AppFactoryTest extends TestCase
         /** @var AppFactory $appFactory */
         $appFactory = $this->objectManager->create(AppFactory::class);
         $appFactory->getCacheWriter()->write($appFactory->getStoreConfig());
+        $this->markTestIncomplete('No assertions');
     }
 }
