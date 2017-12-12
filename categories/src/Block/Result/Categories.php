@@ -10,23 +10,24 @@
 namespace IntegerNet\SolrCategories\Block\Result;
 
 use IntegerNet\SolrCategories\Model\ResourceModel\CategoriesCollection;
+use IntegerNet\SolrCategories\Model\ResourceModel\CategoriesCollectionFactory;
 use Magento\Catalog\Block\Product\Context;
 
 class Categories extends \Magento\Catalog\Block\Product\AbstractProduct
 {
     /**
-     * @var CategoriesCollection
+     * @var CategoriesCollectionFactory
      */
-    private $categoriesCollection;
+    private $categoriesCollectionFactory;
 
     public function __construct(
         Context $context,
-        CategoriesCollection $categoriesCollection,
+        CategoriesCollectionFactory $categoriesCollectionFactory,
         array $data
     )
     {
         parent::__construct($context, $data);
-        $this->categoriesCollection = $categoriesCollection;
+        $this->categoriesCollectionFactory = $categoriesCollectionFactory;
     }
 
     /**
@@ -34,7 +35,7 @@ class Categories extends \Magento\Catalog\Block\Product\AbstractProduct
      */
     public function getResultsCollection()
     {
-        return $this->categoriesCollection;
+        return $this->categoriesCollectionFactory->create();
     }
 
     /**
