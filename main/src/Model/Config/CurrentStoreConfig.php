@@ -13,7 +13,6 @@ namespace IntegerNet\Solr\Model\Config;
 use IntegerNet\Solr\Model\Bridge\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 class CurrentStoreConfig extends Config
@@ -23,18 +22,9 @@ class CurrentStoreConfig extends Config
      * @param StoreManagerInterface $storeManager
      * @param DirectoryList $directoryList
      */
-    public function __construct(
-        ScopeConfigInterface $scopeConfig,
-        StoreManagerInterface $storeManager,
-        DirectoryList $directoryList,
-        SerializerInterface $serializer
-    ) {
-        parent::__construct(
-            $scopeConfig,
-            $storeManager,
-            $directoryList,
-            $storeManager->getStore()->getId(),
-            $serializer
-        );
+    public function __construct(ScopeConfigInterface $scopeConfig, StoreManagerInterface $storeManager, DirectoryList $directoryList)
+    {
+        parent::__construct($scopeConfig, $storeManager, $directoryList, $storeManager->getStore()->getId());
     }
+
 }
