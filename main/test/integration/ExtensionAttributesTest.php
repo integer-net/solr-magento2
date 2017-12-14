@@ -15,8 +15,9 @@ use Magento\Catalog\Api\Data\ProductExtensionInterfaceFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class ExtensionAttributesTest extends \PHPUnit_Framework_TestCase
+class ExtensionAttributesTest extends TestCase
 {
     /**
      * @var ExtensionAttributesFactory

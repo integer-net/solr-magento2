@@ -16,8 +16,9 @@ use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
+use PHPUnit\Framework\TestCase;
 
-class StoreEmulationTest extends \PHPUnit_Framework_TestCase
+class StoreEmulationTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|LocaleResolver

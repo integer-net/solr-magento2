@@ -13,8 +13,9 @@ namespace IntegerNet\Solr\Indexer;
 use IntegerNet\Solr\Model\Indexer\ProductCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class ProductCollectionFactoryTest extends \PHPUnit_Framework_TestCase
+class ProductCollectionFactoryTest extends TestCase
 {
     /**
      * @var ObjectManager

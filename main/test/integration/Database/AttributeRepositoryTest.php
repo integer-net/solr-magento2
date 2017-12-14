@@ -4,8 +4,9 @@ namespace IntegerNet\Solr\Database;
 use IntegerNet\Solr\Implementor\AttributeRepository;
 use IntegerNet\Solr\Model\Bridge;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
+class AttributeRepositoryTest extends TestCase
 {
     /** @var  ObjectManager */
     protected $objectManager;

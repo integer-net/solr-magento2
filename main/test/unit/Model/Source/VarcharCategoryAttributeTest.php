@@ -9,12 +9,13 @@ use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Api\SortOrder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \IntegerNet\Solr\Model\Source\VarcharCategoryAttribute
  * @covers AttributeSearchCriteriaBuilder
  */
-class VarcharCategoryAttributeTest extends \PHPUnit_Framework_TestCase
+class VarcharCategoryAttributeTest extends TestCase
 {
     use AttributeRepositoryMock;
 

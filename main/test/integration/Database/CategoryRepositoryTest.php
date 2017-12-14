@@ -15,8 +15,9 @@ use IntegerNet\Solr\Model\Bridge\Product;
 use IntegerNet\Solr\Model\Bridge\ProductFactory;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class CategoryRepositoryTest extends \PHPUnit_Framework_TestCase
+class CategoryRepositoryTest extends TestCase
 {
     /** @var  ObjectManager */
     protected $objectManager;

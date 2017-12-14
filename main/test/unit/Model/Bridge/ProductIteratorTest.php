@@ -16,11 +16,12 @@ use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\ManagerInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers ProductIterator
  */
-class ProductIteratorTest extends \PHPUnit_Framework_TestCase
+class ProductIteratorTest extends TestCase
 {
     /**
      * @dataProvider dataIterator

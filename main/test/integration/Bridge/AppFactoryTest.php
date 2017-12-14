@@ -13,9 +13,9 @@ namespace IntegerNet\Solr\Bridge;
 use IntegerNet\SolrSuggest\Plain\Cache\CacheWriter;
 use Magento\TestFramework\ObjectManager;
 use IntegerNet\Solr\Model\Bridge\AppFactory;
+use PHPUnit\Framework\TestCase;
 
-
-class AppFactoryTest extends \PHPUnit_Framework_TestCase
+class AppFactoryTest extends TestCase
 {
     /** @var  ObjectManager */
     protected $objectManager;

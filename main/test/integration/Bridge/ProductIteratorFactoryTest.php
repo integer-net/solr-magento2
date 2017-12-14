@@ -11,8 +11,9 @@ namespace IntegerNet\Solr\Model\Bridge;
 
 use Magento\TestFramework\ObjectManager;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use PHPUnit\Framework\TestCase;
 
-class ProductIteratorFactoryTest extends \PHPUnit_Framework_TestCase
+class ProductIteratorFactoryTest extends TestCase
 {
     /** @var  ObjectManager */
     protected $objectManager;

@@ -13,8 +13,9 @@ use IntegerNet\Solr\Model\Plugin\CollectionProviderPlugin;
 use Magento\Catalog\Model\Layer\ItemCollectionProviderInterface;
 use Magento\TestFramework\Interception\PluginList;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class CollectionReplaceTest extends \PHPUnit_Framework_TestCase
+class CollectionReplaceTest extends TestCase
 {
 
     public function testTheCollectionProviderPluginIsRegistered()

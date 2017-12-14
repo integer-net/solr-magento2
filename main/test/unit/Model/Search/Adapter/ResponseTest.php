@@ -13,8 +13,9 @@ namespace IntegerNet\Solr\Model\Search\Adapter;
 
 use IntegerNet\Solr\Request\FakeRequest;
 use IntegerNet\Solr\Response\Response as SolrResponse;
+use PHPUnit\Framework\TestCase;
 
-class ResponseTest extends \PHPUnit_Framework_TestCase
+class ResponseTest extends TestCase
 {
     /**
      * @dataProvider dataResponseAsArray

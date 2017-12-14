@@ -11,8 +11,9 @@ namespace IntegerNet\Solr\Database;
 
 use IntegerNet\Solr\Model\ResourceModel\CategoryPosition;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class CategoryPositionTest extends \PHPUnit_Framework_TestCase
+class CategoryPositionTest extends TestCase
 {
     /**
      * @var CategoryPosition

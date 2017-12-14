@@ -12,8 +12,9 @@ namespace IntegerNet\Solr\Model\Indexer;
 
 
 use IntegerNet\Solr\Indexer\ProductIndexer;
+use PHPUnit\Framework\TestCase;
 
-class FulltextTest extends \PHPUnit_Framework_TestCase
+class FulltextTest extends TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|ProductIndexer  */
     private $solrIndexerMock;

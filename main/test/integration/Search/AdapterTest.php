@@ -16,8 +16,9 @@ use IntegerNet\Solr\Resource\ResourceFacade;
 use Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection as FulltextSearchCollection;
 use Magento\Framework\Registry;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class AdapterTest extends \PHPUnit_Framework_TestCase
+class AdapterTest extends TestCase
 {
     /**
      * @var ObjectManager

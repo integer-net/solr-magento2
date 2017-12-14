@@ -18,8 +18,9 @@ use IntegerNet\Solr\Model\Bridge\AttributeRepository;
 use IntegerNet\Solr\Model\Bridge\Product;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class ProductRepositoryTest extends \PHPUnit_Framework_TestCase
+class ProductRepositoryTest extends TestCase
 {
     /** @var  ObjectManager */
     protected $objectManager;
