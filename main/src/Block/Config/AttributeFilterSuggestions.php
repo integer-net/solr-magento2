@@ -16,14 +16,14 @@ use Magento\Framework\View\Layout;
 
 class AttributeFilterSuggestions extends AbstractFieldArray
 {
-    protected $_itemRenderer = null;
+    private $attributeCodeRenderer = null;
 
     protected function _prepareToRender()
     {
         $this->addColumn('attribute_code', [
             'label' => __('Attribute'),
             'style' => 'width:120px',
-            'renderer' => $this->_getRenderer(),
+            'renderer' => $this->getAttributeCodeRenderer(),
         ]);
         $this->addColumn('max_number_suggestions', [
             'label' => __('Maximum number of suggestions'),
@@ -43,14 +43,16 @@ class AttributeFilterSuggestions extends AbstractFieldArray
     /**
      * @return \IntegerNet\Solr\Block\Config\Adminhtml\Form\Field\Attribute
      */
-    protected function  _getRenderer() {
-        if (!$this->_itemRenderer) {
-            $this->_itemRenderer = $this->getLayout()->createBlock(
-                Attribute::class, '',
+    private function getAttributeCodeRenderer()
+    {
+        if (!$this->attributeCodeRenderer) {
+            $this->attributeCodeRenderer = $this->getLayout()->createBlock(
+                Attribute::class,
+                '',
                 ['is_render_to_js_template' => true]
             );
         }
-        return $this->_itemRenderer;
+        return $this->attributeCodeRenderer;
     }
 
     /**
@@ -60,10 +62,12 @@ class AttributeFilterSuggestions extends AbstractFieldArray
      */
     protected function _prepareArrayRow(DataObject $row)
     {
-        $row->setData(
-            'option_extra_attr_' . $this->_getRenderer()->calcOptionHash($row->getData('attribute_code')),
-            'selected="selected"'
-        );
+        $options = [];
+        $value = $row->getData('attribute_code');
+        if ($value !== null) {
+            $options['option_' . $this->getAttributeCodeRenderer()->calcOptionHash($value)] = 'selected="selected"';
+        }
+        $row->setData('option_extra_attrs', $options);
     }
 
 }
