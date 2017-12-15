@@ -57,4 +57,24 @@ class ConfigTest extends TestCase
         $this->assertArrayHasKey(1, $frontendStoresConfig, 'main store config should be loaded');
     }
 
+    /**
+     * @magentoAppArea frontend
+     * @magentoConfigFixture current_store integernet_solr/autosuggest/attribute_filter_suggestions {"_1513329722653_653":{"attribute_code":"color","max_number_suggestions":"3","sorting":"1"}}
+     */
+    public function testAttributeFilterSuggestionsUnserialized()
+    {
+        /** @var Config $currentStoreConfig */
+        $currentStoreConfig = $this->objectManager->create(CurrentStoreConfig::class);
+        $this->assertEquals(
+            [
+                '_1513329722653_653' => [
+                    'attribute_code' => 'color',
+                    'max_number_suggestions' => 3,
+                    'sorting' => 1
+                ]
+            ],
+            $currentStoreConfig->getAutosuggestConfig()->getAttributeFilterSuggestions()
+        );
+    }
+
 }
