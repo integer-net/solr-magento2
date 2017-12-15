@@ -67,7 +67,8 @@ class StoreEmulationTest extends TestCase
         $callback->expects($this->once())->method('__invoke')->willThrowException(new \Exception($exceptionMessage));
 
         $this->setStartStopExpectations($storeId);
-        $this->setExpectedException(\Exception::class, $exceptionMessage);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage($exceptionMessage);
 
         $storeEmulation = new StoreEmulation($this->appEmulationMock, $this->localeResolverMock, $this->storeManagerMock);
         $storeEmulation->runInStore($storeId, $callback);

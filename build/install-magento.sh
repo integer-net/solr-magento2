@@ -33,9 +33,9 @@ composer config minimum-stability dev
 composer require integer-net/solr-magento2 dev-tmp --no-update
 composer require --dev tddwizard/magento2-fixtures 0.3.0 --no-update
 phpunit_version="$(composer info | grep "phpunit/phpunit " | awk '{ print $2 }')"
-phpunit_minimum="5.0.0"
+phpunit_minimum="5.7.0"
 if [ "$(printf "$phpunit_minimum\n$phpunit_version" | sort -V | head -n1)" == "$phpunit_version" ] && [ "$phpunit_version" != "$phpunit_minimum" ]; then
-    composer require --dev phpunit/phpunit ^5.0 --no-update
+    composer require --dev phpunit/phpunit ^5.7 --no-update
 fi
 
 composer update
