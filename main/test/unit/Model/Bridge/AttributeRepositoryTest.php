@@ -215,7 +215,8 @@ class AttributeRepositoryTest extends TestCase
             ->expects($this->once())
             ->method('get')
             ->willThrowException(new NoSuchEntityException());
-        $this->setExpectedException(Exception::class, 'Attribute whatever does not exist');
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Attribute whatever does not exist');
         $attributeRepository->getAttributeByCode('whatever', null);
     }
 

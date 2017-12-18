@@ -9,14 +9,13 @@
  */
 namespace IntegerNet\Solr\Controller;
 
-class RedirectTest extends \Magento\TestFramework\TestCase\AbstractController
+use IntegerNet\Solr\Fixtures\SolrConfig;
+
+class RedirectTest extends AbstractController
 {
     /**
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoAppArea frontend
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      */
     public function testCategoryRedirect()
     {
@@ -26,11 +25,8 @@ class RedirectTest extends \Magento\TestFramework\TestCase\AbstractController
     }
 
     /**
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoAppArea frontend
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      */
     public function testDeactivatedCategoryNoRedirect()
     {
@@ -40,11 +36,8 @@ class RedirectTest extends \Magento\TestFramework\TestCase\AbstractController
     }
 
     /**
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoAppArea frontend
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      */
     public function testProductRedirectBySku()
     {
@@ -54,11 +47,8 @@ class RedirectTest extends \Magento\TestFramework\TestCase\AbstractController
     }
 
     /**
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoAppArea frontend
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      */
     public function testProductRedirectByName()
     {
@@ -68,11 +58,8 @@ class RedirectTest extends \Magento\TestFramework\TestCase\AbstractController
     }
 
     /**
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoAppArea frontend
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      */
     public function testDeactivatedProductNoRedirect()
     {
@@ -81,13 +68,9 @@ class RedirectTest extends \Magento\TestFramework\TestCase\AbstractController
         $this->assertFalse($this->getResponse()->isRedirect());
     }
 
-    public static function loadFixture()
+    public static function setUpBeforeClass()
     {
-        if (file_exists(__DIR__ . '/../_files/solr_config.php')) {
-            include __DIR__ . '/../_files/solr_config.php';
-        } else {
-            include __DIR__ . '/../_files/solr_config.dist.php';
-        }
+        SolrConfig::loadFromConfigFile();
 
         include __DIR__ . '/../_files/categories_basestore.php';
         include __DIR__ . '/../_files/products.php';

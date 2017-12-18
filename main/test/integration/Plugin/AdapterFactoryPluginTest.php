@@ -9,14 +9,16 @@
  */
 namespace IntegerNet\Solr\Plugin;
 
+use IntegerNet\Solr\Controller\AbstractController;
+use IntegerNet\Solr\Fixtures\SolrConfig;
 use IntegerNet\Solr\Model\Plugin\AdapterFactoryPlugin;
+use IntegerNet\Solr\Model\Search\Adapter\SolrAdapter;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Search\Adapter\Mysql\Adapter as MysqlAdapter;
 use Magento\Search\Model\AdapterFactory;
 use Magento\TestFramework\Interception\PluginList;
-use IntegerNet\Solr\Model\Search\Adapter\SolrAdapter;
-use Magento\Framework\Search\Adapter\Mysql\Adapter as MysqlAdapter;
 
-
-class AdapterFactoryPluginTest extends \Magento\TestFramework\TestCase\AbstractController
+class AdapterFactoryPluginTest extends AbstractController
 {
     /**
      * @magentoAppArea frontend
@@ -32,82 +34,57 @@ class AdapterFactoryPluginTest extends \Magento\TestFramework\TestCase\AbstractC
 
     /**
      * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture default/integernet_solr/general/is_active 0
      */
-    public function testMysqlAdapterIsCreated()
+    public function testSolrAdapterIsCreatedIfModuleEnabled()
     {
-        /** @var AdapterFactory $adapterFactory */
-        $adapterFactory = $this->_objectManager->create(AdapterFactory::class);
-
-        $adapter = $adapterFactory->create();
-        $this->assertInstanceOf(MysqlAdapter::class, $adapter);
+        $this->assertSearchAdapterInstanceOf(SolrAdapter::class);
     }
 
     /**
      * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
-     * @magentoConfigFixture default/integernet_solr/category/is_active 0
      */
-    public function testSolrAdapterIsCreated()
+    public function testMysqlAdapterIsCreatedIfModuleDisabled()
     {
-        /** @var AdapterFactory $adapterFactory */
-        $adapterFactory = $this->_objectManager->create(AdapterFactory::class);
-
-        $adapter = $adapterFactory->create();
-        $this->assertInstanceOf(SolrAdapter::class, $adapter);
+        SolrConfig::loadAdditional(['integernet_solr/general/is_active' => 0]);
+        $this->assertSearchAdapterInstanceOf(MysqlAdapter::class);
     }
 
     /**
      * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
-     * @magentoConfigFixture default/integernet_solr/category/is_active 0
      */
     public function testMysqlAdapterIsCreatedOnCategoryPage()
     {
-        $this->dispatch('catalog/category/view/id/333');
-
-        /** @var AdapterFactory $adapterFactory */
-        $adapterFactory = $this->_objectManager->create(AdapterFactory::class);
-
-        $adapter = $adapterFactory->create();
-        $this->assertInstanceOf(MysqlAdapter::class, $adapter);
+        $this->simulateCategoryRequest();
+        $this->assertSearchAdapterInstanceOf(MysqlAdapter::class);
     }
 
     /**
      * @magentoAppArea frontend
-     * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
-     * @magentoConfigFixture default/integernet_solr/category/is_active 1
      */
-    public function testSolrAdapterIsCreatedOnCategoryPage()
+    public function testSolrAdapterIsCreatedOnCategoryPageIfSolrIsEnabledForCategories()
     {
-        $this->dispatch('catalog/category/view/id/333');
-
-        /** @var AdapterFactory $adapterFactory */
-        $adapterFactory = $this->_objectManager->create(AdapterFactory::class);
-
-        $adapter = $adapterFactory->create();
-        $this->assertInstanceOf(SolrAdapter::class, $adapter);
+        SolrConfig::loadAdditional(['integernet_solr/category/is_active' => 1]);
+        $this->simulateCategoryRequest();
+        $this->assertSearchAdapterInstanceOf(SolrAdapter::class);
     }
 
-    public static function loadFixture()
+
+    private function simulateCategoryRequest()
     {
-        if (file_exists(__DIR__ . '/../_files/solr_config.php')) {
-            include __DIR__ . '/../_files/solr_config.php';
-        } else {
-            include __DIR__ . '/../_files/solr_config.dist.php';
-        }
-        include __DIR__ . '/../_files/categories.php';
+        /** @var RequestInterface $request */
+        $request = $this->objectManager->get(\Magento\Framework\App\RequestInterface::class);
+        $request->setModuleName('catalog');
+    }
+
+    private function assertSearchAdapterInstanceOf(string $class)
+    {
+        /** @var AdapterFactory $adapterFactory */
+        $adapterFactory = $this->_objectManager->create(AdapterFactory::class);
+        $adapter = $adapterFactory->create();
+        $this->assertInstanceOf($class, $adapter);
     }
 }

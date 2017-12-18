@@ -40,6 +40,8 @@ class CategoryPositionTest extends TestCase
     public function testGetCategoryPositions($productId, $storeId, $expectedPositions)
     {
         $positions = $this->categoryPosition->getCategoryPositions($productId, $storeId);
+        // We do not care about the position of the root category, which depends on the Magento version
+        $positions[0]['position'] = '0';
         $this->assertEquals($expectedPositions, $positions);
     }
     public static function dataCategoryPositions()
@@ -49,7 +51,7 @@ class CategoryPositionTest extends TestCase
                 'product_id' => 333,
                 'store_id' => 1,
                 'expected_positions' => [
-                    ['category_id' => '2', 'position' => '1'],
+                    ['category_id' => '2', 'position' => '0'],
                     ['category_id' => '333', 'position' => '10'],
                 ]
             ]

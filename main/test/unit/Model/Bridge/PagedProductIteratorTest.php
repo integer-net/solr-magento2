@@ -101,7 +101,7 @@ class PagedProductIteratorTest extends TestCase
         }
 
         if ($expectedException) {
-            $this->setExpectedExceptionRegExp($expectedException);
+            $this->expectExceptionMessageRegExp($expectedException);
         }
         $subset = $iterator->subset($subsetIds);
         $this->assertInstanceOf(ProductIterator::class, $subset);
