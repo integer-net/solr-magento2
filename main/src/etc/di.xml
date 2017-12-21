@@ -149,6 +149,16 @@
     </arguments>
   </type>
 
+  <!-- Console commands -->
+  <type name="\Magento\Framework\Console\CommandList">
+    <arguments>
+      <argument name="commands" xsi:type="array">
+        <item name="solr_reindex" xsi:type="object">IntegerNet\Solr\Console\Command\ReindexCommand\Proxy</item>
+      </argument>
+    </arguments>
+  </type>
+
+
 
   <!-- Magento bugfixes -->
 

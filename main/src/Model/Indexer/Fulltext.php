@@ -43,9 +43,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeFull()
     {
-        $this->urlFactoryPlugin->setForceFrontend(true);
-        $this->solrIndexer->reindex(null, true);
-        $this->urlFactoryPlugin->setForceFrontend(false);
+        $this->reindex(null, true);
     }
 
     /**
@@ -56,9 +54,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeList(array $ids)
     {
-        $this->urlFactoryPlugin->setForceFrontend(true);
-        $this->solrIndexer->reindex($ids);
-        $this->urlFactoryPlugin->setForceFrontend(false);
+        $this->reindex($ids);
     }
 
     /**
@@ -69,7 +65,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeRow($id)
     {
-        $this->executeList([$id]);
+        $this->reindex([$id]);
     }
 
     /**
@@ -81,6 +77,34 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function execute($ids)
     {
-        $this->executeList($ids);
+        $this->reindex($ids);
+    }
+
+    /**
+     * Call product indexer
+     *
+     * @param array|null $productIds Restrict to given Products if this is set
+     * @param boolean|string $emptyIndex Whether to truncate the index before refilling it
+     * @param null|int[] $restrictToStoreIds
+     * @param null|int $sliceId
+     * @param null|int $totalNumberSlices
+     * @throws \Exception
+     */
+    protected function reindex(
+        $productIds = null,
+        $emptyIndex = false,
+        $restrictToStoreIds = null,
+        $sliceId = null,
+        $totalNumberSlices = null
+    ) {
+        $this->urlFactoryPlugin->setForceFrontend(true);
+        $this->solrIndexer->reindex(
+            $productIds,
+            $emptyIndex,
+            $restrictToStoreIds,
+            $sliceId,
+            $totalNumberSlices
+        );
+        $this->urlFactoryPlugin->setForceFrontend(false);
     }
 }

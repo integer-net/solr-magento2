@@ -10,67 +10,47 @@
 
 namespace IntegerNet\Solr\Model\Indexer;
 
-
 use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\Solr\Plugin\UrlFactoryPlugin;
 use PHPUnit\Framework\TestCase;
 
-class FulltextTest extends TestCase
+class FulltextTest extends AbstractIndexerTest
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProductIndexer  */
-    private $solrIndexerMock;
-    /**
-     * @var Fulltext
-     */
-    private $fulltext;
+    /** @var Fulltext */
+    private $indexer;
 
-    protected function setUp()
-    {
-        $this->solrIndexerMock = $this->getMockBuilder(ProductIndexer::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['reindex', 'deleteIndex'])
-            ->getMock();
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ProductIndexerFactory $indexerFactoryStub */
-        $indexerFactoryStub = $this->getMockBuilder(ProductIndexerFactory::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['create'])
-            ->getMock();
-        $indexerFactoryStub->method('create')->willReturn($this->solrIndexerMock);
-
-        $urlFactoryPluginStub = $this->getMockBuilder(\IntegerNet\Solr\Plugin\UrlFactoryPlugin::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['setForceFrontend'])
-            ->getMock();
-        $this->fulltext = new Fulltext($indexerFactoryStub, $urlFactoryPluginStub);
-    }
     public function testExecuteFull()
     {
-        $this->solrIndexerMock->expects($this->once())
-            ->method('reindex')
-            ->with(null, true, null);
-        $this->fulltext->executeFull();
+        $this->expectForcedFrontendUrls();
+        $this->expectReindexWithArguments(null, true, null);
+        $this->indexer->executeFull();
     }
+
     public function testExecuteList()
     {
         $productIds = [1, 2, 3, 5];
-        $this->solrIndexerMock->expects($this->once())
-            ->method('reindex')
-            ->with($productIds, false, null);
-        $this->fulltext->executeList($productIds);
+        $this->expectReindexWithArguments($productIds, false, null);
+        $this->indexer->executeList($productIds);
     }
+
     public function testExecute()
     {
         $productIds = [1, 2, 3, 5];
-        $this->solrIndexerMock->expects($this->once())
-            ->method('reindex')
-            ->with($productIds, false, null);
-        $this->fulltext->execute($productIds);
+        $this->expectReindexWithArguments($productIds, false, null);
+        $this->indexer->execute($productIds);
     }
+
     public function testExecuteRow()
     {
         $productId = 42;
-        $this->solrIndexerMock->expects($this->once())
-            ->method('reindex')
-            ->with([$productId], false, null);
-        $this->fulltext->executeRow($productId);
+        $this->expectReindexWithArguments([$productId], false, null);
+        $this->indexer->executeRow($productId);
     }
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->indexer = new Fulltext($this->indexerFactoryStub, $this->urlFactoryPluginMock);
+    }
+
 }
