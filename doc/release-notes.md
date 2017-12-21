@@ -2,7 +2,7 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
-Upcoming
+Version 1.4.2 (Dec 21, 2017)
 --------------
 
 - Fix Category URLs in autosuggest if links to category pages are activated.
