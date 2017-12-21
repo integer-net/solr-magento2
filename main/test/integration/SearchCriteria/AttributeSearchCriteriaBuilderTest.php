@@ -12,13 +12,14 @@ namespace IntegerNet\Solr\Model\SearchCriteria;
 
 
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Note: This is an integration test because behavior of generated factory and side effects of builder operations are being tested
  *
  * @package IntegerNet\Solr\Model\SearchCriteria
  */
-class AttributeSearchCriteriaBuilderTest extends \PHPUnit_Framework_TestCase
+class AttributeSearchCriteriaBuilderTest extends TestCase
 {
     /** @var  \Magento\Framework\ObjectManagerInterface */
     private $objectManager;

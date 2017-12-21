@@ -12,8 +12,9 @@ namespace IntegerNet\Solr\Block\Autosuggest;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\View\LayoutInterface;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class ItemTest extends \PHPUnit_Framework_TestCase
+class ItemTest extends TestCase
 {
     /** @var  ObjectManager */
     protected $objectManager;

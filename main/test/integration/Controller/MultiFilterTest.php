@@ -9,31 +9,19 @@
  */
 namespace IntegerNet\Solr\Controller;
 
+use IntegerNet\Solr\Fixtures\SolrConfig;
 use IntegerNet\Solr\Model\Indexer\Fulltext as ProductFulltextIndexer;
 use Magento\Eav\Api\AttributeOptionManagementInterface;
 use Magento\TestFramework\ObjectManager;
 
-class MultiFilterTest extends \Magento\TestFramework\TestCase\AbstractController
+class MultiFilterTest extends AbstractController
 {
     private $options = [];
-
-    /** @var  ObjectManager */
-    protected $objectManager;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->objectManager = ObjectManager::getInstance();
-    }
+    const XPATH_PRODUCTS_CONTAINER = '//div[@class="search results"]';
 
     /**
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture current_store integernet_solr/general/is_active 1
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoAppArea frontend
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      */
     public function testUnfilteredResult()
     {
@@ -41,17 +29,14 @@ class MultiFilterTest extends \Magento\TestFramework\TestCase\AbstractController
 
         $this->dispatch('catalogsearch/result/index?q=product');
 
-        $this->assertContains('Product name in store', $this->getResponse()->getBody());
-        $this->assertContains('Product 2 name in store', $this->getResponse()->getBody());
+        $this->assertDomElementPresent(self::XPATH_PRODUCTS_CONTAINER, 'Element with search results should be present');
+        $this->assertDomElementContains(self::XPATH_PRODUCTS_CONTAINER, 'Product name in store');
+        $this->assertDomElementContains(self::XPATH_PRODUCTS_CONTAINER, 'Product 2 name in store');
     }
 
     /**
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture current_store integernet_solr/general/is_active 1
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoAppArea frontend
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      */
     public function testSelectSingleFilterSuccess()
     {
@@ -59,17 +44,14 @@ class MultiFilterTest extends \Magento\TestFramework\TestCase\AbstractController
 
         $this->dispatch('catalogsearch/result/index?q=product&filterable_attribute_a[]=' . $this->options['Attribute A Option 1']);
 
-        $this->assertContains('Product name in store', $this->getResponse()->getBody());
-        $this->assertNotContains('Product 2 name in store', $this->getResponse()->getBody());
+        $this->assertDomElementPresent(self::XPATH_PRODUCTS_CONTAINER, 'Element with search results should be present');
+        $this->assertDomElementContains(self::XPATH_PRODUCTS_CONTAINER, 'Product name in store');
+        $this->assertDomElementNotContains(self::XPATH_PRODUCTS_CONTAINER, 'Product 2 name in store');
     }
 
     /**
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture current_store integernet_solr/general/is_active 1
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoAppArea frontend
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      */
     public function testSelectMultiFilterSuccess()
     {
@@ -77,17 +59,14 @@ class MultiFilterTest extends \Magento\TestFramework\TestCase\AbstractController
 
         $this->dispatch('catalogsearch/result/index?q=product&filterable_attribute_a[]=' . $this->options['Attribute A Option 1'] . '&filterable_attribute_a[]=' . $this->options['Attribute A Option 3']);
 
-        $this->assertContains('Product name in store', $this->getResponse()->getBody());
-        $this->assertNotContains('Product 2 name in store', $this->getResponse()->getBody());
+        $this->assertDomElementPresent(self::XPATH_PRODUCTS_CONTAINER, 'Element with search results should be present');
+        $this->assertDomElementContains(self::XPATH_PRODUCTS_CONTAINER, 'Product name in store');
+        $this->assertDomElementNotContains(self::XPATH_PRODUCTS_CONTAINER, 'Product 2 name in store');
     }
 
     /**
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture current_store integernet_solr/general/is_active 1
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoAppArea frontend
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      */
     public function testMultiselectSingleFilterSuccess()
     {
@@ -95,17 +74,14 @@ class MultiFilterTest extends \Magento\TestFramework\TestCase\AbstractController
 
         $this->dispatch('catalogsearch/result/index?q=product&filterable_attribute_b[]=' . $this->options['Attribute B Option 1']);
 
-        $this->assertContains('Product name in store', $this->getResponse()->getBody());
-        $this->assertNotContains('Product 2 name in store', $this->getResponse()->getBody());
+        $this->assertDomElementPresent(self::XPATH_PRODUCTS_CONTAINER, 'Element with search results should be present');
+        $this->assertDomElementContains(self::XPATH_PRODUCTS_CONTAINER, 'Product name in store');
+        $this->assertDomElementNotContains(self::XPATH_PRODUCTS_CONTAINER, 'Product 2 name in store');
     }
 
     /**
-     * @magentoDataFixture loadFixture
-     * @magentoConfigFixture current_store integernet_solr/general/is_active 1
-     * @magentoConfigFixture default/integernet_solr/general/is_active 1
      * @magentoAppArea frontend
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      */
     public function testMultiselectMultiFilterSuccess()
     {
@@ -113,17 +89,14 @@ class MultiFilterTest extends \Magento\TestFramework\TestCase\AbstractController
 
         $this->dispatch('catalogsearch/result/index?q=product&filterable_attribute_b[]=' . $this->options['Attribute B Option 1'] . '&filterable_attribute_b[]=' . $this->options['Attribute B Option 3']);
 
-        $this->assertContains('Product name in store', $this->getResponse()->getBody());
-        $this->assertNotContains('Product 2 name in store', $this->getResponse()->getBody());
+        $this->assertDomElementPresent(self::XPATH_PRODUCTS_CONTAINER, 'Element with search results should be present');
+        $this->assertDomElementContains(self::XPATH_PRODUCTS_CONTAINER, 'Product name in store');
+        $this->assertDomElementNotContains(self::XPATH_PRODUCTS_CONTAINER, 'Product 2 name in store');
     }
 
-    public static function loadFixture()
+    public static function setUpBeforeClass()
     {
-        if (file_exists(__DIR__ . '/../_files/solr_config.php')) {
-            include __DIR__ . '/../_files/solr_config.php';
-        } else {
-            include __DIR__ . '/../_files/solr_config.dist.php';
-        }
+        SolrConfig::loadFromConfigFile();
 
         include __DIR__ . '/../_files/filterable_attributes.php';
         include __DIR__ . '/../_files/filterable_products.php';
@@ -151,4 +124,5 @@ class MultiFilterTest extends \Magento\TestFramework\TestCase\AbstractController
             $this->options[$option->getLabel()] = $option->getValue();
         }
     }
+
 }

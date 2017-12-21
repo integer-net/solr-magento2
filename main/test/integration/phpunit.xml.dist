@@ -11,7 +11,7 @@
 >
     <testsuites>
         <testsuite name="IntegerNet_Solr Integration Tests">
-            <directory suffix="Test.php">../../../vendor/integer-net/solr-magento2/test/integration</directory>
+            <directory suffix="Test.php">../../../vendor/integer-net/solr-magento2/main/test/integration</directory>
         </testsuite>
     </testsuites>
     <!-- PHP INI settings and constants definition -->

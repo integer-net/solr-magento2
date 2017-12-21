@@ -16,8 +16,9 @@ use IntegerNet\Solr\Model\Config\CurrentStoreConfig;
 use IntegerNet\Solr\Model\Config\AllStoresConfig;
 use IntegerNet\Solr\Model\Config\FrontendStoresConfig;
 use Magento\TestFramework\ObjectManager;
+use PHPUnit\Framework\TestCase;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends TestCase
 {
     /** @var  ObjectManager */
     protected $objectManager;
@@ -54,6 +55,26 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(FrontendStoresConfig::class, $frontendStoresConfig);
         $this->assertArrayNotHasKey(0, $frontendStoresConfig, 'admin (default) store config should not be loaded');
         $this->assertArrayHasKey(1, $frontendStoresConfig, 'main store config should be loaded');
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoConfigFixture current_store integernet_solr/autosuggest/attribute_filter_suggestions {"_1513329722653_653":{"attribute_code":"color","max_number_suggestions":"3","sorting":"1"}}
+     */
+    public function testAttributeFilterSuggestionsUnserialized()
+    {
+        /** @var Config $currentStoreConfig */
+        $currentStoreConfig = $this->objectManager->create(CurrentStoreConfig::class);
+        $this->assertEquals(
+            [
+                '_1513329722653_653' => [
+                    'attribute_code' => 'color',
+                    'max_number_suggestions' => 3,
+                    'sorting' => 1
+                ]
+            ],
+            $currentStoreConfig->getAutosuggestConfig()->getAttributeFilterSuggestions()
+        );
     }
 
 }

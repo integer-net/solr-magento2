@@ -10,7 +10,8 @@
     "magento/module-search": "^100.1.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^5.0"
+    "phpunit/phpunit": "^5.7",
+    "tddwizard/magento2-fixtures": "0.3.0"
   },
   "type": "magento2-module",
   "license": [
@@ -27,7 +28,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "IntegerNet\\Solr\\": "main/test/unit",
+      "IntegerNet\\Solr\\": ["main/test/unit", "main/test/integration"],
       "IntegerNet\\SolrCategories\\": "categories/test/unit"
     }
   },

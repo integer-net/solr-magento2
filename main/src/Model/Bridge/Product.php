@@ -109,10 +109,8 @@ class Product implements ProductInterface
         if (! \in_array($this->magentoProduct->getStore()->getWebsiteId(), $this->magentoProduct->getWebsiteIds())) {
             return false;
         }
-        if ($solrExcludeCustomAttribute = $this->getMagentoProduct()->getCustomAttribute('solr_exclude')) {
-            if ($solrExcludeCustomAttribute->getValue()) {
-                return false;
-            }
+        if ($solrExcludeValue = $this->magentoProduct->getData('solr_exclude')) {
+            return false;
         }
         return true;
     }
@@ -145,14 +143,11 @@ class Product implements ProductInterface
 
     public function getSolrBoost()
     {
-        $boost = 1;
-        if ($solrBoostCustomAttribute = $this->getMagentoProduct()->getCustomAttribute('solr_boost')) {
-            $boost = $solrBoostCustomAttribute->getValue();
+        $boost = $this->getMagentoProduct()->getData('solr_boost');
+        if ($boost === null) {
+            $boost = 1;
         }
         if (!$this->isInStock()) {
-            if ($boost === null) {
-                $boost = 1;
-            }
             $boost *= floatval($this->scopeConfig->getValue('integernet_solr/results/priority_outofstock', 'stores', $this->storeId));
         }
         return $boost;
@@ -171,11 +166,7 @@ class Product implements ProductInterface
         if (\method_exists($product, $method)) {
             return $product->$method();
         }
-        $magentoAttribute = $this->getMagentoProduct()->getCustomAttribute($attributeCode);
-        if ($magentoAttribute === null) {
-            return null;
-        }
-        return $magentoAttribute->getValue();
+        return $product->getData($attributeCode);
     }
 
     /**

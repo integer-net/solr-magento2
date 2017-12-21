@@ -13,8 +13,9 @@ namespace IntegerNet\Solr\Frontend;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Store\Model\StoreManagerInterface;
+use PHPUnit\Framework\TestCase;
 
-class AutosuggestFormTest extends \PHPUnit_Framework_TestCase
+class AutosuggestFormTest extends TestCase
 {
     /**
      * @var \Magento\TestFramework\ObjectManager

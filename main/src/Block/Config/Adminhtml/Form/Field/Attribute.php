@@ -14,7 +14,8 @@ use Magento\Framework\View\Element\Context as ViewElementContext;
 use Magento\Framework\View\Element\Html\Select;
 use Magento\Store\Model\StoreManagerInterface;
 
-class Attribute extends Select {
+class Attribute extends Select
+{
     /**
      * Store manager
      *
@@ -35,9 +36,12 @@ class Attribute extends Select {
      * @param ViewElementContext $context
      * @param array $data
      */
-    public function __construct(AttributeRepository $attributeRepository, StoreManagerInterface $storeManager,
-                                ViewElementContext $context, array $data = [])
-    {
+    public function __construct(
+        AttributeRepository $attributeRepository,
+        StoreManagerInterface $storeManager,
+        ViewElementContext $context,
+        array $data = []
+    ) {
         $this->attributeRepository = $attributeRepository;
         $this->storeManager = $storeManager;
         parent::__construct($context, $data);
@@ -49,14 +53,19 @@ class Attribute extends Select {
         $attributes = $this->attributeRepository
             ->getFilterableInSearchAttributes($this->storeManager->getStore()->getId());
 
-        foreach($attributes as $attribute) {
-            $this->addOption($attribute->getAttributeCode(), $attribute->getStoreLabel() . ' [' . $attribute->getAttributeCode() . ']');
+        foreach ($attributes as $attribute) {
+            $this->addOption(
+                $attribute->getAttributeCode(),
+                $attribute->getStoreLabel() . ' [' . $attribute->getAttributeCode() . ']'
+            );
         }
 
         return parent::_toHtml();
     }
 
     /**
+     * Used in \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray::renderCellTemplate()
+     *
      * @param string $value
      * @return $this
      */
@@ -64,4 +73,16 @@ class Attribute extends Select {
     {
         return $this->setName($value);
     }
+
+    /**
+     * Used in \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray::renderCellTemplate()
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setInputId($value)
+    {
+        return $this->setId($value);
+    }
+
 }

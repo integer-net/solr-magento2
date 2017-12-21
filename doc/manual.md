@@ -113,14 +113,14 @@ In the upper area, success messages, error messages, warnings and information me
 
 If this switch is set to "No", the search module cannot be used on the frontend. Instead, the default search of Magento will be used. You can set the options for single websites and store views separately.
 
-<!-- #### License Key
+#### License Key
 
 The module needs a correct license key in order to work correctly. You will get it from us after purchase and payment of the module. Please contact solr@integer-net.com if you are having problems with your license key.
 
 You can test the module for two weeks without any license key. Only after this period, the license key will be necessary for the module to work.
 A license key is valid for one live instance and an arbitrary number of corresponding development, test and staging instances.
 
-Attention: there will be no internet connection to a license server. As soon as a valid license key is entered, the module will work on its own without any external dependencies (except the Solr server of course).-->
+Attention: there will be no internet connection to a license server. As soon as a valid license key is entered, the module will work on its own without any external dependencies (except the Solr server of course).
 
 #### Activate Logging
 
@@ -484,6 +484,10 @@ Even if you don't use IntegerNet_Solr to load product lists on category pages, y
 
 <!-- ### Position of Filters
 For each category, you can change the position of filters, overwriting the default value from the IntegerNet_Solr configuration. Filters can be displayed either in the left column next to the product list or above the product list. -->
+
+### Solr Priority
+
+Use the field “Solr Priority” to weight this category more heavily in the search results. The higher the entered number, the higher the boost factor for this category and its ranking in search results.
 
 Template Adjustments
 --------------------

@@ -5,12 +5,13 @@ use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
 use Magento\Eav\Api\Data\AttributeFrontendLabelInterface;
 use Magento\Eav\Model\Entity\Attribute\Source\Boolean;
 use Magento\Eav\Model\ResourceModel\Entity\AttributeFactory;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \IntegerNet\Solr\Model\Bridge\Attribute
  * @covers \IntegerNet\Solr\Model\Bridge\Source
  */
-class AttributeTest extends \PHPUnit_Framework_TestCase
+class AttributeTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|AttributeResource
