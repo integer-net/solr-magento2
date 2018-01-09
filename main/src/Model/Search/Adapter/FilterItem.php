@@ -10,21 +10,44 @@
 
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
+use Magento\Framework\Pricing\Helper\Data as PriceHelper;
+use Magento\Store\Model\StoreManagerInterface;
+
 class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
 {
+    /**
+     * @var float
+     */
+    private $minAvailableValue;
+    /**
+     * @var float
+     */
+    private $maxAvailableValue;
     /**
      * @var \Magento\Framework\Search\RequestInterface
      */
     private $request;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+    /**
+     * @var PriceHelper
+     */
+    private $priceHelper;
 
     public function __construct(
         \Magento\Framework\UrlInterface $url,
         \Magento\Theme\Block\Html\Pager $htmlPagerBlock,
         \Magento\Framework\App\RequestInterface $request,
+        StoreManagerInterface $storeManager,
+        PriceHelper $priceHelper,
         array $data = []
     ) {
         parent::__construct($url, $htmlPagerBlock, $data);
         $this->request = $request;
+        $this->storeManager = $storeManager;
+        $this->priceHelper = $priceHelper;
     }
 
     public function isActive()
@@ -35,5 +58,91 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
         }
 
         return in_array($this->getValue(), $currentValues);
+    }
+
+    public function canUsePriceSlider()
+    {
+        return $this->getFilter() instanceof \Magento\CatalogSearch\Model\Layer\Filter\Price;
+    }
+
+    /**
+     * @throws \Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return float
+     */
+    public function getMinAvailableValue()
+    {
+        if (!$this->canUsePriceSlider()) {
+            throw new \Exception('This method can only be called on price filters');
+        }
+        if ($this->minAvailableValue === null) {
+            foreach ($this->getFilter()->getItems() as $item) {
+                /** @var FilterItem $item */
+                $itemMinValue = floatval(current(explode('-', $item->getData('value'))));
+                if (($this->minAvailableValue === null) || ($itemMinValue < $this->minAvailableValue)) {
+                    $this->minAvailableValue = $itemMinValue;
+                }
+            }
+        }
+        return $this->minAvailableValue;
+    }
+
+    public function getSelectedMinValue()
+    {
+        $activeFilters = $this->getFilter()->getLayer()->getState()->getFilters();
+        foreach($activeFilters as $activeFilter) {
+            if ($activeFilter->getFilter()->getRequestVar() == $this->getFilter()->getRequestVar()) {
+                return $activeFilter->getData('value')[0];
+            }
+        }
+        return $this->getMinAvailableValue();
+    }
+
+    public function getSelectedMinValueFormatted()
+    {
+        return $this->priceHelper->currency($this->getSelectedMinValue(), true, false);
+    }
+
+    /**
+     * @throws \Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return float
+     */
+    public function getMaxAvailableValue()
+    {
+        if (!$this->canUsePriceSlider()) {
+            throw new \Exception('This method can only be called on price filters');
+        }
+        if ($this->maxAvailableValue === null) {
+            foreach ($this->getFilter()->getItems() as $item) {
+                /** @var FilterItem $item */
+                $itemMaxValue = floatval(explode('-', $item->getData('value'))[1]);
+                if (($this->maxAvailableValue === null) || ($itemMaxValue > $this->maxAvailableValue)) {
+                    $this->maxAvailableValue = $itemMaxValue;
+                }
+            }
+        }
+        return $this->maxAvailableValue;
+    }
+
+    public function getSelectedMaxValue()
+    {
+        $activeFilters = $this->getFilter()->getLayer()->getState()->getFilters();
+        foreach($activeFilters as $activeFilter) {
+            if ($activeFilter->getFilter()->getRequestVar() == $this->getFilter()->getRequestVar()) {
+                return $activeFilter->getData('value')[1];
+            }
+        }
+        return $this->getMaxAvailableValue();
+    }
+
+    public function getSelectedMaxValueFormatted()
+    {
+        return $this->priceHelper->currency($this->getSelectedMaxValue(), true, false);
+    }
+
+    public function getCurrencySymbol()
+    {
+        return $this ->storeManager->getStore()->getCurrentCurrency()->getCurrencySymbol();
     }
 }

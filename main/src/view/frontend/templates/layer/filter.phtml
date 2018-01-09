@@ -9,10 +9,14 @@
  * @var \IntegerNet\Solr\Model\Search\Adapter\FilterItem[] $filterItems
  */
 ?>
-<?php if(current($filterItems)->getData('filter') instanceof \Magento\CatalogSearch\Model\Layer\Filter\Price): ?>
-<?php $attribute = current($filterItems)->getData('filter')->getData('attribute_model')->getFrontendInput() ?>
-    <span class="filter-label"><?php echo __('Price') ?></span>
-    <span class="filter-value">0€ - 100 €</span>
+<?php $filterItem = current($filterItems) ?>
+<?php if ($filterItem->canUsePriceSlider()): ?>
+    <?php $currencySymbol = $filterItem->getCurrencySymbol() ?>
+    <span class="filter-value">
+        <?php echo $filterItem->getSelectedMinValueFormatted() ?>
+        -
+        <?php echo $filterItem->getSelectedMaxValueFormatted() ?>
+    </span>
     <br><br>
     <div class="ui-slider-wrapper">
         <div class="filter-options-slider"></div>
@@ -22,18 +26,22 @@
         require([
             'jquery',
             'jquery/ui',
-            'jQueryUiSlider'
-        ], function ($, _ui, slider) {
+            'jQueryUiSlider',
+            'Magento_Catalog/js/price-utils'
+        ], function ($, _ui, slider, priceUtils) {
 
             var valueContainer = $('.filter-value');
 
             $('.filter-options-slider').slider({
                 range: true,
-                min: 0,
-                max: 100,
-                values: [ 30, 70 ],
-                slide: function( event, ui ) {
-                    var newValue = ui.values[0] + '€ - ' + ui.values[1] + '€';
+                min: <?php echo $filterItem->getMinAvailableValue() ?>,
+                max: <?php echo $filterItem->getMaxAvailableValue() ?>,
+                values: [<?php echo $filterItem->getSelectedMinValue() ?>, <?php echo $filterItem->getSelectedMaxValue() ?>],
+                slide: function (event, ui) {
+                    var newValue = priceUtils.formatPrice(ui.values[0])
+                        + ' <?php echo $currencySymbol ?> - '
+                        + priceUtils.formatPrice(ui.values[1])
+                        + ' <?php echo $currencySymbol ?>';
 
                     valueContainer.html(newValue);
                 }
@@ -49,22 +57,31 @@
                         <div class="filter-options-slider"></div>
                     <?php else: ?>
                         <a class="filter-options-link" href="<?php echo $block->escapeUrl($filterItem->getUrl()) ?>">
-                            <label class="tickbox<?php if ($filterItem->isActive()): ?> tickbox--active<?php endif ?>" for="">
-                                <input class="tickbox__field" type="checkbox" >
+                            <label class="tickbox<?php if ($filterItem->isActive()): ?> tickbox--active<?php endif ?>"
+                                   for="">
+                                <input class="tickbox__field" type="checkbox">
                             </label>
-                            <?php /* @escapeNotVerified */ echo $filterItem->getLabel() ?>
+                            <?php /* @escapeNotVerified */
+                            echo $filterItem->getLabel() ?>
                             <?php if ($this->helper('\Magento\Catalog\Helper\Data')->shouldDisplayProductCountOnLayer()): ?>
-                                <span class="count"><?php /* @escapeNotVerified */ echo $filterItem->getCount()?><span class="filter-count-label">
-                            <?php if ($filterItem->getCount() == 1):?> <?php /* @escapeNotVerified */ echo __('item')?><?php else:?> <?php /* @escapeNotVerified */ echo __('items') ?><?php endif;?></span></span>
+                                <span class="count"><?php /* @escapeNotVerified */
+                                    echo $filterItem->getCount() ?><span class="filter-count-label">
+                            <?php if ($filterItem->getCount() == 1): ?><?php /* @escapeNotVerified */
+                                echo __('item') ?><?php else: ?><?php /* @escapeNotVerified */
+                                echo __('items') ?><?php endif; ?></span></span>
                             <?php endif; ?>
                         </a>
                     <?php endif; ?>
 
-                <?php else:?>
-                    <?php /* @escapeNotVerified */ echo $filterItem->getLabel() ?>
+                <?php else: ?>
+                    <?php /* @escapeNotVerified */
+                    echo $filterItem->getLabel() ?>
                     <?php if ($this->helper('\Magento\Catalog\Helper\Data')->shouldDisplayProductCountOnLayer()): ?>
-                        <span class="count"><?php /* @escapeNotVerified */ echo $filterItem->getCount()?><span class="filter-count-label">
-                        <?php if ($filterItem->getCount() == 1):?><?php /* @escapeNotVerified */ echo __('item')?><?php else:?><?php /* @escapeNotVerified */ echo __('items') ?><?php endif;?></span></span>
+                        <span class="count"><?php /* @escapeNotVerified */
+                            echo $filterItem->getCount() ?><span class="filter-count-label">
+                        <?php if ($filterItem->getCount() == 1): ?><?php /* @escapeNotVerified */
+                            echo __('item') ?><?php else: ?><?php /* @escapeNotVerified */
+                            echo __('items') ?><?php endif; ?></span></span>
                     <?php endif; ?>
                 <?php endif; ?>
             </li>
@@ -84,5 +101,6 @@
             })
         })
     })
-</script>
+
+    </script>
 <?php endif; ?>
