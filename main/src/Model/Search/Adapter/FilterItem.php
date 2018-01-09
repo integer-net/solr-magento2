@@ -145,4 +145,33 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
     {
         return $this ->storeManager->getStore()->getCurrentCurrency()->getCurrencySymbol();
     }
+
+    public function getFilterIdentifier()
+    {
+        return $this->getFilter()->getRequestVar();
+    }
+
+    /**
+     * Get url for remove item from filter
+     *
+     * @return string
+     */
+    public function getPriceFilterUrlWithPlaceholder()
+    {
+        $query = [$this->getFilter()->getRequestVar() => 'priceRange'];
+        $params['_current'] = true;
+        $params['_use_rewrite'] = true;
+        $params['_query'] = $query;
+        $params['_escape'] = false;
+        return $this->_url->getUrl('*/*/*', $params);
+    }
+
+    public function getPriceFilterUrlWithCurrentValues()
+    {
+        return str_replace(
+            'priceRange',
+            $this->getSelectedMinValue() . '-' . $this->getSelectedMaxValue(),
+            $this->getPriceFilterUrlWithPlaceholder()
+        );
+    }
 }

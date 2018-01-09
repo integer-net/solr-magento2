@@ -12,15 +12,21 @@
 <?php $filterItem = current($filterItems) ?>
 <?php if ($filterItem->canUsePriceSlider()): ?>
     <?php $currencySymbol = $filterItem->getCurrencySymbol() ?>
-    <span class="filter-value">
+    <?php $identifier = $filterItem->getFilterIdentifier() ?>
+    <span class="filter-value" id="filter_value_<?php echo $identifier ?>">
         <?php echo $filterItem->getSelectedMinValueFormatted() ?>
         -
         <?php echo $filterItem->getSelectedMaxValueFormatted() ?>
     </span>
     <br><br>
     <div class="ui-slider-wrapper">
-        <div class="filter-options-slider"></div>
+        <div class="filter-options-slider" id="filter_options_slider_<?php echo $identifier ?>"></div>
     </div>
+    <a class="action"
+       href="<?php echo $block->escapeUrl($filterItem->getPriceFilterUrlWithCurrentValues()) ?>"
+       id="filter_link_<?php echo $identifier ?>">
+        <span><?php echo __('Select') ?></span>
+    </a>
 
     <script>
         require([
@@ -30,20 +36,23 @@
             'Magento_Catalog/js/price-utils'
         ], function ($, _ui, slider, priceUtils) {
 
-            var valueContainer = $('.filter-value');
+            var valueContainer = $('#filter_value_<?php echo $identifier ?>');
+            var filterLink = $('#filter_link_<?php echo $identifier ?>');
+            var targetUrl = '<?php echo $block->escapeJsQuote($filterItem->getPriceFilterUrlWithPlaceholder()) ?>';
 
-            $('.filter-options-slider').slider({
+            $('#filter_options_slider_<?php echo $identifier ?>').slider({
                 range: true,
                 min: <?php echo $filterItem->getMinAvailableValue() ?>,
                 max: <?php echo $filterItem->getMaxAvailableValue() ?>,
                 values: [<?php echo $filterItem->getSelectedMinValue() ?>, <?php echo $filterItem->getSelectedMaxValue() ?>],
                 slide: function (event, ui) {
-                    var newValue = priceUtils.formatPrice(ui.values[0])
+                    var newUrl = targetUrl.replace('priceRange', ui.values[0] + '-' + ui.values[1]);
+                    filterLink.attr('href', newUrl);
+                    var newValueFormatted = priceUtils.formatPrice(ui.values[0])
                         + ' <?php echo $currencySymbol ?> - '
                         + priceUtils.formatPrice(ui.values[1])
                         + ' <?php echo $currencySymbol ?>';
-
-                    valueContainer.html(newValue);
+                    valueContainer.html(newValueFormatted);
                 }
             });
         });
@@ -53,25 +62,21 @@
         <?php foreach ($filterItems as $filterItem): ?>
             <li class="item">
                 <?php if ($filterItem->getCount() > 0): ?>
-                    <?php if ($filterItem->getName() === '_Price'): ?>
-                        <div class="filter-options-slider"></div>
-                    <?php else: ?>
-                        <a class="filter-options-link" href="<?php echo $block->escapeUrl($filterItem->getUrl()) ?>">
-                            <label class="tickbox<?php if ($filterItem->isActive()): ?> tickbox--active<?php endif ?>"
-                                   for="">
-                                <input class="tickbox__field" type="checkbox">
-                            </label>
-                            <?php /* @escapeNotVerified */
-                            echo $filterItem->getLabel() ?>
-                            <?php if ($this->helper('\Magento\Catalog\Helper\Data')->shouldDisplayProductCountOnLayer()): ?>
-                                <span class="count"><?php /* @escapeNotVerified */
-                                    echo $filterItem->getCount() ?><span class="filter-count-label">
-                            <?php if ($filterItem->getCount() == 1): ?><?php /* @escapeNotVerified */
-                                echo __('item') ?><?php else: ?><?php /* @escapeNotVerified */
-                                echo __('items') ?><?php endif; ?></span></span>
-                            <?php endif; ?>
-                        </a>
-                    <?php endif; ?>
+                    <a class="filter-options-link" href="<?php echo $block->escapeUrl($filterItem->getUrl()) ?>">
+                        <label class="tickbox<?php if ($filterItem->isActive()): ?> tickbox--active<?php endif ?>"
+                               for="">
+                            <input class="tickbox__field" type="checkbox">
+                        </label>
+                        <?php /* @escapeNotVerified */
+                        echo $filterItem->getLabel() ?>
+                        <?php if ($this->helper('\Magento\Catalog\Helper\Data')->shouldDisplayProductCountOnLayer()): ?>
+                            <span class="count"><?php /* @escapeNotVerified */
+                                echo $filterItem->getCount() ?><span class="filter-count-label">
+                        <?php if ($filterItem->getCount() == 1): ?><?php /* @escapeNotVerified */
+                            echo __('item') ?><?php else: ?><?php /* @escapeNotVerified */
+                            echo __('items') ?><?php endif; ?></span></span>
+                        <?php endif; ?>
+                    </a>
 
                 <?php else: ?>
                     <?php /* @escapeNotVerified */
