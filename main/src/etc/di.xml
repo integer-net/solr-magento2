@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
   <preference for="IntegerNet\Solr\Model\StatusMessages" type="IntegerNet\Solr\Model\SolrStatusMessages" />
-  
+
   <!-- Bridge implementations -->
 
   <preference for="IntegerNet\Solr\Implementor\SolrRequestFactoryInterface" type="IntegerNet\Solr\Model\Bridge\RequestFactory" />
@@ -164,6 +164,12 @@
     <plugin name="attributeFilterFixer" type="IntegerNet\Solr\Model\Plugin\AttributeFilterFixer" />
   </type>
 
-
+  <type name="Magento\Framework\Console\CommandListInterface">
+    <arguments>
+      <argument name="commands" xsi:type="array">
+        <item name="integerNetSolrIndex" xsi:type="object">IntegerNet\Solr\Console\Command\Index</item>
+      </argument>
+    </arguments>
+  </type>
 
 </config>
