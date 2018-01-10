@@ -2,9 +2,8 @@
 
 namespace IntegerNet\Solr\Console\Command;
 
-use IntegerNet\Solr\Indexer\ProductIndexer;
 use IntegerNet\Solr\Model\Indexer;
-use IntegerNet\Solr\Model\Indexer\ProductIndexerFactory;
+use Magento\Framework\App;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,11 +22,16 @@ class ReindexCommand extends Command
      * @var Indexer\Console
      */
     private $indexer;
+    /**
+     * @var App\State
+     */
+    private $appState;
 
-    public function __construct(Indexer\Console $indexer, $name = null)
+    public function __construct(Indexer\Console $indexer, App\State $appState, $name = null)
     {
         parent::__construct($name);
         $this->indexer = $indexer;
+        $this->appState = $appState;
     }
 
     protected function configure()
@@ -43,13 +47,13 @@ class ReindexCommand extends Command
             new InputOption(
                 'emptyindex',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_NONE,
                 'Force emptying the solr index for the given store(s). If not set, configured value is used.'
             ),
             new InputOption(
                 'noemptyindex',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_NONE,
                 'Force not emptying the solr index for the given store(s). If not set, configured value is used.'
             ),
         ];
@@ -60,6 +64,7 @@ class ReindexCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->appState->setAreaCode(App\Area::AREA_GLOBAL);
         if (!$input->getOption(self::INPUT_STORES) || $input->getOption(self::INPUT_STORES) === 'all') {
             $stores = null;
             $output->writeln('Starting full reindex of Solr product index...');

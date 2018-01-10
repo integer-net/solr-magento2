@@ -4,7 +4,7 @@ namespace IntegerNet\Solr\Console\Command;
 
 use IntegerNet\Solr\Indexer\ProductIndexer;
 use IntegerNet\Solr\Model\Indexer;
-use IntegerNet\Solr\Model\Indexer\ProductIndexerFactory;
+use Magento\Framework\App;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -30,7 +30,8 @@ class ReindexCommandTest extends TestCase
     protected function setUp()
     {
         $this->indexer = $this->getMockBuilder(Indexer\Console::class)->disableOriginalConstructor()->getMock();
-        $this->command = new ReindexCommand($this->indexer);
+        $appState = $this->getMockBuilder(App\State::class)->disableOriginalConstructor()->getMock();
+        $this->command = new ReindexCommand($this->indexer, $appState);
         $this->output = new BufferedOutput();
     }
 
