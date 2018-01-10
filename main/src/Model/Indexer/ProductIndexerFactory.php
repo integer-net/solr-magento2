@@ -49,6 +49,10 @@ class ProductIndexerFactory
      * @var StoreEmulation
      */
     private $storeEmulation;
+    /**
+     * @var ProductIndexerDecoratorFactory
+     */
+    private $productIndexerDecoratorFactory;
 
     /**
      * @param FrontendStoresConfig $storesConfig
@@ -59,11 +63,16 @@ class ProductIndexerFactory
      * @param ProductRenderer $productRenderer
      * @param StoreEmulation $storeEmulation
      */
-    public function __construct(FrontendStoresConfig $storesConfig, EventDispatcher $eventDispatcher,
-                                AttributeRepository $attributeRepository, IndexCategoryRepository $indexCategoryRepository,
-                                ProductRepository $productRepository, ProductRenderer $productRenderer,
-                                StoreEmulation $storeEmulation)
-    {
+    public function __construct(
+        FrontendStoresConfig $storesConfig,
+        EventDispatcher $eventDispatcher,
+        AttributeRepository $attributeRepository,
+        IndexCategoryRepository $indexCategoryRepository,
+        ProductRepository $productRepository,
+        ProductRenderer $productRenderer,
+        StoreEmulation $storeEmulation,
+        ProductIndexerDecoratorFactory $productIndexerDecoratorFactory
+    ) {
 
         $this->storesConfig = $storesConfig;
         $this->eventDispatcher = $eventDispatcher;
@@ -72,6 +81,7 @@ class ProductIndexerFactory
         $this->productRepository = $productRepository;
         $this->productRenderer = $productRenderer;
         $this->storeEmulation = $storeEmulation;
+        $this->productIndexerDecoratorFactory = $productIndexerDecoratorFactory;
     }
 
     /**
@@ -80,7 +90,7 @@ class ProductIndexerFactory
     public function create()
     {
         $storesConfig = $this->storesConfig->getArrayCopy();
-        return new ProductIndexer(
+        $productIndexer = new ProductIndexer(
             0,
             $storesConfig,
             new ResourceFacade($storesConfig),
@@ -90,6 +100,11 @@ class ProductIndexerFactory
             $this->productRepository,
             $this->productRenderer,
             $this->storeEmulation
+        );
+        return $this->productIndexerDecoratorFactory->create(
+            [
+                ProductIndexerDecorator::PARAM_INDEXER => $productIndexer
+            ]
         );
     }
 

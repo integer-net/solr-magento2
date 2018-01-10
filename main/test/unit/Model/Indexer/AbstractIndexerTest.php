@@ -27,13 +27,13 @@ abstract class AbstractIndexerTest extends TestCase
             ->disableOriginalConstructor()
             ->setMethods(['create'])
             ->getMock();
-        $this->indexerFactoryStub->method('create')->willReturn($this->solrIndexerMock);
-
         $this->urlFactoryPluginMock = $this->getMockBuilder(UrlFactoryPlugin::class)
             ->disableOriginalConstructor()
             ->setMethods(
                 ['setForceFrontend']
             )->getMock();
+        $decoratedSolrIndexer = new ProductIndexerDecorator($this->solrIndexerMock, $this->urlFactoryPluginMock);
+        $this->indexerFactoryStub->method('create')->willReturn($decoratedSolrIndexer);
     }
 
     protected function expectForcedFrontendUrls()
