@@ -50,7 +50,7 @@
                     filterLink.attr('href', newUrl);
                     var newValueFormatted = priceUtils.formatPrice(ui.values[0])
                         + ' <?php echo $currencySymbol ?> - '
-                        + priceUtils.formatPrice(ui.values[1])
+                        + priceUtils.formatPrice(ui.values[1] - 0.01)
                         + ' <?php echo $currencySymbol ?>';
                     valueContainer.html(newValueFormatted);
                 }

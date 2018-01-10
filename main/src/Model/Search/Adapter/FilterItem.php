@@ -138,7 +138,7 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
 
     public function getSelectedMaxValueFormatted()
     {
-        return $this->priceHelper->currency($this->getSelectedMaxValue(), true, false);
+        return $this->priceHelper->currency($this->getSelectedMaxValue() - 0.01, true, false);
     }
 
     public function getCurrencySymbol()
