@@ -1,1 +1,24 @@
 @import '../../jquery-ui/_jquery-ui-1.10.4.slider.less';
+
+& when (@media-common = true)
+{
+  .filter-options-content .action.primary {
+    margin-left: 0;
+  }
+
+  .filter-options-content {
+    .ui-slider-wrapper {
+      .ui-slider-horizontal {
+        .ui-slider-handle {
+          &__left {
+            margin-left: -.1em;
+          }
+          &__right {
+            margin-left: -1.2em;
+          }
+        }
+      }
+    }
+  }
+
+}
