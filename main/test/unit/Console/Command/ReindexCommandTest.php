@@ -5,6 +5,7 @@ namespace IntegerNet\Solr\Console\Command;
 use IntegerNet\Solr\Indexer\ProductIndexer;
 use IntegerNet\Solr\Model\Indexer;
 use IntegerNet\Solr\Model\Indexer\ProductIndexerFactory;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -26,12 +27,20 @@ class ReindexCommandTest extends TestCase
      */
     private $indexer;
 
+    protected function setUp()
+    {
+        $this->indexer = $this->getMockBuilder(Indexer\Console::class)->disableOriginalConstructor()->getMock();
+        $this->command = new ReindexCommand($this->indexer);
+        $this->output = new BufferedOutput();
+    }
+
+
     public function testRunsFullProductReindexWithoutArguments()
     {
-        $this->indexer->expects($this->once())->method('executeFull');
+        $this->indexer->expects($this->once())->method('executeStores')->with(null);
         $exitCode = $this->runCommandWithInput([]);
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
-        $this->assertOutputMessages('Starting full reindex of Solr product index.', 'Finished');
+        $this->assertOutputMessages('Starting full reindex of Solr product index.', 'Finished.');
     }
 
     public function testRunsProductReindexWithStoreFilter()
@@ -40,11 +49,11 @@ class ReindexCommandTest extends TestCase
         $this->indexer->expects($this->once())->method('executeStores')->with($storeIds);
         $exitCode = $this->runCommandWithInput(
             [
-                '--stores' => \implode(',', $storeIds)
+                '--stores' => \implode(',', $storeIds),
             ]
         );
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
-        $this->assertOutputMessages('Starting reindex of Solr product index for stores 1, 3.', 'Finished');
+        $this->assertOutputMessages('Starting reindex of Solr product index for stores 1, 3.', 'Finished.');
     }
 
     public function testRunsProductReindexWithStoreFilterByCodes()
@@ -54,43 +63,82 @@ class ReindexCommandTest extends TestCase
 
     public function testRunsFullProductReindexWithForcedEmptyIndex()
     {
-        $this->markTestIncomplete('Not implemented yet');
+        $this->indexer->expects($this->once())->method('executeStoresForceEmpty')->with(null);
+        $exitCode = $this->runCommandWithInput(
+            [
+                '--emptyindex' => true,
+            ]
+        );
+        $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
+        $this->assertOutputMessages(
+            'Starting full reindex of Solr product index.',
+            'Forcing empty index.',
+            'Finished.'
+        );
     }
 
     public function testRunsFullProductReindexWithForcedNonEmptyIndex()
     {
-        $this->markTestIncomplete('Not implemented yet');
+        $this->indexer->expects($this->once())->method('executeStoresForceNotEmpty')->with(null);
+        $exitCode = $this->runCommandWithInput(
+            [
+                '--noemptyindex' => true,
+            ]
+        );
+        $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
+        $this->assertOutputMessages(
+            'Starting full reindex of Solr product index.',
+            'Forcing non-empty index.',
+            'Finished.'
+        );
     }
 
     public function testRunsProductReindexWithStoreFilterAndForcedEmptyIndex()
     {
-        $this->markTestIncomplete('Not implemented yet');
+        $storeIds = [1, 3];
+        $this->indexer->expects($this->once())->method('executeStoresForceEmpty')->with($storeIds);
+        $exitCode = $this->runCommandWithInput(
+            [
+                '--stores' => \implode(',', $storeIds),
+                '--emptyindex' => true,
+            ]
+        );
+        $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
+        $this->assertOutputMessages(
+            'Starting reindex of Solr product index for stores 1, 3.',
+            'Forcing empty index.',
+            'Finished.'
+        );
     }
 
     public function testRunsProductReindexWithStoreFilterAndForcedNonEmptyIndex()
     {
-        $this->markTestIncomplete('Not implemented yet');
+        $storeIds = [1, 3];
+        $this->indexer->expects($this->once())->method('executeStoresForceNotEmpty')->with($storeIds);
+        $exitCode = $this->runCommandWithInput(
+            [
+                '--stores' => \implode(',', $storeIds),
+                '--noemptyindex' => true,
+            ]
+        );
+        $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
+        $this->assertOutputMessages(
+            'Starting reindex of Solr product index for stores 1, 3.',
+            'Forcing non-empty index.',
+            'Finished.'
+        );
     }
-
-    protected function setUp()
-    {
-        $this->indexer = $this->getMockBuilder(Indexer\Console::class)->disableOriginalConstructor()->getMock();
-        $this->command = new ReindexCommand($this->indexer);
-        $this->output = new BufferedOutput();
-    }
-
     private function runCommandWithInput($input)
     {
         return $this->command->run(new ArrayInput($input), $this->output);
     }
 
-    private function assertOutputMessages($startMessage, $endMessage)
+    private function assertOutputMessages(...$messages)
     {
         $this->assertThat(
             $this->output->fetch(),
             $this->logicalAnd(
-                $this->stringContains($startMessage),
-                $this->stringContains($endMessage)
+                ...array_map([Assert::class, 'stringContains'], $messages)
             )
         );
     }

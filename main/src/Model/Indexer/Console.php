@@ -27,7 +27,7 @@ class Console
         $this->solrIndexer = $solrIndexerFactory->create();
     }
 
-    public function executeStores(array $storeIds)
+    public function executeStores(array $storeIds = null)
     {
         $this->reindex(null, true, $storeIds);
     }

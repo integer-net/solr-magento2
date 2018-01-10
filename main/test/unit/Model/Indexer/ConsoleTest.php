@@ -9,6 +9,12 @@ class ConsoleTest extends AbstractIndexerTest
      */
     private $indexer;
 
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->indexer = new Console($this->indexerFactoryStub, $this->urlFactoryPluginMock);
+    }
+
     public function testExecuteStores()
     {
         $storeIds = [1, 2];
@@ -28,11 +34,5 @@ class ConsoleTest extends AbstractIndexerTest
         $storeIds = [1, 2];
         $this->expectReindexWithArguments(null, false, $storeIds);
         $this->indexer->executeStoresForceNotEmpty($storeIds);
-    }
-
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->indexer = new Console($this->indexerFactoryStub, $this->urlFactoryPluginMock);
     }
 }

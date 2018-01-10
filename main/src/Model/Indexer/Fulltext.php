@@ -24,7 +24,6 @@ class Fulltext implements ActionInterface, MviewActionInterface
 
     /**
      * @param ProductIndexerFactory $solrIndexerFactory
-     * @param UrlFactoryPlugin $urlFactoryPlugin
      */
     public function __construct(ProductIndexerFactory $solrIndexerFactory)
     {
