@@ -13,12 +13,13 @@ use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\NoSuchEntityException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers AttributeRepository
  * @covers AttributeSearchCriteriaBuilder
  */
-class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
+class AttributeRepositoryTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|ProductAttributeRepositoryInterface
@@ -214,7 +215,8 @@ class AttributeRepositoryTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('get')
             ->willThrowException(new NoSuchEntityException());
-        $this->setExpectedException(Exception::class, 'Attribute whatever does not exist');
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Attribute whatever does not exist');
         $attributeRepository->getAttributeByCode('whatever', null);
     }
 

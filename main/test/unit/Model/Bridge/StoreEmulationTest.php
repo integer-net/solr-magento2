@@ -16,8 +16,9 @@ use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
+use PHPUnit\Framework\TestCase;
 
-class StoreEmulationTest extends \PHPUnit_Framework_TestCase
+class StoreEmulationTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|LocaleResolver
@@ -66,7 +67,8 @@ class StoreEmulationTest extends \PHPUnit_Framework_TestCase
         $callback->expects($this->once())->method('__invoke')->willThrowException(new \Exception($exceptionMessage));
 
         $this->setStartStopExpectations($storeId);
-        $this->setExpectedException(\Exception::class, $exceptionMessage);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage($exceptionMessage);
 
         $storeEmulation = new StoreEmulation($this->appEmulationMock, $this->localeResolverMock, $this->storeManagerMock);
         $storeEmulation->runInStore($storeId, $callback);

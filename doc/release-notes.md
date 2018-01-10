@@ -2,11 +2,29 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Version 1.4.2 (Dec 21, 2017)
+--------------
+
+- Fix Category URLs in autosuggest if links to category pages are activated.
+- Show complete category path in autosuggest if activated in configuration
+- Optimize product search results for cases when parts of search query occur in different attributes
+- Full compatibility to Magento 2.2 regarding (using JSON serialization now)
+- Fix Autosuggest URL for stores with different base url
+- Use require.js to handle filter options link
+- Hide categories tab while initialising search results page
+- Fix behavior of search_weight field for boosting attributes
+- Change search_weight field for boosting attributes from dropdown to text field
+- Add category attribute for solr priority
+- Solve problems with indexing on some stores
+- Eliminate all calls of `getCustomAttribute()` in order to improve indexing performance
+- Support really small boost values (like 0.00000001)
+- Don't store categories in cache which don't belong to the correct category tree
+
 Version 1.4.1 (Oct 20, 2017)
 ---------------
 
 - Fix behavior of product attributes "Solr Priority" and "Exclude this Product from Solr Index"
-- Compatibility for final Magento 2.2.0 defined in composer.json
+- Define compatibility to final Magento 2.2.0 in composer.json
 
 Version 1.4.0 (Oct 11, 2017)
 ---------------
@@ -21,7 +39,7 @@ Version 1.3.2 (Aug 23, 2017)
 ---------------
 
 - Introduction of new events around product collection
-- Skip indexing a product if child product cannot be loaded instead of aborting
+- Skip indexing a product instead of aborting if child product cannot be loaded 
 
 Version 1.3.1 (Aug 17, 2017)
 ---------------

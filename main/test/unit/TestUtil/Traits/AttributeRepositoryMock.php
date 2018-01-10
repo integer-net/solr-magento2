@@ -2,6 +2,7 @@
 namespace IntegerNet\Solr\TestUtil\Traits;
 
 use Magento\Framework\Api\SearchCriteria;
+use PHPUnit\Framework\Assert;
 
 trait AttributeRepositoryMock
 {
@@ -23,7 +24,7 @@ trait AttributeRepositoryMock
             $attributeStubs[] = $this->mockAttribute($attributeInterface, $dataAttribute);
         }
         $attributeRepositoryStub->method('getList')
-            ->with(\PHPUnit_Framework_Assert::identicalTo($expectedSearchCriteria))
+            ->with(Assert::identicalTo($expectedSearchCriteria))
             ->willReturn($this->mockSearchResults($attributeStubs));
         return $attributeRepositoryStub;
     }

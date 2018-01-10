@@ -483,6 +483,11 @@ Selbst wenn IntegerNet_Solr nicht zum Laden der Produkte auf Kategorieseiten gen
 <!-- ### Position der Filter
 Für jede Kategorie können Sie bestimmen, wo die Filter angezeigt werden, auch abweichend vom Standardwert, den Sie in der Konfiguration von IntegerNet_Solr hinterlegen. Filter können entweder in der linken Spalte neben den Produkten oder oberhalb der Produkte angezeigt werden.-->
 
+### Solr-Priorität
+
+Nutzen Sie das Feld “Solr-Priorität” um der Kategorie in den Suchergebnissen mehr Gewicht zu verleihen. Je höher der eingetragene Wert ist, desto höher ist auch der Boost-Faktor für diese Kategorie und damit ihr Ranking in den Suchergebnissen.
+
+
 Template-Anpassungen
 --------------------
 

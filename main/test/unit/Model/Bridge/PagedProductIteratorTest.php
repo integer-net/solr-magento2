@@ -19,11 +19,12 @@ use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\Framework\Event\ManagerInterface as EventManagerInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers PagedProductIterator
  */
-class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
+class PagedProductIteratorTest extends TestCase
 {
     /**
      * @dataProvider dataIterator
@@ -100,7 +101,7 @@ class PagedProductIteratorTest extends \PHPUnit_Framework_TestCase
         }
 
         if ($expectedException) {
-            $this->setExpectedExceptionRegExp($expectedException);
+            $this->expectExceptionMessageRegExp($expectedException);
         }
         $subset = $iterator->subset($subsetIds);
         $this->assertInstanceOf(ProductIterator::class, $subset);

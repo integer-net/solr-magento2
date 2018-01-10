@@ -11,8 +11,9 @@
 namespace IntegerNet\Solr\Model\Bridge;
 
 use Magento\Framework\Event\ManagerInterface as EventManager;
+use PHPUnit\Framework\TestCase;
 
-class EventDispatcherTest extends \PHPUnit_Framework_TestCase
+class EventDispatcherTest extends TestCase
 {
     public function testDispatch()
     {

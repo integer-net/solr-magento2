@@ -1,4 +1,6 @@
 phpunit.xml
 composer.lock
+wercker.env
+.wercker
 /vendor/
 .idea/

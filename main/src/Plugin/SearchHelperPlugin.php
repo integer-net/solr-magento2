@@ -35,6 +35,7 @@ class SearchHelperPlugin
     {
         /** @var \Magento\Store\Model\Store $store */
         $store = $this->storeManager->getStore();
-        return $this->scopeConfig->getValue('web/unsecure/base_url') . 'autosuggest.php?store_id=' . $store->getId();
+        return $this->scopeConfig->getValue('web/unsecure/base_url', 'store', $store->getCode())
+            . 'autosuggest.php?store_id=' . $store->getId();
     }
 }

@@ -9,6 +9,7 @@
  */
 
 namespace IntegerNet\Solr\Model\Plugin;
+
 use Magento\Eav\Model\AttributeRepository;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection;
 use Magento\Framework\Api\Search\FilterGroup;
@@ -45,14 +46,13 @@ class AttributeFilterFixer
         \Magento\Eav\Api\Data\AttributeSearchResultsInterfaceFactory $searchResultsFactory,
         \Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface $joinProcessor
     ) {
-
         $this->eavConfig = $eavConfig;
         $this->attributeCollectionFactory = $attributeCollectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->joinProcessor = $joinProcessor;
     }
 
-        public function aroundGetList(AttributeRepository $subject, \Closure $proceed, $entityTypeCode, \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria)
+    public function aroundGetList(AttributeRepository $subject, \Closure $proceed, $entityTypeCode, \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria)
     {
         if (!$entityTypeCode) {
             throw InputException::requiredField('entity_type_code');

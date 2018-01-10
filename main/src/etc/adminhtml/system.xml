@@ -243,12 +243,10 @@
           <validate>validate-number validate-zero-or-greater</validate>
         </field>
         -->
-        <!--
         <field id="show_complete_category_path" translate="label" sortOrder="60" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Show complete category path</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
-        -->
         <field id="category_link_type" translate="label" sortOrder="70" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Type of Category Links</label>
           <source_model>IntegerNet\Solr\Model\Source\CategoryLinkType</source_model>
@@ -257,7 +255,7 @@
           <label>Attribute Filter Suggestions</label>
           <comment>0 = show all</comment>
           <frontend_model>IntegerNet\Solr\Block\Config\AttributeFilterSuggestions</frontend_model>
-          <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+          <backend_model>IntegerNet\Solr\Model\Config\Backend\JsonSerialized</backend_model>
         </field>
         <field id="show_outofstock" translate="label,comment" sortOrder="90" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Show products which are out of stock</label>
