@@ -62,7 +62,8 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
 
     public function canUsePriceSlider()
     {
-        return $this->getFilter() instanceof \Magento\CatalogSearch\Model\Layer\Filter\Price;
+        return $this->getFilter() instanceof \Magento\CatalogSearch\Model\Layer\Filter\Price
+            || $this->getFilter() instanceof \Magento\CatalogSearch\Model\Layer\Filter\Decimal;
     }
 
     /**
@@ -143,7 +144,10 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
 
     public function getCurrencySymbol()
     {
-        return $this ->storeManager->getStore()->getCurrentCurrency()->getCurrencySymbol();
+        if ($this->getFilter() instanceof \Magento\CatalogSearch\Model\Layer\Filter\Price) {
+            return $this->storeManager->getStore()->getCurrentCurrency()->getCurrencySymbol();
+        }
+        return '';
     }
 
     public function getFilterIdentifier()
@@ -152,7 +156,7 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
     }
 
     /**
-     * Get url for remove item from filter
+     * Get url for filter with "priceRange" as placeholder
      *
      * @return string
      */
@@ -166,6 +170,11 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
         return $this->_url->getUrl('*/*/*', $params);
     }
 
+    /**
+     * Get initial URL for current filter
+     *
+     * @return string
+     */
     public function getPriceFilterUrlWithCurrentValues()
     {
         return str_replace(

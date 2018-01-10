@@ -10,6 +10,7 @@
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
 use IntegerNet\Solr\Implementor\SolrRequestFactoryInterface;
+use IntegerNet\Solr\Model\Bridge\AttributeRepository;
 use IntegerNet\Solr\Model\Bridge\SearchRequest;
 use IntegerNet\SolrCategories\Request\CategoryRequest;
 use Magento\Framework\Search\Adapter\Mysql\ResponseFactory;
@@ -37,20 +38,27 @@ class SolrAdapter implements AdapterInterface
      * @var CategoryRequestConverter
      */
     private $categoryRequestBuilder;
+    /**
+     * @var AttributeRepository
+     */
+    private $attributeRepository;
 
     /**
      * @param SearchRequestConverter $searchRequestBuilder
      * @param CategoryRequestConverter $categoryRequestBuilder
      * @param ResponseFactory $responseFactory
+     * @param AttributeRepository $attributeRepository
      */
     public function __construct(
         SearchRequestConverter $searchRequestBuilder,
         CategoryRequestConverter $categoryRequestBuilder,
-        ResponseFactory $responseFactory
+        ResponseFactory $responseFactory,
+        AttributeRepository $attributeRepository
     ) {
         $this->responseFactory = $responseFactory;
         $this->searchRequestBuilder = $searchRequestBuilder;
         $this->categoryRequestBuilder = $categoryRequestBuilder;
+        $this->attributeRepository = $attributeRepository;
     }
     /**
      * Process Search Request
@@ -66,7 +74,7 @@ class SolrAdapter implements AdapterInterface
             $solrResponse = $this->makeSearchRequest($request);
         }
         return $this->responseFactory->create(
-            ResponseWithProductIds::fromSolrResponse($solrResponse)->toArray()
+            ResponseWithProductIds::fromSolrResponse($solrResponse, $this->attributeRepository)->toArray()
         );
     }
 

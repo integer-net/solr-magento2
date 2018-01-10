@@ -9,6 +9,8 @@
  */
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
+use IntegerNet\Solr\Exception;
+use IntegerNet\Solr\Model\Bridge\AttributeRepository;
 use IntegerNet\Solr\Model\Data\ArrayCollection;
 use IntegerNet\Solr\Response\ApacheSolrFacet;
 use IntegerNet\Solr\Response\Document;
@@ -27,22 +29,28 @@ class ResponseWithProductIds
      * @var SolrResponse
      */
     private $solrResponse;
+    /**
+     * @var AttributeRepository
+     */
+    private $attributeRepository;
 
     /**
      * @param SolrResponse $solrResponse
+     * @param AttributeRepository $attributeRepository
      */
-    private function __construct(SolrResponse $solrResponse)
+    private function __construct(SolrResponse $solrResponse, AttributeRepository $attributeRepository)
     {
         $this->solrResponse = $solrResponse;
+        $this->attributeRepository = $attributeRepository;
     }
 
     /**
      * @param SolrResponse $solrResponse
      * @return ResponseWithProductIds
      */
-    public static function fromSolrResponse(SolrResponse $solrResponse)
+    public static function fromSolrResponse(SolrResponse $solrResponse, AttributeRepository $attributeRepository)
     {
-        return new static($solrResponse);
+        return new static($solrResponse, $attributeRepository);
     }
 
     public function toArray()
@@ -68,8 +76,12 @@ class ResponseWithProductIds
                 )->filter(function (FacetCount $facetCount) {
                     return $facetCount->count() > 0;
                 })->map(function (FacetCount $facetCount) use ($facet) {
-                    if ($facet->name() == 'price') {
-                        return $this->transformIntervalSyntax($facetCount);
+                    try {
+                        $attribute = $this->attributeRepository->getAttributeByCode($facet->name(), null);
+                        if ($attribute->getBackendType() == 'decimal') {
+                            return $this->transformIntervalSyntax($facetCount);
+                        }
+                    } catch (\Exception $e) {
                     }
                     return $facetCount;
                 })->flatMap(function (FacetCount $facetCount) {

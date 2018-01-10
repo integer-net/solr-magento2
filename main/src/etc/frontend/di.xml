@@ -33,4 +33,6 @@
                 type="IntegerNet\Solr\Model\Search\Adapter\CategoryFilter" />
     <preference for="Magento\CatalogSearch\Model\Layer\Filter\Attribute"
                 type="IntegerNet\Solr\Model\Search\Adapter\AttributeFilter" />
+    <preference for="Magento\CatalogSearch\Model\Layer\Filter\Decimal"
+                type="IntegerNet\Solr\Model\Search\Adapter\DecimalFilter" />
 </config>
