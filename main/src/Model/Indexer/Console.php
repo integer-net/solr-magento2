@@ -12,6 +12,7 @@ namespace IntegerNet\Solr\Model\Indexer;
 
 use IntegerNet\Solr\Indexer\ProductIndexer;
 use IntegerNet\Solr\Indexer\Slice;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Console
 {
@@ -19,33 +20,38 @@ class Console
      * @var ProductIndexer
      */
     private $solrIndexer;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     /**
      * @param ProductIndexerFactory $solrIndexerFactory
      */
-    public function __construct(ProductIndexerFactory $solrIndexerFactory)
+    public function __construct(ProductIndexerFactory $solrIndexerFactory, StoreManagerInterface $storeManager)
     {
         $this->solrIndexer = $solrIndexerFactory->create();
+        $this->storeManager = $storeManager;
     }
 
     public function executeStores(array $storeIds = null)
     {
-        $this->reindex(null, true, $storeIds);
+        $this->reindex(null, true, $this->getStoreIds($storeIds));
     }
 
     public function executeStoresSlice(Slice $slice, array $storeIds = null)
     {
-        $this->solrIndexer->reindexSlice($slice, $storeIds);
+        $this->solrIndexer->reindexSlice($slice, $this->getStoreIds($storeIds));
     }
 
     public function executeStoresForceEmpty($storeIds)
     {
-        $this->reindex(null, 'force', $storeIds);
+        $this->reindex(null, 'force', $this->getStoreIds($storeIds));
     }
 
     public function executeStoresForceNotEmpty($storeIds)
     {
-        $this->reindex(null, false, $storeIds);
+        $this->reindex(null, false, $this->getStoreIds($storeIds));
     }
 
     public function clearStores(array $storeIds = null)
@@ -54,7 +60,7 @@ class Console
         if (empty($storeIds)) {
             throw new \BadMethodCallException("Command for 'clear all stores' not implemented yet");
         }
-        foreach ($storeIds as $storeId) {
+        foreach ($this->getStoreIds($storeIds) as $storeId) {
             $this->solrIndexer->clearIndex($storeId);
         }
     }
@@ -82,6 +88,27 @@ class Console
             $restrictToStoreIds,
             $sliceId,
             $totalNumberSlices
+        );
+    }
+
+    /**
+     * @param array $storeIds An array of store codes or store ids
+     * @return array An array of store ids
+     */
+    private function getStoreIds(array $storeIds): array
+    {
+        $storesByCode = $this->storeManager->getStores(false, true);
+        return array_map(
+            function ($storeId) use ($storesByCode) {
+                if (is_numeric($storeId)) {
+                    return $storeId;
+                }
+                if (isset($storesByCode[$storeId])) {
+                    return $storesByCode[$storeId]->getId();
+                }
+                throw new \InvalidArgumentException("'$storeId' is neither a numric ID nor an existing store code");
+            },
+            $storeIds
         );
     }
 }

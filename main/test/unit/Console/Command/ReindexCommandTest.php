@@ -47,7 +47,7 @@ class ReindexCommandTest extends TestCase
 
     public function testRunsProductReindexWithStoreFilter()
     {
-        $storeIds = [1, 3];
+        $storeIds = [1, 3, 'french'];
         $this->indexer->expects($this->once())->method('executeStores')->with($storeIds);
         $exitCode = $this->runCommandWithInput(
             [
@@ -55,12 +55,7 @@ class ReindexCommandTest extends TestCase
             ]
         );
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
-        $this->assertOutputMessages('Starting reindex of Solr product index for stores 1, 3.', 'Finished.');
-    }
-
-    public function testRunsProductReindexWithStoreFilterByCodes()
-    {
-        $this->markTestIncomplete('--stores parameter with store codes instead of ids not implemented yet');
+        $this->assertOutputMessages('Starting reindex of Solr product index for stores 1, 3, french.', 'Finished.');
     }
 
     public function testRunsFullProductReindexWithForcedEmptyIndex()

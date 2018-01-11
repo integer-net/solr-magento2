@@ -14,7 +14,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  * solr:reindex:products command
  *
  * @todo Add --useswapcore argument
- * @todo Allow store codes instead of store ids
  * @todo Add callback to indexer to allow progress output and info about indexed stores
  */
 class ReindexCommand extends Command
@@ -78,7 +77,7 @@ class ReindexCommand extends Command
             $stores = null;
             $output->writeln('Starting full reindex of Solr product index...');
         } else {
-            $stores = \array_map('intval', \explode(',', $input->getOption(self::INPUT_STORES)));
+            $stores = \explode(',', $input->getOption(self::INPUT_STORES));
             $output->writeln('Starting reindex of Solr product index for stores ' . \implode(', ', $stores) . '...');
         }
         try {
