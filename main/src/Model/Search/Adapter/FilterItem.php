@@ -102,14 +102,6 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
         return $this->getMinAvailableValue();
     }
 
-    public function getSelectedMinValueFormatted()
-    {
-        if ($this->isPriceFilter()) {
-            return $this->priceHelper->currency($this->getSelectedMinValue(), true, false);
-        }
-        return $this->getSelectedMinValue();
-    }
-
     /**
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -205,5 +197,16 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
     private function isDecimalFilter()
     {
         return $this->getFilter() instanceof \Magento\CatalogSearch\Model\Layer\Filter\Decimal;
+    }
+
+    /**
+     * Calculate step size of slider so there are always between 10 and 100 steps between minimum and maximum value
+     *
+     * @return float
+     */
+    public function getStepSize()
+    {
+        $difference = $this->getMaxAvailableValue() - $this->getMinAvailableValue();
+        return pow(10, ceil(log($difference, 10)) - 2);
     }
 }

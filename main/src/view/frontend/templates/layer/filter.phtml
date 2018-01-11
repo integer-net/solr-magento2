@@ -52,6 +52,7 @@
                 min: <?php echo $filterItem->getMinAvailableValue() ?>,
                 max: <?php echo $filterItem->getMaxAvailableValue() ?>,
                 values: [<?php echo $filterItem->getSelectedMinValue() ?>, <?php echo $filterItem->getSelectedMaxValue() ?>],
+                step: <?php echo $filterItem->getStepSize() ?>,
                 slide: function (event, ui) {
                     var newUrl = targetUrl.replace('priceRange', ui.values[0] + '-' + ui.values[1]);
                     filterLink.attr('href', newUrl);
