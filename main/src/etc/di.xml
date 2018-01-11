@@ -150,11 +150,17 @@
   </type>
 
   <!-- Console commands -->
-  <type name="\Magento\Framework\Console\CommandListInterface">
+  <type name="Magento\Framework\Console\CommandListInterface">
     <arguments>
       <argument name="commands" xsi:type="array">
-        <item name="solr_reindex" xsi:type="object">IntegerNet\Solr\Console\Command\ReindexCommand\Proxy</item>
+        <item name="solr_reindex" xsi:type="object">IntegerNet\Solr\Console\Command\ReindexCommand</item>
       </argument>
+    </arguments>
+  </type>
+  <type name="IntegerNet\Solr\Console\Command\ReindexCommand">
+    <arguments>
+      <argument name="indexer" xsi:type="object">\IntegerNet\Solr\Model\Indexer\Console\Proxy</argument>
+      <argument name="appState" xsi:type="object">\Magento\Framework\App\State\Proxy</argument>
     </arguments>
   </type>
 

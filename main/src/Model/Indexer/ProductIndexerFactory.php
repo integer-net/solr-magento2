@@ -64,7 +64,7 @@ class ProductIndexerFactory
      * @param StoreEmulation $storeEmulation
      */
     public function __construct(
-        FrontendStoresConfig $storesConfig,
+        FrontendStoresConfig\Proxy $storesConfig,
         EventDispatcher $eventDispatcher,
         AttributeRepository $attributeRepository,
         IndexCategoryRepository $indexCategoryRepository,

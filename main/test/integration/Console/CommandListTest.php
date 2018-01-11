@@ -29,9 +29,9 @@ class CommandListTest extends TestCase
         $reindexCommand = $commands['solr_reindex'];
         $this->assertEquals('solr:reindex:products', $reindexCommand->getName(), 'Command name');
         $this->assertInstanceof(
-            Command\ReindexCommand\Proxy::class,
+            Command\ReindexCommand::class,
             $reindexCommand,
-            'Command should be instantiated as proxy'
+            'Command should be instantiated.'
         );
     }
 
