@@ -62,8 +62,7 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
 
     public function canUsePriceSlider()
     {
-        return $this->getFilter() instanceof \Magento\CatalogSearch\Model\Layer\Filter\Price
-            || $this->getFilter() instanceof \Magento\CatalogSearch\Model\Layer\Filter\Decimal;
+        return $this->isPriceFilter() || $this->isDecimalFilter();
     }
 
     /**
@@ -93,7 +92,11 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
         $activeFilters = $this->getFilter()->getLayer()->getState()->getFilters();
         foreach($activeFilters as $activeFilter) {
             if ($activeFilter->getFilter()->getRequestVar() == $this->getFilter()->getRequestVar()) {
-                return $activeFilter->getData('value')[0];
+                $value = $activeFilter->getData('value');
+                if (!is_array($value)) {
+                    $value = explode('-', $value);
+                }
+                return $value[0];
             }
         }
         return $this->getMinAvailableValue();
@@ -101,7 +104,10 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
 
     public function getSelectedMinValueFormatted()
     {
-        return $this->priceHelper->currency($this->getSelectedMinValue(), true, false);
+        if ($this->isPriceFilter()) {
+            return $this->priceHelper->currency($this->getSelectedMinValue(), true, false);
+        }
+        return $this->getSelectedMinValue();
     }
 
     /**
@@ -131,20 +137,19 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
         $activeFilters = $this->getFilter()->getLayer()->getState()->getFilters();
         foreach($activeFilters as $activeFilter) {
             if ($activeFilter->getFilter()->getRequestVar() == $this->getFilter()->getRequestVar()) {
-                return $activeFilter->getData('value')[1];
+                $value = $activeFilter->getData('value');
+                if (!is_array($value)) {
+                    $value = explode('-', $value);
+                }
+                return $value[1];
             }
         }
         return $this->getMaxAvailableValue();
     }
 
-    public function getSelectedMaxValueFormatted()
+    public function getUnit()
     {
-        return $this->priceHelper->currency($this->getSelectedMaxValue() - 0.01, true, false);
-    }
-
-    public function getCurrencySymbol()
-    {
-        if ($this->getFilter() instanceof \Magento\CatalogSearch\Model\Layer\Filter\Price) {
+        if ($this->isPriceFilter()) {
             return $this->storeManager->getStore()->getCurrentCurrency()->getCurrencySymbol();
         }
         return '';
@@ -182,5 +187,23 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
             $this->getSelectedMinValue() . '-' . $this->getSelectedMaxValue(),
             $this->getPriceFilterUrlWithPlaceholder()
         );
+    }
+
+    /**
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function isPriceFilter()
+    {
+        return $this->getFilter() instanceof \Magento\CatalogSearch\Model\Layer\Filter\Price;
+    }
+
+    /**
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function isDecimalFilter()
+    {
+        return $this->getFilter() instanceof \Magento\CatalogSearch\Model\Layer\Filter\Decimal;
     }
 }

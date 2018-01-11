@@ -11,13 +11,9 @@
 ?>
 <?php $filterItem = current($filterItems) ?>
 <?php if ($filterItem->canUsePriceSlider()): ?>
-    <?php $currencySymbol = $filterItem->getCurrencySymbol() ?>
+    <?php $unit = $filterItem->getUnit() ?>
     <?php $identifier = $filterItem->getFilterIdentifier() ?>
-    <span class="filter-value" id="filter_value_<?php echo $identifier ?>">
-        <?php echo $filterItem->getSelectedMinValueFormatted() ?>
-        -
-        <?php echo $filterItem->getSelectedMaxValueFormatted() ?>
-    </span>
+    <span class="filter-value" id="filter_value_<?php echo $identifier ?>"></span>
     <br><br>
     <div class="ui-slider-wrapper">
         <div class="filter-options-slider" id="filter_options_slider_<?php echo $identifier ?>"></div>
@@ -40,6 +36,12 @@
             var filterLink = $('#filter_link_<?php echo $identifier ?>');
             var targetUrl = '<?php echo $block->escapeJsQuote($filterItem->getPriceFilterUrlWithPlaceholder()) ?>';
 
+            var valueFormatted = priceUtils.formatPrice(<?php echo $filterItem->getSelectedMinValue() ?>)
+                + ' <?php echo $unit ?> - '
+                + priceUtils.formatPrice(<?php echo $filterItem->getSelectedMaxValue() ?>)
+                + ' <?php echo $unit ?>';
+            valueContainer.html(valueFormatted);
+
             $('#filter_options_slider_<?php echo $identifier ?>').slider({
                 range: true,
                 min: <?php echo $filterItem->getMinAvailableValue() ?>,
@@ -49,9 +51,9 @@
                     var newUrl = targetUrl.replace('priceRange', ui.values[0] + '-' + ui.values[1]);
                     filterLink.attr('href', newUrl);
                     var newValueFormatted = priceUtils.formatPrice(ui.values[0])
-                        + ' <?php echo $currencySymbol ?> - '
-                        + priceUtils.formatPrice(ui.values[1] - 0.01)
-                        + ' <?php echo $currencySymbol ?>';
+                        + ' <?php echo $unit ?> - '
+                        + priceUtils.formatPrice(ui.values[1])
+                        + ' <?php echo $unit ?>';
                     valueContainer.html(newValueFormatted);
                 }
             });
