@@ -2,6 +2,7 @@
 
 namespace IntegerNet\Solr\Console\Command;
 
+use IntegerNet\Solr\Indexer\Slice;
 use IntegerNet\Solr\Model\Indexer;
 use Magento\Framework\App;
 use Symfony\Component\Console\Command\Command;
@@ -10,7 +11,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @todo Add slice arguments
+ * solr:reindex:products command
+ *
  * @todo Add --useswapcore argument
  * @todo Allow store codes instead of store ids
  * @todo Add callback to indexer to allow progress output and info about indexed stores
@@ -45,6 +47,13 @@ class ReindexCommand extends Command
                 . 'If not set, reindex all stores.'
             ),
             new InputOption(
+                'slice',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                '<number>/<total_number>, i.e. "1/5" or "2/5". '
+                .'Use this if you want to index only a part of the products, i.e. for letting indexing run in parallel.'
+            ),
+            new InputOption(
                 'emptyindex',
                 null,
                 InputOption::VALUE_NONE,
@@ -73,7 +82,10 @@ class ReindexCommand extends Command
             $output->writeln('Starting reindex of Solr product index for stores ' . \implode(', ', $stores) . '...');
         }
         try {
-            if ($input->getOption('emptyindex')) {
+            if ($input->getOption('slice')) {
+                $output->writeln('Processing slice ' . $input->getOption('slice') . '...');
+                $this->indexer->executeStoresSlice(Slice::fromExpression($input->getOption('slice')), $stores);
+            } elseif ($input->getOption('emptyindex')) {
                 $output->writeln('Forcing empty index.');
                 $this->indexer->executeStoresForceEmpty($stores);
             } elseif ($input->getOption('noemptyindex')) {

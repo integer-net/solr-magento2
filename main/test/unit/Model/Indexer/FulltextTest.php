@@ -19,6 +19,12 @@ class FulltextTest extends AbstractIndexerTest
     /** @var Fulltext */
     private $indexer;
 
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->indexer = new Fulltext($this->indexerFactoryStub);
+    }
+
     public function testExecuteFull()
     {
         $this->expectForcedFrontendUrls();
@@ -29,6 +35,7 @@ class FulltextTest extends AbstractIndexerTest
     public function testExecuteList()
     {
         $productIds = [1, 2, 3, 5];
+        $this->expectForcedFrontendUrls();
         $this->expectReindexWithArguments($productIds, false, null);
         $this->indexer->executeList($productIds);
     }
@@ -36,21 +43,15 @@ class FulltextTest extends AbstractIndexerTest
     public function testExecute()
     {
         $productIds = [1, 2, 3, 5];
+        $this->expectForcedFrontendUrls();
         $this->expectReindexWithArguments($productIds, false, null);
         $this->indexer->execute($productIds);
     }
-
     public function testExecuteRow()
     {
         $productId = 42;
+        $this->expectForcedFrontendUrls();
         $this->expectReindexWithArguments([$productId], false, null);
         $this->indexer->executeRow($productId);
     }
-
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->indexer = new Fulltext($this->indexerFactoryStub, $this->urlFactoryPluginMock);
-    }
-
 }

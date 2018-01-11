@@ -3,6 +3,7 @@
 namespace IntegerNet\Solr\Console\Command;
 
 use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\Solr\Indexer\Slice;
 use IntegerNet\Solr\Model\Indexer;
 use Magento\Framework\App;
 use PHPUnit\Framework\Assert;
@@ -129,6 +130,30 @@ class ReindexCommandTest extends TestCase
             'Finished.'
         );
     }
+
+    public function testRunsProductReindexWithSlice()
+    {
+        $storeIds = [1];
+        $sliceExpression = '1/2';
+
+        $this->indexer->expects($this->once())->method('executeStoresSlice')->with(
+            Slice::fromExpression($sliceExpression),
+            $storeIds
+        );
+        $exitCode = $this->runCommandWithInput(
+            [
+                '--stores' => \implode(',', $storeIds),
+                '--slice' => $sliceExpression
+            ]
+        );
+        $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
+        $this->assertOutputMessages(
+            'Starting reindex of Solr product index for stores 1.',
+            'Processing slice 1/2.',
+            'Finished.'
+        );
+    }
+
     private function runCommandWithInput($input)
     {
         return $this->command->run(new ArrayInput($input), $this->output);

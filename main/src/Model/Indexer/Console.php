@@ -11,6 +11,7 @@
 namespace IntegerNet\Solr\Model\Indexer;
 
 use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\Solr\Indexer\Slice;
 
 class Console
 {
@@ -32,6 +33,11 @@ class Console
         $this->reindex(null, true, $storeIds);
     }
 
+    public function executeStoresSlice(Slice $slice, array $storeIds = null)
+    {
+        $this->solrIndexer->reindexSlice($slice, $storeIds);
+    }
+
     public function executeStoresForceEmpty($storeIds)
     {
         $this->reindex(null, 'force', $storeIds);
@@ -40,6 +46,17 @@ class Console
     public function executeStoresForceNotEmpty($storeIds)
     {
         $this->reindex(null, false, $storeIds);
+    }
+
+    public function clearStores(array $storeIds = null)
+    {
+        //TODO fetch all store ids if NULL
+        if (empty($storeIds)) {
+            throw new \BadMethodCallException("Command for 'clear all stores' not implemented yet");
+        }
+        foreach ($storeIds as $storeId) {
+            $this->solrIndexer->clearIndex($storeId);
+        }
     }
 
     /**

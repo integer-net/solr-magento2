@@ -3,6 +3,7 @@
 namespace IntegerNet\Solr\Model\Indexer;
 
 use IntegerNet\Solr\Indexer\Indexer;
+use IntegerNet\Solr\Indexer\Slice;
 use IntegerNet\Solr\Plugin\UrlFactoryPlugin;
 
 /**
@@ -43,6 +44,13 @@ class ProductIndexerDecorator implements Indexer
     ) {
         $this->urlFactoryPlugin->setForceFrontend(true);
         $this->productIndexer->reindex($entityIds, $emptyIndex, $restrictToStoreIds, $sliceId, $totalNumberSlices);
+        $this->urlFactoryPlugin->setForceFrontend(false);
+    }
+
+    public function reindexSlice(Slice $slice, $restrictToStoreIds = null)
+    {
+        $this->urlFactoryPlugin->setForceFrontend(true);
+        $this->productIndexer->reindexSlice($slice, $restrictToStoreIds);
         $this->urlFactoryPlugin->setForceFrontend(false);
     }
 

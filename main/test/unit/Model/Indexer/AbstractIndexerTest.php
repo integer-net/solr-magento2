@@ -21,7 +21,7 @@ abstract class AbstractIndexerTest extends TestCase
     {
         $this->solrIndexerMock = $this->getMockBuilder(ProductIndexer::class)
             ->disableOriginalConstructor()
-            ->setMethods(['reindex', 'deleteIndex'])
+            ->setMethods(['reindex', 'reindexSlice', 'deleteIndex'])
             ->getMock();
         $this->indexerFactoryStub = $this->getMockBuilder(ProductIndexerFactory::class)
             ->disableOriginalConstructor()
