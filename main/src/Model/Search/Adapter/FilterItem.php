@@ -10,6 +10,7 @@
 
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Pricing\Helper\Data as PriceHelper;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -35,6 +36,10 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
      * @var PriceHelper
      */
     private $priceHelper;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
 
     public function __construct(
         \Magento\Framework\UrlInterface $url,
@@ -42,12 +47,14 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
         \Magento\Framework\App\RequestInterface $request,
         StoreManagerInterface $storeManager,
         PriceHelper $priceHelper,
+        ScopeConfigInterface $scopeConfig,
         array $data = []
     ) {
         parent::__construct($url, $htmlPagerBlock, $data);
         $this->request = $request;
         $this->storeManager = $storeManager;
         $this->priceHelper = $priceHelper;
+        $this->scopeConfig = $scopeConfig;
     }
 
     public function isActive()
@@ -62,6 +69,9 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
 
     public function canUsePriceSlider()
     {
+        if ($this->isPriceFilter() && !$this->scopeConfig->isSetFlag('integernet_solr/results/use_price_slider')) {
+            return false;
+        }
         return $this->isPriceFilter() || $this->isDecimalFilter();
     }
 
@@ -96,7 +106,7 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
                 if (!is_array($value)) {
                     $value = explode('-', $value);
                 }
-                return $value[0];
+                return max($value[0], $this->getMinAvailableValue());
             }
         }
         return $this->getMinAvailableValue();
@@ -133,7 +143,7 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
                 if (!is_array($value)) {
                     $value = explode('-', $value);
                 }
-                return $value[1];
+                return min($value[1], $this->getMaxAvailableValue());
             }
         }
         return $this->getMaxAvailableValue();

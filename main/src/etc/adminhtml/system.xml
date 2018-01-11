@@ -179,24 +179,43 @@
           <comment>0 = don't show at all, 1 = don't modify, anything between = lower priority</comment>
           <validate>validate-number validate-zero-or-greater</validate>
         </field>
-        <field id="price_step_size" translate="label,comment" sortOrder="30" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="use_price_slider" translate="label,comment" sortOrder="30" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Use Slider for Price Filter</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="price_step_size" translate="label,comment" sortOrder="40" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Size of Price Steps</label>
           <comment>i.e. 100</comment>
           <validate>validate-number validate-zero-or-greater</validate>
+          <depends>
+            <field id="use_custom_price_intervals">0</field>
+            <field id="use_price_slider">0</field>
+          </depends>
         </field>
-        <field id="max_price" translate="label,comment" sortOrder="40" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="max_price" translate="label,comment" sortOrder="45" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Upper Limit of Price Steps</label>
           <comment>i.e. 1000</comment>
           <validate>validate-number validate-zero-or-greater</validate>
+          <depends>
+            <field id="use_custom_price_intervals">0</field>
+            <field id="use_price_slider">0</field>
+          </depends>
         </field>
         <field id="use_custom_price_intervals" translate="label,comment" sortOrder="50" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Use Custom Price Intervals</label>
           <comment>Needs Solr 4.10+</comment>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+          <depends>
+            <field id="use_price_slider">0</field>
+          </depends>
         </field>
         <field id="custom_price_intervals" translate="label,comment" sortOrder="60" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Custom Price Intervals</label>
           <comment>Divide steps by comma, i.e. 10,20,50,100,200,300,400,500</comment>
+          <depends>
+            <field id="use_custom_price_intervals">1</field>
+            <field id="use_price_slider">0</field>
+          </depends>
         </field>
         <field id="product_attributes_redirect" translate="label,comment" sortOrder="70" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Redirect to product page on direct match in one of these attributes</label>
