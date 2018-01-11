@@ -16,13 +16,18 @@
     <span class="filter-value" id="filter_value_<?php echo $identifier ?>"></span>
     <br><br>
     <div class="ui-slider-wrapper">
-        <div class="filter-options-slider" id="filter_options_slider_<?php echo $identifier ?>"></div>
+        <div class="filter-options-slider" id="filter_options_slider_<?php echo $identifier ?>">
+            <span class="ui-slider-handle ui-slider-handle__left"></span>
+            <span class="ui-slider-handle ui-slider-handle__right"></span>
+        </div>
     </div>
-    <a class="action"
-       href="<?php echo $block->escapeUrl($filterItem->getPriceFilterUrlWithCurrentValues()) ?>"
-       id="filter_link_<?php echo $identifier ?>">
-        <span><?php echo __('Select') ?></span>
-    </a>
+    <p>
+        <a class="action primary"
+           href="<?php echo $block->escapeUrl($filterItem->getPriceFilterUrlWithCurrentValues()) ?>"
+           id="filter_link_<?php echo $identifier ?>">
+            <span><?php echo __('Select') ?></span>
+        </a>
+    </p>
 
     <script>
         require([
