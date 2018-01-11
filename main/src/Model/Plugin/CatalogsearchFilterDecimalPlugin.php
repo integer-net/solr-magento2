@@ -28,7 +28,7 @@ class CatalogsearchFilterDecimalPlugin
      */
     private $priceCurrency;
     /**
-     * @var \Magento\Catalog\Model\Layer\Filter\DataProvider\DecimalFactory
+     * @var \Magento\Catalog\Model\Layer\Filter\DataProvider\PriceFactory
      */
     private $dataProviderFactory;
 
@@ -133,14 +133,5 @@ class CatalogsearchFilterDecimalPlugin
     private function getDataProvider(Subject $subject)
     {
         return $this->dataProviderFactory->create(['layer' => $subject->getLayer()]);
-    }
-
-    /**
-     * @param Subject $subject
-     * @param string $attributeValue
-     */
-    private function addFilterToState(Subject $subject, $attributeValue)
-    {
-
     }
 }

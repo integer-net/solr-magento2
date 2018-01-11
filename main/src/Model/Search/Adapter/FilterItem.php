@@ -167,7 +167,7 @@ class FilterItem extends \Magento\Catalog\Model\Layer\Filter\Item
      */
     public function getPriceFilterUrlWithPlaceholder()
     {
-        $query = [$this->getFilter()->getRequestVar() => 'priceRange'];
+        $query = [$this->getFilter()->getRequestVar() => ['priceRange']];
         $params['_current'] = true;
         $params['_use_rewrite'] = true;
         $params['_query'] = $query;
