@@ -43,4 +43,5 @@ sed -i -e "s/8983/$SOLR_CI_PORT_8983_TCP_PORT/g"  vendor/integer-net/solr-magent
 sed -i -e "s/localhost/$SOLR_CI_PORT_8983_TCP_ADDR/g" vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
 sed -i -e "s/solr-magento2-tests/core0/g" vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
 bin/magento module:enable IntegerNet_Solr
+bin/magento setup:di:compile
 bin/magento setup:upgrade
