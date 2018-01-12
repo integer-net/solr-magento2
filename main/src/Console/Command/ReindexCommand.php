@@ -66,6 +66,12 @@ class ReindexCommand extends Command
                 'Force not emptying the solr index for the given store(s). If not set, configured value is used.'
             ),
             new InputOption(
+                'useswapcore',
+                null,
+                InputOption::VALUE_NONE,
+                'Use swap core for clearing instead of live solr core (only if configured correctly).'
+            ),
+            new InputOption(
                 'progress',
                 null,
                 InputOption::VALUE_NONE,
@@ -98,7 +104,14 @@ class ReindexCommand extends Command
             );
             if ($input->getOption('slice')) {
                 $output->writeln('Processing slice ' . $input->getOption('slice') . '...');
-                $this->indexer->executeStoresSlice(Slice::fromExpression($input->getOption('slice')), $stores);
+                if ($input->getOption('useswapcore')) {
+                    $this->indexer->executeStoresSliceOnSwappedCore(
+                        Slice::fromExpression($input->getOption('slice')),
+                        $stores
+                    );
+                } else {
+                    $this->indexer->executeStoresSlice(Slice::fromExpression($input->getOption('slice')), $stores);
+                }
             } elseif ($input->getOption('emptyindex')) {
                 $output->writeln('Forcing empty index.');
                 $this->indexer->executeStoresForceEmpty($stores);

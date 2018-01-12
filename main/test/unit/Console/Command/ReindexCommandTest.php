@@ -149,11 +149,43 @@ class ReindexCommandTest extends TestCase
         );
     }
 
+    public function testRunsProductReindexWithSliceOnSwappedCore()
+    {
+        $storeIds = [1];
+        $sliceExpression = '1/2';
+
+        $this->indexer->expects($this->once())->method('executeStoresSliceOnSwappedCore')->with(
+            Slice::fromExpression($sliceExpression),
+            $storeIds
+        );
+        $exitCode = $this->runCommandWithInput(
+            [
+                '--stores' => \implode(',', $storeIds),
+                '--slice' => $sliceExpression,
+                '--useswapcore' => true,
+            ]
+        );
+        $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
+        $this->assertOutputMessages(
+            'Reindex of Solr product index for stores 1',
+            'Processing slice 1/2',
+            'Finished'
+        );
+    }
+
     private function runCommandWithInput($input)
     {
         return $this->command->run(new ArrayInput($input), $this->output);
     }
 
+    /**
+     * Assert that output contains all given strings.
+     *
+     * Note that this is only for output directly emitted from the command,
+     * not via progress updates because the indexer is mocked.
+     *
+     * @param string[] $messages
+     */
     private function assertOutputMessages(...$messages)
     {
         $this->assertThat(

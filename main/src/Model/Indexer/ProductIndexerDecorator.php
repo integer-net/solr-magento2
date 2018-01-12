@@ -70,6 +70,26 @@ class ProductIndexerDecorator implements Indexer
         $this->productIndexer->clearIndex($storeId);
     }
 
+    public function checkSwapCoresConfiguration($restrictToStoreIds)
+    {
+        $this->productIndexer->checkSwapCoresConfiguration($restrictToStoreIds);
+    }
+
+    public function swapCores($restrictToStoreIds)
+    {
+        $this->productIndexer->swapCores($restrictToStoreIds);
+    }
+
+    public function activateSwapCore()
+    {
+        $this->productIndexer->activateSwapCore();
+    }
+
+    public function deactivateSwapCore()
+    {
+        $this->productIndexer->deactivateSwapCore();
+    }
+
     /**
      * Pass all non-interface method calls to the indexer as well
      *

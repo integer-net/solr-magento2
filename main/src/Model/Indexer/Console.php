@@ -55,6 +55,13 @@ class Console
         $this->reindex(null, false, $this->getStoreIds($storeIds));
     }
 
+    public function executeStoresSliceOnSwappedCore($slice, $storeIds)
+    {
+        $this->solrIndexer->activateSwapCore($storeIds);
+        $this->solrIndexer->reindexSlice($slice, $this->getStoreIds($storeIds));
+        $this->solrIndexer->deactivateSwapCore($storeIds);
+    }
+
     public function clearStores(array $storeIds = null)
     {
         //TODO fetch all store ids if NULL

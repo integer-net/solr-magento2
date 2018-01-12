@@ -82,4 +82,16 @@ class ConsoleTest extends AbstractIndexerTest
         $this->expectReindexWithArguments(null, false, $storeIds);
         $this->indexer->executeStoresForceNotEmpty($storeIds);
     }
+
+    public function testExecuteStoresSliceOnSwappedCore()
+    {
+        $storeIds = self::ARBITRARY_STORE_IDS;
+        $slice = new Slice(1, 2);
+        $this->expectForcedFrontendUrls();
+        $this->solrIndexerMock->expects($this->at(0))->method('activateSwapCore');
+        $this->solrIndexerMock->expects($this->at(1))->method('reindexSlice')->with($slice, $storeIds);
+        $this->solrIndexerMock->expects($this->at(2))->method('deactivateSwapCore');
+        $this->solrIndexerMock->expects($this->never())->method('swapCores');
+        $this->indexer->executeStoresSliceOnSwappedCore($slice, $storeIds);
+    }
 }

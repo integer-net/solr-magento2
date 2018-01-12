@@ -20,9 +20,17 @@ abstract class AbstractIndexerTest extends TestCase
     protected function setUp()
     {
         $this->solrIndexerMock = $this->getMockBuilder(ProductIndexer::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['reindex', 'reindexSlice', 'deleteIndex'])
-            ->getMock();
+            ->disableOriginalConstructor()->setMethods(
+                [
+                    'reindex',
+                    'reindexSlice',
+                    'deleteIndex',
+                    'checkSwapCoresConfiguration',
+                    'activateSwapCore',
+                    'deactivateSwapCore',
+                    'swapCores'
+                ]
+            )->getMock();
         $this->indexerFactoryStub = $this->getMockBuilder(ProductIndexerFactory::class)
             ->disableOriginalConstructor()
             ->setMethods(['create'])
