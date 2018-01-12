@@ -6,15 +6,16 @@ use IntegerNet\Solr\Indexer\Slice;
 use IntegerNet\Solr\Model\Indexer;
 use Magento\Framework\App;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * solr:reindex:products command
  *
  * @todo Add --useswapcore argument
- * @todo Add callback to indexer to allow progress output and info about indexed stores
  */
 class ReindexCommand extends Command
 {
@@ -64,6 +65,12 @@ class ReindexCommand extends Command
                 InputOption::VALUE_NONE,
                 'Force not emptying the solr index for the given store(s). If not set, configured value is used.'
             ),
+            new InputOption(
+                'progress',
+                null,
+                InputOption::VALUE_NONE,
+                'Show progress bar.'
+            )
         ];
         $this->setName('solr:reindex:products');
         $this->setDescription('Reindex solr for given stores (see "stores" param)');
@@ -72,15 +79,23 @@ class ReindexCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $styledOutput = new SymfonyStyle($input, $output);
+        $startTime = microtime(true);
         $this->appState->setAreaCode(App\Area::AREA_GLOBAL);
         if (!$input->getOption(self::INPUT_STORES) || $input->getOption(self::INPUT_STORES) === 'all') {
             $stores = null;
-            $output->writeln('Starting full reindex of Solr product index...');
+            $styledOutput->title('Full reindex of Solr product index...');
         } else {
             $stores = \explode(',', $input->getOption(self::INPUT_STORES));
-            $output->writeln('Starting reindex of Solr product index for stores ' . \implode(', ', $stores) . '...');
+            $styledOutput->title('Reindex of Solr product index for stores ' . \implode(', ', $stores) . '...');
         }
         try {
+            $this->indexer->addProgressHandler(
+                new ProgressInConsole(
+                    $output,
+                    $input->getOption('progress') ? ProgressInConsole::USE_PROGRESS_BAR : false
+                )
+            );
             if ($input->getOption('slice')) {
                 $output->writeln('Processing slice ' . $input->getOption('slice') . '...');
                 $this->indexer->executeStoresSlice(Slice::fromExpression($input->getOption('slice')), $stores);
@@ -93,7 +108,8 @@ class ReindexCommand extends Command
             } else {
                 $this->indexer->executeStores($stores);
             }
-            $output->writeln('Finished.');
+            $totalTime = number_format(microtime(true) - $startTime, 2);
+            $styledOutput->success("Reindex finished in $totalTime seconds.");
         } catch (\Exception $e) {
             $output->writeln('<error>' . $e->getMessage() . '</error>');
         }

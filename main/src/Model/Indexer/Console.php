@@ -11,6 +11,7 @@
 namespace IntegerNet\Solr\Model\Indexer;
 
 use IntegerNet\Solr\Indexer\ProductIndexer;
+use IntegerNet\Solr\Indexer\Progress\ProgressHandler;
 use IntegerNet\Solr\Indexer\Slice;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -65,6 +66,11 @@ class Console
         }
     }
 
+    public function addProgressHandler(ProgressHandler $handler)
+    {
+        $this->solrIndexer->addProgressHandler($handler);
+    }
+
     /**
      * Call product indexer
      *
@@ -92,11 +98,14 @@ class Console
     }
 
     /**
-     * @param array $storeIds An array of store codes or store ids
-     * @return array An array of store ids
+     * @param array|null $storeIds An array of store codes or store ids
+     * @return array|null An array of store ids
      */
-    private function getStoreIds(array $storeIds): array
+    private function getStoreIds(array $storeIds = null)
     {
+        if ($storeIds === null) {
+            return null;
+        }
         $storesByCode = $this->storeManager->getStores(false, true);
         return array_map(
             function ($storeId) use ($storesByCode) {

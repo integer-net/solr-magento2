@@ -3,6 +3,7 @@
 namespace IntegerNet\Solr\Model\Indexer;
 
 use IntegerNet\Solr\Indexer\Indexer;
+use IntegerNet\Solr\Indexer\Progress\ProgressHandler;
 use IntegerNet\Solr\Indexer\Slice;
 use IntegerNet\Solr\Plugin\UrlFactoryPlugin;
 
@@ -33,6 +34,11 @@ class ProductIndexerDecorator implements Indexer
     {
         $this->productIndexer = $productIndexer;
         $this->urlFactoryPlugin = $urlFactoryPlugin;
+    }
+
+    public function addProgressHandler(ProgressHandler $handler)
+    {
+        $this->productIndexer->addProgressHandler($handler);
     }
 
     public function reindex(

@@ -42,7 +42,7 @@ class ReindexCommandTest extends TestCase
         $this->indexer->expects($this->once())->method('executeStores')->with(null);
         $exitCode = $this->runCommandWithInput([]);
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
-        $this->assertOutputMessages('Starting full reindex of Solr product index.', 'Finished.');
+        $this->assertOutputMessages('Full reindex of Solr product index.', 'Finished');
     }
 
     public function testRunsProductReindexWithStoreFilter()
@@ -55,7 +55,7 @@ class ReindexCommandTest extends TestCase
             ]
         );
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
-        $this->assertOutputMessages('Starting reindex of Solr product index for stores 1, 3, french.', 'Finished.');
+        $this->assertOutputMessages('Reindex of Solr product index for stores 1, 3, french.', 'Finished');
     }
 
     public function testRunsFullProductReindexWithForcedEmptyIndex()
@@ -68,9 +68,9 @@ class ReindexCommandTest extends TestCase
         );
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
         $this->assertOutputMessages(
-            'Starting full reindex of Solr product index.',
+            'Full reindex of Solr product index.',
             'Forcing empty index.',
-            'Finished.'
+            'Finished'
         );
     }
 
@@ -84,9 +84,9 @@ class ReindexCommandTest extends TestCase
         );
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
         $this->assertOutputMessages(
-            'Starting full reindex of Solr product index.',
+            'Full reindex of Solr product index.',
             'Forcing non-empty index.',
-            'Finished.'
+            'Finished'
         );
     }
 
@@ -102,9 +102,9 @@ class ReindexCommandTest extends TestCase
         );
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
         $this->assertOutputMessages(
-            'Starting reindex of Solr product index for stores 1, 3.',
+            'Reindex of Solr product index for stores 1, 3.',
             'Forcing empty index.',
-            'Finished.'
+            'Finished'
         );
     }
 
@@ -120,9 +120,9 @@ class ReindexCommandTest extends TestCase
         );
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
         $this->assertOutputMessages(
-            'Starting reindex of Solr product index for stores 1, 3.',
+            'Reindex of Solr product index for stores 1, 3.',
             'Forcing non-empty index.',
-            'Finished.'
+            'Finished'
         );
     }
 
@@ -143,9 +143,9 @@ class ReindexCommandTest extends TestCase
         );
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
         $this->assertOutputMessages(
-            'Starting reindex of Solr product index for stores 1.',
+            'Reindex of Solr product index for stores 1.',
             'Processing slice 1/2.',
-            'Finished.'
+            'Finished'
         );
     }
 
