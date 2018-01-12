@@ -18,18 +18,35 @@ class CommandListTest extends TestCase
      */
     private $commandList;
 
-    public function testContainsReindexCommand()
+    public function testContainsReindexProductsCommand()
     {
         $commands = $this->commandList->getCommands();
         $this->assertArrayHasKey(
-            'solr_reindex',
+            'solr_reindex_full',
             $commands,
             'Command should be listed'
         );
-        $reindexCommand = $commands['solr_reindex'];
-        $this->assertEquals('solr:reindex:products', $reindexCommand->getName(), 'Command name');
+        $reindexCommand = $commands['solr_reindex_full'];
+        $this->assertEquals('solr:reindex:full', $reindexCommand->getName(), 'Command name');
         $this->assertInstanceof(
             Command\ReindexCommand::class,
+            $reindexCommand,
+            'Command should be instantiated.'
+        );
+    }
+
+    public function testContainsReindexSliceCommand()
+    {
+        $commands = $this->commandList->getCommands();
+        $this->assertArrayHasKey(
+            'solr_reindex_slice',
+            $commands,
+            'Command should be listed'
+        );
+        $reindexCommand = $commands['solr_reindex_slice'];
+        $this->assertEquals('solr:reindex:slice', $reindexCommand->getName(), 'Command name');
+        $this->assertInstanceof(
+            Command\ReindexSliceCommand::class,
             $reindexCommand,
             'Command should be instantiated.'
         );

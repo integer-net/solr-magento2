@@ -13,9 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * solr:reindex:full command
+ * solr:reindex:slice command
  */
-class ReindexCommand extends Command
+class ReindexSliceCommand extends Command
 {
     const INPUT_STORES = 'stores';
     /**
@@ -45,16 +45,16 @@ class ReindexCommand extends Command
                 . 'If not set, reindex all stores.'
             ),
             new InputOption(
-                'emptyindex',
+                'slice',
                 null,
-                InputOption::VALUE_NONE,
-                'Force emptying the solr index for the given store(s). If not set, configured value is used.'
+                InputOption::VALUE_REQUIRED,
+                '<number>/<total_number>, i.e. "1/5" or "2/5". '
             ),
             new InputOption(
-                'noemptyindex',
+                'useswapcore',
                 null,
                 InputOption::VALUE_NONE,
-                'Force not emptying the solr index for the given store(s). If not set, configured value is used.'
+                'Use swap core for indexing instead of live solr core (only if configured correctly).'
             ),
             new InputOption(
                 'progress',
@@ -63,9 +63,9 @@ class ReindexCommand extends Command
                 'Show progress bar.'
             )
         ];
-        $this->setName('solr:reindex:full');
-        $this->setHelp('Reindex Solr for given stores (see "stores" param).');
-        $this->setDescription('Reindex Solr');
+        $this->setName('solr:reindex:slice');
+        $this->setHelp('Partially reindex Solr for given stores (see "stores" param). Can be used for letting indexing run in parallel.');
+        $this->setDescription('Partially reindex Solr');
         $this->setDefinition($options);
     }
 
@@ -88,14 +88,14 @@ class ReindexCommand extends Command
                     $input->getOption('progress') ? ProgressInConsole::USE_PROGRESS_BAR : false
                 )
             );
-            if ($input->getOption('emptyindex')) {
-                $output->writeln('Forcing empty index.');
-                $this->indexer->executeStoresForceEmpty($stores);
-            } elseif ($input->getOption('noemptyindex')) {
-                $output->writeln('Forcing non-empty index.');
-                $this->indexer->executeStoresForceNotEmpty($stores);
+            $output->writeln('Processing slice ' . $input->getOption('slice') . '...');
+            if ($input->getOption('useswapcore')) {
+                $this->indexer->executeStoresSliceOnSwappedCore(
+                    Slice::fromExpression($input->getOption('slice')),
+                    $stores
+                );
             } else {
-                $this->indexer->executeStores($stores);
+                $this->indexer->executeStoresSlice(Slice::fromExpression($input->getOption('slice')), $stores);
             }
             $totalTime = number_format(microtime(true) - $startTime, 2);
             $styledOutput->success("Reindex finished in $totalTime seconds.");

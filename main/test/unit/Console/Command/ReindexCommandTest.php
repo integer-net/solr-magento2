@@ -3,7 +3,6 @@
 namespace IntegerNet\Solr\Console\Command;
 
 use IntegerNet\Solr\Indexer\ProductIndexer;
-use IntegerNet\Solr\Indexer\Slice;
 use IntegerNet\Solr\Model\Indexer;
 use Magento\Framework\App;
 use PHPUnit\Framework\Assert;
@@ -122,53 +121,6 @@ class ReindexCommandTest extends TestCase
         $this->assertOutputMessages(
             'Reindex of Solr product index for stores 1, 3.',
             'Forcing non-empty index.',
-            'Finished'
-        );
-    }
-
-    public function testRunsProductReindexWithSlice()
-    {
-        $storeIds = [1];
-        $sliceExpression = '1/2';
-
-        $this->indexer->expects($this->once())->method('executeStoresSlice')->with(
-            Slice::fromExpression($sliceExpression),
-            $storeIds
-        );
-        $exitCode = $this->runCommandWithInput(
-            [
-                '--stores' => \implode(',', $storeIds),
-                '--slice' => $sliceExpression
-            ]
-        );
-        $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
-        $this->assertOutputMessages(
-            'Reindex of Solr product index for stores 1.',
-            'Processing slice 1/2.',
-            'Finished'
-        );
-    }
-
-    public function testRunsProductReindexWithSliceOnSwappedCore()
-    {
-        $storeIds = [1];
-        $sliceExpression = '1/2';
-
-        $this->indexer->expects($this->once())->method('executeStoresSliceOnSwappedCore')->with(
-            Slice::fromExpression($sliceExpression),
-            $storeIds
-        );
-        $exitCode = $this->runCommandWithInput(
-            [
-                '--stores' => \implode(',', $storeIds),
-                '--slice' => $sliceExpression,
-                '--useswapcore' => true,
-            ]
-        );
-        $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful indexing');
-        $this->assertOutputMessages(
-            'Reindex of Solr product index for stores 1',
-            'Processing slice 1/2',
             'Finished'
         );
     }

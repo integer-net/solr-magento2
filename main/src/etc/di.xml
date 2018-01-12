@@ -153,7 +153,8 @@
   <type name="Magento\Framework\Console\CommandListInterface">
     <arguments>
       <argument name="commands" xsi:type="array">
-        <item name="solr_reindex" xsi:type="object">IntegerNet\Solr\Console\Command\ReindexCommand</item>
+        <item name="solr_reindex_full" xsi:type="object">IntegerNet\Solr\Console\Command\ReindexCommand</item>
+        <item name="solr_reindex_slice" xsi:type="object">IntegerNet\Solr\Console\Command\ReindexSliceCommand</item>
       </argument>
     </arguments>
   </type>
