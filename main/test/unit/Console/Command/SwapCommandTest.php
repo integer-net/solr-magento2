@@ -10,10 +10,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class ClearCommandTest extends TestCase
+class SwapCommandTest extends TestCase
 {
     /**
-     * @var ClearCommand
+     * @var SwapCommand
      */
     private $command;
 
@@ -31,48 +31,30 @@ class ClearCommandTest extends TestCase
     {
         $this->indexer = $this->getMockBuilder(Indexer\Console::class)->disableOriginalConstructor()->getMock();
         $appState = $this->getMockBuilder(App\State::class)->disableOriginalConstructor()->getMock();
-        $this->command = new ClearCommand($this->indexer, $appState);
+        $this->command = new SwapCommand($this->indexer, $appState);
         $this->output = new BufferedOutput();
     }
 
 
-    public function testClearsFullProductIndexWithoutArguments()
+    public function testSwapAllCoresWithoutArguments()
     {
-        $this->indexer->expects($this->once())->method('clearStores')->with(null);
+        $this->indexer->expects($this->once())->method('swapCores')->with(null);
         $exitCode = $this->runCommandWithInput([]);
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful clear');
-        $this->assertOutputMessages('Clearing full Solr product index', 'Finished');
+        $this->assertOutputMessages('Swap all cores', 'Finished');
     }
 
-    public function testClearProductIndexWithStoreFilter()
+    public function testSwapCoresWithStoreFilter()
     {
         $storeIds = [1, 3, 'french'];
-        $this->indexer->expects($this->once())->method('clearStores')->with($storeIds);
+        $this->indexer->expects($this->once())->method('swapCores')->with($storeIds);
         $exitCode = $this->runCommandWithInput(
             [
                 '--stores' => \implode(',', $storeIds),
             ]
         );
         $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful clearing');
-        $this->assertOutputMessages('Clearing Solr product index for stores 1, 3, french', 'Finished');
-    }
-
-    public function testClearProductIndexOnSwappedCore()
-    {
-        $storeIds = [1];
-
-        $this->indexer->expects($this->once())->method('clearStoresOnSwappedCore')->with($storeIds);
-        $exitCode = $this->runCommandWithInput(
-            [
-                '--stores' => \implode(',', $storeIds),
-                '--useswapcore' => true,
-            ]
-        );
-        $this->assertEquals(0, $exitCode, 'Exit code should be 0 for successful clearing');
-        $this->assertOutputMessages(
-            'Clearing Solr product index for stores 1',
-            'Finished'
-        );
+        $this->assertOutputMessages('Swap cores for stores 1, 3, french', 'Finished');
     }
 
     private function runCommandWithInput($input)

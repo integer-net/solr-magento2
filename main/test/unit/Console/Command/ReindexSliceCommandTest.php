@@ -24,7 +24,7 @@ class ReindexSliceCommandTest extends TestCase
     private $output;
 
     /**
-     * @var ProductIndexer|\PHPUnit_Framework_MockObject_MockObject
+     * @var Indexer\Console|\PHPUnit_Framework_MockObject_MockObject
      */
     private $indexer;
 

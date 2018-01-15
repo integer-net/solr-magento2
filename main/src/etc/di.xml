@@ -156,6 +156,7 @@
         <item name="solr_reindex_full" xsi:type="object">IntegerNet\Solr\Console\Command\ReindexCommand</item>
         <item name="solr_reindex_slice" xsi:type="object">IntegerNet\Solr\Console\Command\ReindexSliceCommand</item>
         <item name="solr_clear" xsi:type="object">IntegerNet\Solr\Console\Command\ClearCommand</item>
+        <item name="solr_swap" xsi:type="object">IntegerNet\Solr\Console\Command\SwapCommand</item>
       </argument>
     </arguments>
   </type>
@@ -172,6 +173,11 @@
     </arguments>
   </type>
   <type name="IntegerNet\Solr\Console\Command\ClearCommand">
+    <arguments>
+      <argument name="indexer" xsi:type="object">\IntegerNet\Solr\Model\Indexer\Console\Proxy</argument>
+      <argument name="appState" xsi:type="object">\Magento\Framework\App\State\Proxy</argument>
+    </arguments>
+  </type>  <type name="IntegerNet\Solr\Console\Command\SwapCommand">
     <arguments>
       <argument name="indexer" xsi:type="object">\IntegerNet\Solr\Model\Indexer\Console\Proxy</argument>
       <argument name="appState" xsi:type="object">\Magento\Framework\App\State\Proxy</argument>

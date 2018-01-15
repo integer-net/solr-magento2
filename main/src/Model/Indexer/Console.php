@@ -95,6 +95,11 @@ class Console
         $this->solrIndexer->deactivateSwapCore();
     }
 
+    public function swapCores(array $storeIds = null)
+    {
+        $this->solrIndexer->swapCores($storeIds);
+    }
+
     public function addProgressHandler(ProgressHandler $handler)
     {
         $this->solrIndexer->addProgressHandler($handler);

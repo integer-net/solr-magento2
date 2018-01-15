@@ -69,6 +69,23 @@ class CommandListTest extends TestCase
         );
     }
 
+    public function testContainsSwapCommand()
+    {
+        $commands = $this->commandList->getCommands();
+        $this->assertArrayHasKey(
+            'solr_swap',
+            $commands,
+            'Command should be listed'
+        );
+        $clearCommand = $commands['solr_swap'];
+        $this->assertEquals('solr:swap', $clearCommand->getName(), 'Command name');
+        $this->assertInstanceOf(
+            Command\SwapCommand::class,
+            $clearCommand,
+            'Command should be instantiated.'
+        );
+    }
+
     protected function setUp()
     {
         $this->fixMagento2․2Di();
