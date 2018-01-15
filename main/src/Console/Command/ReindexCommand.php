@@ -71,7 +71,10 @@ class ReindexCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $styledOutput = new SymfonyStyle($input, $output);
+        $styledOutput = new StyledOutput(
+            $output,
+            class_exists(SymfonyStyle::class) ? new SymfonyStyle($input, $output) : null
+        );
         $startTime = microtime(true);
         $this->appState->setAreaCode(App\Area::AREA_GLOBAL);
         if (!$input->getOption(self::INPUT_STORES) || $input->getOption(self::INPUT_STORES) === 'all') {
@@ -89,10 +92,10 @@ class ReindexCommand extends Command
                 )
             );
             if ($input->getOption('emptyindex')) {
-                $output->writeln('Forcing empty index.');
+                $styledOutput->note('Forcing empty index.');
                 $this->indexer->executeStoresForceEmpty($stores);
             } elseif ($input->getOption('noemptyindex')) {
-                $output->writeln('Forcing non-empty index.');
+                $styledOutput->note('Forcing non-empty index.');
                 $this->indexer->executeStoresForceNotEmpty($stores);
             } else {
                 $this->indexer->executeStores($stores);
@@ -100,7 +103,7 @@ class ReindexCommand extends Command
             $totalTime = number_format(microtime(true) - $startTime, 2);
             $styledOutput->success("Reindex finished in $totalTime seconds.");
         } catch (\Exception $e) {
-            $output->writeln('<error>' . $e->getMessage() . '</error>');
+            $styledOutput->error($e->getMessage());
         }
     }
 }

@@ -71,7 +71,10 @@ class ReindexSliceCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $styledOutput = new SymfonyStyle($input, $output);
+        $styledOutput = new StyledOutput(
+            $output,
+            class_exists(SymfonyStyle::class) ? new SymfonyStyle($input, $output) : null
+        );
         $startTime = microtime(true);
         $this->appState->setAreaCode(App\Area::AREA_GLOBAL);
         if (!$input->getOption(self::INPUT_STORES) || $input->getOption(self::INPUT_STORES) === 'all') {
@@ -88,7 +91,7 @@ class ReindexSliceCommand extends Command
                     $input->getOption('progress') ? ProgressInConsole::USE_PROGRESS_BAR : false
                 )
             );
-            $output->writeln('Processing slice ' . $input->getOption('slice') . '...');
+            $styledOutput->note('Processing slice ' . $input->getOption('slice') . '...');
             if ($input->getOption('useswapcore')) {
                 $this->indexer->executeStoresSliceOnSwappedCore(
                     Slice::fromExpression($input->getOption('slice')),
@@ -100,7 +103,7 @@ class ReindexSliceCommand extends Command
             $totalTime = number_format(microtime(true) - $startTime, 2);
             $styledOutput->success("Reindex finished in $totalTime seconds.");
         } catch (\Exception $e) {
-            $output->writeln('<error>' . $e->getMessage() . '</error>');
+            $styledOutput->error($e->getMessage());
         }
     }
 }
