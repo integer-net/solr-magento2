@@ -28,7 +28,7 @@ class CommandListTest extends TestCase
         );
         $reindexCommand = $commands['solr_reindex_full'];
         $this->assertEquals('solr:reindex:full', $reindexCommand->getName(), 'Command name');
-        $this->assertInstanceof(
+        $this->assertInstanceOf(
             Command\ReindexCommand::class,
             $reindexCommand,
             'Command should be instantiated.'
@@ -45,9 +45,26 @@ class CommandListTest extends TestCase
         );
         $reindexCommand = $commands['solr_reindex_slice'];
         $this->assertEquals('solr:reindex:slice', $reindexCommand->getName(), 'Command name');
-        $this->assertInstanceof(
+        $this->assertInstanceOf(
             Command\ReindexSliceCommand::class,
             $reindexCommand,
+            'Command should be instantiated.'
+        );
+    }
+
+    public function testContainsClearCommand()
+    {
+        $commands = $this->commandList->getCommands();
+        $this->assertArrayHasKey(
+            'solr_clear',
+            $commands,
+            'Command should be listed'
+        );
+        $clearCommand = $commands['solr_clear'];
+        $this->assertEquals('solr:clear', $clearCommand->getName(), 'Command name');
+        $this->assertInstanceOf(
+            Command\ClearCommand::class,
+            $clearCommand,
             'Command should be instantiated.'
         );
     }

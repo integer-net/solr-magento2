@@ -13,6 +13,7 @@ namespace IntegerNet\Solr\Model\Indexer;
 use IntegerNet\Solr\Indexer\ProductIndexer;
 use IntegerNet\Solr\Indexer\Progress\ProgressHandler;
 use IntegerNet\Solr\Indexer\Slice;
+use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 class Console
@@ -64,13 +65,34 @@ class Console
 
     public function clearStores(array $storeIds = null)
     {
-        //TODO fetch all store ids if NULL
         if (empty($storeIds)) {
-            throw new \BadMethodCallException("Command for 'clear all stores' not implemented yet");
+            $storeIds = array_map(
+                function (StoreInterface $store) {
+                    return $store->getId();
+                },
+                $this->storeManager->getStores()
+            );
         }
         foreach ($this->getStoreIds($storeIds) as $storeId) {
             $this->solrIndexer->clearIndex($storeId);
         }
+    }
+
+    public function clearStoresOnSwappedCore(array $storeIds = null)
+    {
+        if (empty($storeIds)) {
+            $storeIds = array_map(
+                function (StoreInterface $store) {
+                    return $store->getId();
+                },
+                $this->storeManager->getStores()
+            );
+        }
+        $this->solrIndexer->activateSwapCore();
+        foreach ($this->getStoreIds($storeIds) as $storeId) {
+            $this->solrIndexer->clearIndex($storeId);
+        }
+        $this->solrIndexer->deactivateSwapCore();
     }
 
     public function addProgressHandler(ProgressHandler $handler)
@@ -122,7 +144,7 @@ class Console
                 if (isset($storesByCode[$storeId])) {
                     return $storesByCode[$storeId]->getId();
                 }
-                throw new \InvalidArgumentException("'$storeId' is neither a numric ID nor an existing store code");
+                throw new \InvalidArgumentException("'$storeId' is neither a numeric ID nor an existing store code");
             },
             $storeIds
         );
