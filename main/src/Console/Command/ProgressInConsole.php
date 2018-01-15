@@ -3,6 +3,7 @@
 namespace IntegerNet\Solr\Console\Command;
 
 use IntegerNet\Solr\Indexer\Progress\EventFinish;
+use IntegerNet\Solr\Indexer\Progress\EventInfo;
 use IntegerNet\Solr\Indexer\Progress\EventProgress;
 use IntegerNet\Solr\Indexer\Progress\EventStart;
 use IntegerNet\Solr\Indexer\Progress\ProgressHandler;
@@ -55,7 +56,7 @@ class ProgressInConsole implements ProgressHandler
             $this->output->writeln(
                 '<info>' . $update->getDescription() . ' finished in ' . $update->getElapsedTimeMs() . 'ms</info>'
             );
-        } else {
+        } elseif ($update instanceof EventInfo) {
             $this->output->writeln(
                 '<comment>' . $update->getDescription() . '</comment>'
             );
