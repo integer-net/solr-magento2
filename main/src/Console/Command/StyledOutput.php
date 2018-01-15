@@ -24,9 +24,9 @@ class StyledOutput
     /**
      * StyledOutput constructor.
      * @param OutputInterface $output
-     * @param SymfonyStyle $symfonyStyle
+     * @param SymfonyStyle|null $symfonyStyle
      */
-    public function __construct(OutputInterface $output, SymfonyStyle $symfonyStyle = null)
+    public function __construct(OutputInterface $output, $symfonyStyle = null)
     {
         $this->output = $output;
         $this->symfonyStyle = $symfonyStyle;
