@@ -164,6 +164,12 @@
       <argument name="appState" xsi:type="object">\Magento\Framework\App\State\Proxy</argument>
     </arguments>
   </type>
+  <type name="IntegerNet\Solr\Console\Command\ReindexSliceCommand">
+    <arguments>
+      <argument name="indexer" xsi:type="object">\IntegerNet\Solr\Model\Indexer\Console\Proxy</argument>
+      <argument name="appState" xsi:type="object">\Magento\Framework\App\State\Proxy</argument>
+    </arguments>
+  </type>
 
 
 
