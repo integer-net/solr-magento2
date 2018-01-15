@@ -31,7 +31,7 @@ composer config repositories.solr-pro vcs git@github.com:integer-net/solr-pro.gi
 sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/main\/test\/unit", "vendor\/integer-net\/solr-magento2\/main\/test\/integration", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
 composer config minimum-stability dev
 composer require integer-net/solr-magento2 dev-tmp --no-update
-composer require --dev tddwizard/magento2-fixtures 0.3.0 --no-update
+composer require --dev tddwizard/magento2-fixtures 0.3.1 --no-update
 phpunit_version="$(composer info | grep "phpunit/phpunit " | awk '{ print $2 }')"
 phpunit_minimum="5.7.0"
 if [ "$(printf "$phpunit_minimum\n$phpunit_version" | sort -V | head -n1)" == "$phpunit_version" ] && [ "$phpunit_version" != "$phpunit_minimum" ]; then
@@ -43,4 +43,5 @@ sed -i -e "s/8983/$SOLR_CI_PORT_8983_TCP_PORT/g"  vendor/integer-net/solr-magent
 sed -i -e "s/localhost/$SOLR_CI_PORT_8983_TCP_ADDR/g" vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
 sed -i -e "s/solr-magento2-tests/core0/g" vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
 bin/magento module:enable IntegerNet_Solr
+bin/magento setup:di:compile
 bin/magento setup:upgrade

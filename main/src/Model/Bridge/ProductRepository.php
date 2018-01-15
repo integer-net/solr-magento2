@@ -91,7 +91,6 @@ class ProductRepository implements ProductRepositoryInterface
             }
             $productCollection->getSelect()->where('e.entity_id % ' . intval($totalNumberSlices) . ' = ' . intval($sliceId));
         }
-
         return $productCollection->getAllIds();
     }
 
