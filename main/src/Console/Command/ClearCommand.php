@@ -17,7 +17,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ClearCommand extends Command
 {
-    const INPUT_STORES = 'stores';
+    const INPUT_STORES      = 'stores';
+    const INPUT_USESWAPCORE = 'useswapcore';
     /**
      * @var Indexer\Console
      */
@@ -38,14 +39,14 @@ class ClearCommand extends Command
     {
         $options = [
             new InputOption(
-                'stores',
+                self::INPUT_STORES,
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Clear solr product index for given stores (can be store id, store code, comma seperated. Or "all".) '
                 . 'If not set, clear all stores.'
             ),
             new InputOption(
-                'useswapcore',
+                self::INPUT_USESWAPCORE,
                 null,
                 InputOption::VALUE_NONE,
                 'Use swap core for clearing instead of live solr core (only if configured correctly).'
@@ -76,7 +77,7 @@ class ClearCommand extends Command
             $this->indexer->addProgressHandler(
                 new ProgressInConsole($output)
             );
-            if ($input->getOption('useswapcore')) {
+            if ($input->getOption(self::INPUT_USESWAPCORE)) {
                 $this->indexer->clearStoresOnSwappedCore($stores);
             } else {
                 $this->indexer->clearStores($stores);
