@@ -48,7 +48,11 @@ class PagedProductIteratorTest extends TestCase
         /** @var Product[] $productsFromIterator */
         $productsFromIterator = \iterator_to_array($iterator);
 
-        $this->assertEquals(\count($productsById), \count($productsFromIterator));
+        $this->assertEquals(
+            \count($productsById),
+            \count($productsFromIterator),
+            'Number of products from iterator should be the same as of input'
+        );
         foreach ($productsFromIterator as $actualProduct) {
             $this->assertProductBridgeFor(current($productsById), $storeId, $actualProduct);
             next($productsById);
@@ -315,21 +319,18 @@ class PagedProductIteratorTest extends TestCase
             ->setMethods(['getIterator', 'load', 'getSize', 'getItemById'])
             ->getMock();
         $collectionStub->method('getSize')->willReturn(count($products));
-        $collectionStub->method('getIterator')
-            ->willReturnCallback(function() use ($collectionStub, $productIds, $products) {
-                $offset = ($collectionStub->getCurPage() - 1) * $collectionStub->getPageSize();
-                $limit = $collectionStub->getPageSize();
+        $collectionStub->method('getIterator')->willReturnCallback(
+            function () use ($productIds, $products) {
                 return new \ArrayIterator(
-                    \array_combine(
-                        \array_slice($productIds, $offset, $limit),
-                        \array_slice($products, $offset, $limit)
-                    )
+                    \array_combine($productIds, $products)
                 );
-            });
-        $collectionStub->method('getItemById')
-            ->willReturnCallback(function($id) use ($products) {
+            }
+        );
+        $collectionStub->method('getItemById')->willReturnCallback(
+            function ($id) use ($products) {
                 return isset($products[$id]) ? $products[$id] : null;
-            });
+            }
+        );
         return $collectionStub;
     }
 
