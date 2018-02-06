@@ -13,6 +13,8 @@ use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Api\Data\StoreInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -84,6 +86,19 @@ class AttributeRepositoryTest extends TestCase
     {
         return $this->mockAttributeRepository($dataAttributes, $expectedSearchCriteria,
             ProductAttributeRepositoryInterface::class, AttributeResource::class);
+    }
+
+    /**
+     * @return StoreManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getStoreManagerMock()
+    {
+        $storeMock = $this->getMockBuilder(StoreInterface::class)->getMockForAbstractClass();
+        $storeMock->method('getId')->willReturn(1);
+        $storeManagerMock = $this->getMockBuilder(StoreManagerInterface::class)->getMockForAbstractClass();
+        $storeManagerMock->method('getStore')
+            ->willReturn($storeMock);
+        return $storeManagerMock;
     }
 
     /**
@@ -349,9 +364,12 @@ class AttributeRepositoryTest extends TestCase
         $searchCriteriaDummy = new SearchCriteria();
         $searchCriteriaBuilderMock = $this->searchCriteriaBuilderExpects($this->getSearchCriteriaBuilderMock(), $expectedFilters, $expectedSortOrder, $searchCriteriaDummy);
         $this->productAttributeRepositoryMock = $this->mockProductAttributeRepository($dataAttributes, $searchCriteriaDummy);
+
         $attributeRepository = new AttributeRepository(
             $this->productAttributeRepositoryMock,
-            new AttributeSearchCriteriaBuilder($this->mockSearchCriteriaBuilderFactory($searchCriteriaBuilderMock)));
+            new AttributeSearchCriteriaBuilder($this->mockSearchCriteriaBuilderFactory($searchCriteriaBuilderMock)),
+            $this->getStoreManagerMock()
+        );
         return $attributeRepository;
     }
 
