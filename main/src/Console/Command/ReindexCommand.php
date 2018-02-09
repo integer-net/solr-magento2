@@ -17,7 +17,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ReindexCommand extends Command
 {
-    const INPUT_STORES = 'stores';
+    const INPUT_STORES       = 'stores';
+    const INPUT_EMPTYINDEX   = 'emptyindex';
+    const INPUT_NOEMPTYINDEX = 'noemptyindex';
+    const INPUT_PROGRESS     = 'progress';
     /**
      * @var Indexer\Console
      */
@@ -38,26 +41,26 @@ class ReindexCommand extends Command
     {
         $options = [
             new InputOption(
-                'stores',
+                self::INPUT_STORES,
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Reindex given stores (can be store id, store code, comma seperated. Or "all".) '
                 . 'If not set, reindex all stores.'
             ),
             new InputOption(
-                'emptyindex',
+                self::INPUT_EMPTYINDEX,
                 null,
                 InputOption::VALUE_NONE,
                 'Force emptying the solr index for the given store(s). If not set, configured value is used.'
             ),
             new InputOption(
-                'noemptyindex',
+                self::INPUT_NOEMPTYINDEX,
                 null,
                 InputOption::VALUE_NONE,
                 'Force not emptying the solr index for the given store(s). If not set, configured value is used.'
             ),
             new InputOption(
-                'progress',
+                self::INPUT_PROGRESS,
                 null,
                 InputOption::VALUE_NONE,
                 'Show progress bar.'
@@ -88,13 +91,13 @@ class ReindexCommand extends Command
             $this->indexer->addProgressHandler(
                 new ProgressInConsole(
                     $output,
-                    $input->getOption('progress') ? ProgressInConsole::USE_PROGRESS_BAR : false
+                    $input->getOption(self::INPUT_PROGRESS) ? ProgressInConsole::USE_PROGRESS_BAR : false
                 )
             );
-            if ($input->getOption('emptyindex')) {
+            if ($input->getOption(self::INPUT_EMPTYINDEX)) {
                 $styledOutput->note('Forcing empty index.');
                 $this->indexer->executeStoresForceEmpty($stores);
-            } elseif ($input->getOption('noemptyindex')) {
+            } elseif ($input->getOption(self::INPUT_NOEMPTYINDEX)) {
                 $styledOutput->note('Forcing non-empty index.');
                 $this->indexer->executeStoresForceNotEmpty($stores);
             } else {
