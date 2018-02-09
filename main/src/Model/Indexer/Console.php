@@ -97,6 +97,7 @@ class Console
 
     public function swapCores(array $storeIds = null)
     {
+        $this->solrIndexer->checkSwapCoresConfiguration($storeIds);
         $this->solrIndexer->swapCores($storeIds);
     }
 
