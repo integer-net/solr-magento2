@@ -10,9 +10,25 @@
 namespace IntegerNet\Solr\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Model\ResourceModel\Db\Context;
 
 class CategoryPosition extends AbstractDb
 {
+    /**
+     * @var ProductMetadataInterface
+     */
+    private $productMetaData;
+
+    public function __construct(
+        Context $context,
+        ProductMetadataInterface $productMetadata,
+        ?string $connectionName = null
+    ) {
+        $this->productMetaData = $productMetadata;
+        parent::__construct($context, $connectionName);
+    }
+
     /**
      * Resource initialization
      *
@@ -32,9 +48,13 @@ class CategoryPosition extends AbstractDb
      */
     public function getCategoryPositions($productId, $storeId)
     {
+        $table = $this->getMainTable();
+        if (version_compare($this->productMetaData->getVersion(), '2.2', '>=')) {
+            $table = $this->getTable('catalog_category_product_index_store' . $storeId);
+        }
         $select = $this->getConnection()
             ->select()
-            ->from($this->getMainTable(), ['category_id', 'position'])
+            ->from($table, ['category_id', 'position'])
             ->where('product_id = ?', $productId)
             ->where('store_id = ?', $storeId);
         return $this->getConnection()->fetchAll($select);
