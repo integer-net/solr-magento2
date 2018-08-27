@@ -9,6 +9,7 @@
  */
 namespace IntegerNet\Solr\Model\ResourceModel;
 
+use Magento\Catalog\Model\Indexer\Category\Product\TableMaintainer;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Model\ResourceModel\Db\Context;
@@ -49,8 +50,8 @@ class CategoryPosition extends AbstractDb
     public function getCategoryPositions($productId, $storeId)
     {
         $table = $this->getMainTable();
-        if (version_compare($this->productMetaData->getVersion(), '2.2', '>=')) {
-            $table = $this->getTable('catalog_category_product_index_store' . $storeId);
+        if (\class_exists(TableMaintainer::class)) {
+            $table = TableMaintainer::getMainTable($storeId);
         }
         $select = $this->getConnection()
             ->select()
