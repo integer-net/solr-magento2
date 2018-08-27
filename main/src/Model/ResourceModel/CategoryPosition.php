@@ -24,7 +24,7 @@ class CategoryPosition extends AbstractDb
     public function __construct(
         Context $context,
         ProductMetadataInterface $productMetadata,
-        ?string $connectionName = null
+        $connectionName = null
     ) {
         $this->productMetaData = $productMetadata;
         parent::__construct($context, $connectionName);
