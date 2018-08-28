@@ -10,6 +10,7 @@
 namespace IntegerNet\Solr\Model\ResourceModel;
 
 use Magento\Catalog\Model\Indexer\Category\Product\TableMaintainer;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Model\ResourceModel\Db\Context;
@@ -51,7 +52,8 @@ class CategoryPosition extends AbstractDb
     {
         $table = $this->getMainTable();
         if (\class_exists(TableMaintainer::class)) {
-            $table = TableMaintainer::getMainTable($storeId);
+            $tableMaintainer = ObjectManager::getInstance()->get(TableMaintainer::class);
+            $table = $tableMaintainer->getMainTable($storeId);
         }
         $select = $this->getConnection()
             ->select()
