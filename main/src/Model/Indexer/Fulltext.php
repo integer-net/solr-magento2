@@ -22,6 +22,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
      * @var ProductIndexer
      */
     private $solrIndexer;
+
     /**
      * @var UrlFactoryPlugin
      */
@@ -49,7 +50,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
     public function executeFull()
     {
         $this->urlFactoryPlugin->setForceFrontend(true);
-        $this->state->emulateAreaCode('frontend', [$this->solrIndexer, 'reindex'], [null, true]);
+        $this->state->emulateAreaCode('frontend', 'reindex', [null, true]);
         $this->urlFactoryPlugin->setForceFrontend(false);
     }
 
@@ -62,7 +63,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
     public function executeList(array $ids)
     {
         $this->urlFactoryPlugin->setForceFrontend(true);
-        $this->state->emulateAreaCode('frontend', [$this->solrIndexer, 'reindex'], [$ids]);
+        $this->state->emulateAreaCode('frontend', 'reindex', [$ids]);
         $this->urlFactoryPlugin->setForceFrontend(false);
     }
 
@@ -74,7 +75,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeRow($id)
     {
-        $this->executeList([$id]);
+        $this->reindex([$id]);
     }
 
     /**
@@ -86,6 +87,32 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function execute($ids)
     {
-        $this->executeList($ids);
+        $this->reindex($ids);
+    }
+
+    /**
+     * Call product indexer
+     *
+     * @param array|null $productIds Restrict to given Products if this is set
+     * @param boolean|string $emptyIndex Whether to truncate the index before refilling it
+     * @param null|int[] $restrictToStoreIds
+     * @param null|int $sliceId
+     * @param null|int $totalNumberSlices
+     * @throws \Exception
+     */
+    private function reindex(
+        $productIds = null,
+        $emptyIndex = false,
+        $restrictToStoreIds = null,
+        $sliceId = null,
+        $totalNumberSlices = null
+    ) {
+        $this->solrIndexer->reindex(
+            $productIds,
+            $emptyIndex,
+            $restrictToStoreIds,
+            $sliceId,
+            $totalNumberSlices
+        );
     }
 }

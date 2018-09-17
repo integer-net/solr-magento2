@@ -28,10 +28,6 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
      */
     private $storeId;
     /**
-     * @var null|int[]
-     */
-    private $productIdFilter;
-    /**
      * @var callable
      */
     private $pageCallback;
@@ -39,10 +35,6 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
      * @var int
      */
     private $currentChunkId;
-    /**
-     * @var int
-     */
-    private $pageSize;
     /**
      * @var Collection
      */
@@ -98,9 +90,6 @@ class PagedProductIterator implements PagedProductIteratorInterface, \OuterItera
     private function getProductCollection()
     {
         $collection = $this->collectionFactory->create($this->storeId, $this->currentChunk()->getAllIds());
-
-        $collection->setCurPage($this->currentChunkId);
-        $collection->setPageSize($this->pageSize);
 
         $this->eventManager->dispatch('integernet_solr_product_collection_load_before', [
             'collection' => $collection,
