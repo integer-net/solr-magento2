@@ -14,6 +14,7 @@ use IntegerNet\Solr\Indexer\ProductIndexer;
 use IntegerNet\Solr\Plugin\UrlFactoryPlugin;
 use Magento\Framework\Indexer\ActionInterface;
 use Magento\Framework\Mview\ActionInterface as MviewActionInterface;
+use Magento\Framework\App\State;
 
 class Fulltext implements ActionInterface, MviewActionInterface
 {
@@ -25,15 +26,19 @@ class Fulltext implements ActionInterface, MviewActionInterface
      * @var UrlFactoryPlugin
      */
     private $urlFactoryPlugin;
-
     /**
-     * @param ProductIndexerFactory $solrIndexerFactory
-     * @param UrlFactoryPlugin $urlFactoryPlugin
+     * @var State
      */
-    public function __construct(ProductIndexerFactory $solrIndexerFactory, UrlFactoryPlugin $urlFactoryPlugin)
-    {
+    private $state;
+
+    public function __construct(
+        ProductIndexerFactory $solrIndexerFactory,
+        UrlFactoryPlugin $urlFactoryPlugin,
+        State $state
+    ) {
         $this->solrIndexer = $solrIndexerFactory->create();
         $this->urlFactoryPlugin = $urlFactoryPlugin;
+        $this->state = $state;
     }
 
     /**
@@ -44,7 +49,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
     public function executeFull()
     {
         $this->urlFactoryPlugin->setForceFrontend(true);
-        $this->solrIndexer->reindex(null, true);
+        $this->state->emulateAreaCode('frontend', [$this->solrIndexer, 'reindex'], [null, true]);
         $this->urlFactoryPlugin->setForceFrontend(false);
     }
 
@@ -57,7 +62,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
     public function executeList(array $ids)
     {
         $this->urlFactoryPlugin->setForceFrontend(true);
-        $this->solrIndexer->reindex($ids);
+        $this->state->emulateAreaCode('frontend', [$this->solrIndexer, 'reindex'], [$ids]);
         $this->urlFactoryPlugin->setForceFrontend(false);
     }
 
