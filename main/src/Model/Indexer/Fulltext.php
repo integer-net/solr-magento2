@@ -22,7 +22,6 @@ class Fulltext implements ActionInterface, MviewActionInterface
      * @var ProductIndexer
      */
     private $solrIndexer;
-
     /**
      * @var UrlFactoryPlugin
      */
@@ -50,7 +49,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
     public function executeFull()
     {
         $this->urlFactoryPlugin->setForceFrontend(true);
-        $this->state->emulateAreaCode('frontend', 'reindex', [null, true]);
+        $this->reindex(null, true);
         $this->urlFactoryPlugin->setForceFrontend(false);
     }
 
@@ -63,7 +62,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
     public function executeList(array $ids)
     {
         $this->urlFactoryPlugin->setForceFrontend(true);
-        $this->state->emulateAreaCode('frontend', 'reindex', [$ids]);
+        $this->reindex($ids);
         $this->urlFactoryPlugin->setForceFrontend(false);
     }
 
@@ -107,12 +106,16 @@ class Fulltext implements ActionInterface, MviewActionInterface
         $sliceId = null,
         $totalNumberSlices = null
     ) {
-        $this->solrIndexer->reindex(
-            $productIds,
-            $emptyIndex,
-            $restrictToStoreIds,
-            $sliceId,
-            $totalNumberSlices
+        $this->state->emulateAreaCode(
+            'frontend',
+            [$this->solrIndexer, 'reindex'],
+            [
+                $productIds,
+                $emptyIndex,
+                $restrictToStoreIds,
+                $sliceId,
+                $totalNumberSlices
+            ]
         );
     }
 }
