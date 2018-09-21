@@ -15,6 +15,7 @@ use IntegerNet\Solr\Indexer\Data\ProductAssociation;
 use IntegerNet\Solr\Model\Data\ArrayCollection;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface as AttributeRepository;
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\ResourceModel\Product as ProductResource;
 use Magento\Framework\EntityManager\MetadataPool;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\Model\ResourceModel\Db\Context as ResourceContext;
@@ -30,6 +31,10 @@ class GroupedProductAssociations extends AbstractDb implements ProductAssociatio
      * @var AttributeRepository
      */
     private $attributeRepository;
+    /**
+     * @var ProductResource
+     */
+    private $productResource;
 
     private $productEntityLinkField;
 
@@ -37,11 +42,13 @@ class GroupedProductAssociations extends AbstractDb implements ProductAssociatio
         ResourceContext $context,
         MetadataPool $metadataPool,
         AttributeRepository $attributeRepository,
+        ProductResource $productResource,
         $connectionName = null
     ) {
         $this->metadataPool = $metadataPool;
         parent::__construct($context, $connectionName);
         $this->attributeRepository = $attributeRepository;
+        $this->productResource = $productResource;
     }
 
     /**
@@ -66,18 +73,20 @@ class GroupedProductAssociations extends AbstractDb implements ProductAssociatio
         $statusAttributeId = $this->attributeRepository->get('status')->getAttributeId();
         $bind = [':link_type_id' => ProductLinkResource::LINK_TYPE_GROUPED, ':status_attribute_id' => $statusAttributeId];
 
+        $linkField = $this->metadataPool->getMetadata(ProductInterface::class)->getLinkField();
         $select = $connection->select()->from(
             ['l' => $this->getMainTable()],
             ['product_id', 'linked_product_id']
         )->join(
             ['cpe' => $this->getTable('catalog_product_entity')],
-            sprintf(
-                'cpe.%s = l.product_id',
-                $this->metadataPool->getMetadata(ProductInterface::class)->getLinkField()
-            )
+            'cpe.entity_id = l.product_id'
         )->join(
             ['cpei' => $this->getTable('catalog_product_entity_int')],
-            'cpei.entity_id = l.linked_product_id AND cpei.attribute_id = :status_attribute_id',
+            sprintf(
+            'cpei.%s = cpe.%s AND cpei.attribute_id = :status_attribute_id',
+                $linkField,
+                $linkField
+            ),
             ''
         )->where(
             'link_type_id = :link_type_id'
