@@ -4,6 +4,8 @@ set -x
 echo memory_limit=-1 >> /usr/local/etc/php/php.ini
 git checkout -b tmp
 git add -A
+git config --global user.email "wercker@localhost"
+git config --global user.name "Wercker"
 git commit --allow-empty -m "tmp"
 export MODULE_DIR=`pwd`
 export M2SETUP_DB_HOST=$MYSQL_CI_PORT_3306_TCP_ADDR
@@ -20,10 +22,15 @@ export M2SETUP_VERSION=$1
 export M2SETUP_USE_SAMPLE_DATA=false
 export M2SETUP_USE_ARCHIVE=true
 export COMPOSER_HOME=$WERCKER_CACHE_DIR/composer
+BIN_MAGENTO=magento-command
+
+# Reconfigure composer after COMPOSER_HOME has been changed
+[ ! -z "${COMPOSER_MAGENTO_USERNAME}" ] && \
+    composer config -a -g http-basic.repo.magento.com $COMPOSER_MAGENTO_USERNAME $COMPOSER_MAGENTO_PASSWORD
+
 mysqladmin -u$M2SETUP_DB_USER -p"$M2SETUP_DB_PASSWORD" -h$M2SETUP_DB_HOST create $M2SETUP_DB_NAME
-/usr/local/bin/mage-setup
-cd /srv/www
-composer config http-basic.repo.magento.com $MAGENTO_REPO_PUBLIC_KEY $MAGENTO_REPO_PRIVATE_KEY
+DEBUG=true magento-installer
+cd /var/www/magento
 composer config repositories.solr-module vcs $MODULE_DIR
 composer config repositories.solr-autosuggest vcs git@github.com:integer-net/solr-magento2-autosuggest.git
 composer config repositories.solr-base vcs git@github.com:integer-net/solr-base.git
@@ -42,6 +49,5 @@ composer update
 sed -i -e "s/8983/$SOLR_CI_PORT_8983_TCP_PORT/g"  vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
 sed -i -e "s/localhost/$SOLR_CI_PORT_8983_TCP_ADDR/g" vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
 sed -i -e "s/solr-magento2-tests/core0/g" vendor/integer-net/solr-magento2/main/test/integration/_files/solr_config.dist.php
-bin/magento module:enable IntegerNet_Solr
-bin/magento setup:di:compile
-bin/magento setup:upgrade
+$BIN_MAGENTO module:enable IntegerNet_Solr
+$BIN_MAGENTO setup:di:compile
