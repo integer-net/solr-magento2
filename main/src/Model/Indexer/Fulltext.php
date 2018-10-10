@@ -23,21 +23,15 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     private $solrIndexer;
     /**
-     * @var UrlFactoryPlugin
-     */
-    private $urlFactoryPlugin;
-    /**
      * @var State
      */
     private $state;
 
     public function __construct(
         ProductIndexerFactory $solrIndexerFactory,
-        UrlFactoryPlugin $urlFactoryPlugin,
         State $state
     ) {
         $this->solrIndexer = $solrIndexerFactory->create();
-        $this->urlFactoryPlugin = $urlFactoryPlugin;
         $this->state = $state;
     }
 
@@ -48,9 +42,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeFull()
     {
-        $this->urlFactoryPlugin->setForceFrontend(true);
         $this->reindex(null, true);
-        $this->urlFactoryPlugin->setForceFrontend(false);
     }
 
     /**
@@ -61,9 +53,7 @@ class Fulltext implements ActionInterface, MviewActionInterface
      */
     public function executeList(array $ids)
     {
-        $this->urlFactoryPlugin->setForceFrontend(true);
         $this->reindex($ids);
-        $this->urlFactoryPlugin->setForceFrontend(false);
     }
 
     /**
