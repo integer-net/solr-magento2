@@ -14,6 +14,7 @@ use IntegerNet\Solr\Block\Autosuggest\Item;
 use IntegerNet\Solr\Implementor\Product as ProductInterface;
 use IntegerNet\Solr\Implementor\ProductRenderer as ProductRendererInterface;
 use IntegerNet\Solr\Indexer\IndexDocument;
+use IntegerNet\Solr\Model\Config\FrontendStoresConfig;
 use Magento\Framework\App\State as AppState;
 use Magento\Framework\View\LayoutInterface;
 
@@ -27,10 +28,18 @@ class ProductRenderer implements ProductRendererInterface
      * @var AppState
      */
     private $appState;
+    /**
+     * @var FrontendStoresConfig
+     */
+    private $storesConfig;
+    /**
+     * @var bool
+     */
     private $isLayoutLoaded = false;
 
-    public function __construct(LayoutInterface\Proxy $layout, AppState $appState)
+    public function __construct(LayoutInterface\Proxy $layout, AppState $appState, FrontendStoresConfig $storesConfig)
     {
+        $this->storesConfig = $storesConfig;
         $this->layout = $layout;
         $this->appState = $appState;
     }
@@ -65,7 +74,9 @@ class ProductRenderer implements ProductRendererInterface
             // We need direct access to the Magento product
             throw new \InvalidArgumentException('Magento 2 product bridge expected, '. get_class($product) .' received.');
         }
-        $this->addAutosuggestItemHtml($product, $productData);
+        if ($this->storesConfig->byStoreId($product->getStoreId())->getAutosuggestConfig()->isActive()) {
+            $this->addAutosuggestItemHtml($product, $productData);
+        }
         //TODO if $useHtmlInResult, render product list and grid HTML
     }
 
