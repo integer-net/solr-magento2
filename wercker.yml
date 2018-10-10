@@ -1,13 +1,14 @@
 # Originally mageinferno/magento2-php was used but it is not maintained anymore in favor of markoshust/magento2-php
 # But this is based on the php-fpm image and there's an issue with Wercker (https://github.com/wercker/wercker/issues/262)
 # The meanbee/magento2-php image has a CLI mode and fits our needs better
-box: meanbee/magento2-php:7.0-cli
+box: meanbee/magento2-php:7.1-cli
 services:
   - id: integernet/mysql_ci:5.6
     env:
       MYSQL_ROOT_PASSWORD: root
   - id: integernet/solr_ci:1.6.0
 build-2.1:
+  box: meanbee/magento2-php:7.0-cli # Magento 2.1 is not compatible to PHP 7.1
   steps:
     - install-packages:
         packages: git zip mysql-client libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev libpng12-dev netcat-openbsd
