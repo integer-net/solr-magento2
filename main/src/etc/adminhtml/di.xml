@@ -5,6 +5,10 @@
         <plugin name="search_weight_as_text" type="IntegerNet\Solr\Plugin\FrontTabPlugin" sortOrder="-10" />
     </type>
 
+    <type name="Magento\Catalog\Model\Category\DataProvider">
+        <plugin name="integernet_solr" type="IntegerNet\Solr\Plugin\CategoryDataProviderPlugin" />
+    </type>
+
     <!-- Bugfix: Always use the frontend URL model for categories -->
     <!--  necessary for autosuggest cache, to generate the right store urls  -->
     <type name="Magento\Catalog\Model\Category">
