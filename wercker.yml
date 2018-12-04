@@ -11,7 +11,7 @@ build-2.1:
   box: meanbee/magento2-php:7.0-cli # Magento 2.1 is not compatible to PHP 7.1
   steps:
     - install-packages:
-        packages: git zip mysql-client libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev libpng12-dev netcat-openbsd
+        packages: git zip mysql-client libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev netcat-openbsd
     - add-ssh-key:
         keyname: GITHUB_DEPLOY
         host: github.com
@@ -25,7 +25,7 @@ build-2.1:
           while ! nc -q 1 $MYSQL_CI_PORT_3306_TCP_ADDR $MYSQL_CI_PORT_3306_TCP_PORT </dev/null; do echo -n . && sleep 3; done
     - script:
         name: set up test system
-        code: build/install-magento.sh 2.1.15
+        code: build/install-magento.sh 2.1.16
     - script:
         name: run unit tests
         cwd: /var/www/magento/vendor/integer-net/solr-magento2
@@ -36,7 +36,7 @@ build-2.1:
 build-2.2:
   steps:
     - install-packages:
-        packages: git zip mysql-client libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev libpng12-dev netcat-openbsd
+        packages: git zip mysql-client libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev netcat-openbsd
     - add-ssh-key:
         keyname: GITHUB_DEPLOY
         host: github.com
@@ -50,7 +50,7 @@ build-2.2:
           while ! nc -q 1 $MYSQL_CI_PORT_3306_TCP_ADDR $MYSQL_CI_PORT_3306_TCP_PORT </dev/null; do echo -n . && sleep 3; done
     - script:
         name: set up test system
-        code: build/install-magento.sh 2.2.6
+        code: build/install-magento.sh 2.2.7
     - script:
         name: run unit tests
         cwd: /var/www/magento/vendor/integer-net/solr-magento2
