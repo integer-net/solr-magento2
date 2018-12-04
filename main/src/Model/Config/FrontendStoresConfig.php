@@ -27,4 +27,8 @@ class FrontendStoresConfig  extends \ArrayIterator
         parent::__construct($configByStore);
     }
 
+    public function byStoreId($storeId)
+    {
+        return $this[$storeId];
+    }
 }
