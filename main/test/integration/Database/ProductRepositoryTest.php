@@ -17,6 +17,7 @@ use IntegerNet\Solr\Model\Bridge\Attribute;
 use IntegerNet\Solr\Model\Bridge\AttributeRepository;
 use IntegerNet\Solr\Model\Bridge\Product;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\TestFramework\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use TddWizard\Fixtures\Catalog\ProductBuilder;
@@ -37,6 +38,14 @@ class ProductRepositoryTest extends TestCase
     protected function setUp()
     {
         $this->objectManager = ObjectManager::getInstance();
+        //TODO fix test on Magento 2.2.5
+        /** @var ProductMetadataInterface $productMetadata */
+        $productMetadata = $this->objectManager->get(\Magento\Framework\App\ProductMetadataInterface::class);
+        if (version_compare($productMetadata->getVersion(), '2.2.5', '>=')) {
+            $this->markTestSkipped(
+                'This test does not terminate on Magento 2.2.5 because of https://github.com/tddwizard/magento2-fixtures/issues/13'
+            );
+        }
         $this->productRepository = $this->objectManager->create(ProductRepository::class);
     }
 
