@@ -31,13 +31,13 @@ BIN_MAGENTO=magento-command
 mysqladmin -u$M2SETUP_DB_USER -p"$M2SETUP_DB_PASSWORD" -h$M2SETUP_DB_HOST create $M2SETUP_DB_NAME
 DEBUG=true magento-installer
 cd /var/www/magento
-composer config repositories.solr-module vcs $MODULE_DIR
+composer config repositories.solr-module '{"type":"path", "url":"'$MODULE_DIR'", "options":{"symlink":false}}'
 composer config repositories.solr-autosuggest vcs git@github.com:integer-net/solr-magento2-autosuggest.git
 composer config repositories.solr-base vcs git@github.com:integer-net/solr-base.git
 composer config repositories.solr-pro vcs git@github.com:integer-net/solr-pro.git
 sed -i -e 's/"psr-4": {/"psr-4": {\n      "IntegerNet\\\\Solr\\\\": ["vendor\/integer-net\/solr-magento2\/main\/test\/unit", "vendor\/integer-net\/solr-magento2\/main\/test\/integration", "vendor\/integer-net\/solr-base\/test\/Solr" ],/g' composer.json
 composer config minimum-stability dev
-composer require integer-net/solr-magento2 dev-tmp --no-update
+composer require integer-net/solr-magento2 @dev --no-update
 composer require --dev tddwizard/magento2-fixtures 0.3.1 --no-update
 phpunit_version="$(composer info | grep "phpunit/phpunit " | awk '{ print $2 }')"
 phpunit_minimum="5.7.0"
