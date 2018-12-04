@@ -155,7 +155,11 @@ class Product implements ProductInterface
 
     public function getPrice()
     {
-        return $this->getMagentoProduct()->getPrice();
+        $price = $this->getMagentoProduct()->getFinalPrice();
+        if ($price == 0) {
+            $price = $this->getMagentoProduct()->getMinimalPrice();
+        }
+        return $price;
     }
 
     public function getAttributeValue(AttributeInterface $attribute)
