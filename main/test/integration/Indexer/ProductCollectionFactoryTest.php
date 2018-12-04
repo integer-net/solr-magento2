@@ -30,7 +30,6 @@ class ProductCollectionFactoryTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDbIsolation enabled
      * @magentoAppArea frontend
      * @magentoConfigFixture current_store catalog/frontend/flat_catalog_product 1
      */

@@ -1,10 +1,14 @@
-box: mageinferno/magento2-php:7.0.8-fpm-3
+# Originally mageinferno/magento2-php was used but it is not maintained anymore in favor of markoshust/magento2-php
+# But this is based on the php-fpm image and there's an issue with Wercker (https://github.com/wercker/wercker/issues/262)
+# The meanbee/magento2-php image has a CLI mode and fits our needs better
+box: meanbee/magento2-php:7.1-cli
 services:
   - id: integernet/mysql_ci:5.6
     env:
       MYSQL_ROOT_PASSWORD: root
   - id: integernet/solr_ci:1.6.0
 build-2.1:
+  box: meanbee/magento2-php:7.0-cli # Magento 2.1 is not compatible to PHP 7.1
   steps:
     - install-packages:
         packages: git zip mysql-client libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev libpng12-dev netcat-openbsd
@@ -21,10 +25,10 @@ build-2.1:
           while ! nc -q 1 $MYSQL_CI_PORT_3306_TCP_ADDR $MYSQL_CI_PORT_3306_TCP_PORT </dev/null; do echo -n . && sleep 3; done
     - script:
         name: set up test system
-        code: build/install-magento.sh 2.1.11
+        code: build/install-magento.sh 2.1.15
     - script:
         name: run unit tests
-        cwd: /srv/www/vendor/integer-net/solr-magento2
+        cwd: /var/www/magento/vendor/integer-net/solr-magento2
         code: php ../../phpunit/phpunit/phpunit
     - script:
         name: run integration tests
@@ -46,10 +50,10 @@ build-2.2:
           while ! nc -q 1 $MYSQL_CI_PORT_3306_TCP_ADDR $MYSQL_CI_PORT_3306_TCP_PORT </dev/null; do echo -n . && sleep 3; done
     - script:
         name: set up test system
-        code: build/install-magento.sh 2.2.2
+        code: build/install-magento.sh 2.2.6
     - script:
         name: run unit tests
-        cwd: /srv/www/vendor/integer-net/solr-magento2
+        cwd: /var/www/magento/vendor/integer-net/solr-magento2
         code: php ../../phpunit/phpunit/phpunit
     - script:
         name: run integration tests

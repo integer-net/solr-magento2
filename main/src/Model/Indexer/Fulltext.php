@@ -14,6 +14,7 @@ use IntegerNet\Solr\Indexer\ProductIndexer;
 use IntegerNet\Solr\Plugin\UrlFactoryPlugin;
 use Magento\Framework\Indexer\ActionInterface;
 use Magento\Framework\Mview\ActionInterface as MviewActionInterface;
+use Magento\Framework\App\State;
 
 class Fulltext implements ActionInterface, MviewActionInterface
 {
@@ -21,13 +22,17 @@ class Fulltext implements ActionInterface, MviewActionInterface
      * @var ProductIndexer
      */
     private $solrIndexer;
-
     /**
-     * @param ProductIndexerFactory $solrIndexerFactory
+     * @var State
      */
-    public function __construct(ProductIndexerFactory $solrIndexerFactory)
-    {
+    private $state;
+
+    public function __construct(
+        ProductIndexerFactory $solrIndexerFactory,
+        State $state
+    ) {
         $this->solrIndexer = $solrIndexerFactory->create();
+        $this->state = $state;
     }
 
     /**
@@ -91,12 +96,16 @@ class Fulltext implements ActionInterface, MviewActionInterface
         $sliceId = null,
         $totalNumberSlices = null
     ) {
-        $this->solrIndexer->reindex(
-            $productIds,
-            $emptyIndex,
-            $restrictToStoreIds,
-            $sliceId,
-            $totalNumberSlices
+        $this->state->emulateAreaCode(
+            'frontend',
+            [$this->solrIndexer, 'reindex'],
+            [
+                $productIds,
+                $emptyIndex,
+                $restrictToStoreIds,
+                $sliceId,
+                $totalNumberSlices
+            ]
         );
     }
 }

@@ -22,7 +22,7 @@ use TddWizard\Fixtures\Catalog\ProductFixtureRollback;
 
 class IndexerTest extends TestCase
 {
-    private static $productFixtures = [];
+    private $productFixtures = [];
 
     /**
      * @var ObjectManager
@@ -32,6 +32,19 @@ class IndexerTest extends TestCase
     protected function setUp()
     {
         $this->objectManager = ObjectManager::getInstance();
+        //TODO fix test on Magento 2.2.5
+        /** @var ProductMetadataInterface $productMetadata */
+        $productMetadata = $this->objectManager->get(\Magento\Framework\App\ProductMetadataInterface::class);
+        if (version_compare($productMetadata->getVersion(), '2.2.5', '>=')) {
+            $this->markTestSkipped(
+                'This test does not terminate on Magento 2.2.5 because of https://github.com/tddwizard/magento2-fixtures/issues/13'
+            );
+        }
+        $this->createProductFixture();
+    }
+    protected function tearDown()
+    {
+        $this->deleteProductFixture();
     }
     public function testIndexerInstantiation()
     {
@@ -40,7 +53,6 @@ class IndexerTest extends TestCase
     }
 
     /**
-     * @magentoDataFixture loadFixture
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
      */
@@ -58,7 +70,6 @@ class IndexerTest extends TestCase
         );
     }
     /**
-     * @magentoDataFixture loadFixture
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
      */
@@ -77,7 +88,6 @@ class IndexerTest extends TestCase
         );
     }
     /**
-     * @magentoDataFixture loadFixture
      * @magentoAppIsolation enabled
      * @magentoDbIsolation enabled
      */
@@ -97,9 +107,9 @@ class IndexerTest extends TestCase
         );
     }
 
-    public static function loadFixture()
+    private function createProductFixture()
     {
-        self::$productFixtures = [
+        $this->productFixtures = [
             new ProductFixture(
                 ProductBuilder::aSimpleProduct()->withName('First potato')->build()
             ),
@@ -113,10 +123,10 @@ class IndexerTest extends TestCase
         SolrConfig::loadFromConfigFile();
     }
 
-    public static function loadFixtureRollback()
+    private function deleteProductFixture()
     {
-        ProductFixtureRollback::create()->execute(...self::$productFixtures);
-        self::$productFixtures = [];
+        ProductFixtureRollback::create()->execute(...$this->productFixtures);
+        $this->productFixtures = [];
     }
 
     /**
