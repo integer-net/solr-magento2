@@ -84,7 +84,7 @@ class ProductTest extends TestCase
         $this->assertEquals($productData['id'], $productBridge->getId(), 'id');
         $this->assertEquals($productData['id'] . '_' . $storeId, $productBridge->getSolrId(), 'solr_id');
         $this->assertEquals($productData['solr_boost'], $productBridge->getSolrBoost(), 'solr_boost');
-        $this->assertEquals($productData['price'], $productBridge->getPrice(), 'price');
+        $this->assertEquals($finalPrice, $productBridge->getPrice(), 'price');
         $this->assertEquals($productData['category_ids'], $productBridge->getCategoryIds(), 'category_ids');
 
         $this->assertSame($expectedHasSpecialPrice, $productBridge->hasSpecialPrice(), 'has_special_price');
