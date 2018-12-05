@@ -102,6 +102,7 @@ class CategoryFilter extends \Magento\CatalogSearch\Model\Layer\Filter\Category
     {
         /** @var \Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection $productCollection */
         $productCollection = $this->getLayer()->getProductCollection();
+        $productCollection->setOrder('relevance', \Zend_Db_Select::SQL_DESC);
         $optionsFacetedData = $productCollection->getFacetedData('category');
 
         /** @var CategoryCollection $categories */

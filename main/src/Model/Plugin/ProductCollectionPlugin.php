@@ -2,6 +2,7 @@
 namespace IntegerNet\Solr\Model\Plugin;
 
 use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
+use Magento\Framework\DB\Select;
 
 /**
  * Among other problems, this plugin fixes issue with filtration by store/website ID in
@@ -56,5 +57,18 @@ class ProductCollectionPlugin
             $condition = ['in' => $condition['eq']];
         }
         return [$attribute, $condition, $joinType];
+    }
+
+    /**
+     * Always sort by relevance as it is returned by the IntegerNet_Solr module correctly
+     *
+     * @param ProductCollection $subject
+     * @param string $attribute
+     * @param string $dir
+     * @return array
+     */
+    public function beforeSetOrder(ProductCollection $subject, string $attribute, string $dir = Select::SQL_DESC)
+    {
+        return ['relevance', Select::SQL_DESC];
     }
 }
