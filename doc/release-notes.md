@@ -2,6 +2,17 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Version 1.5.0 (Dec 19, 2018)
+----------------------------
+
+- Add seperate command line tools for full and partial reindexing
+- Compatibility fixes for Magento 2.2
+- Add compatibility to Magento 2.2 Commerce Edition
+- Fix bugs with area emulation on command line
+- Improve declaration of category attributes
+- Fix bug with price filter and special prices
+- Add automatical reindexing of products if they are assigned to categories in the category view
+
 Version 1.4.2 (Dec 21, 2017)
 --------------
 
