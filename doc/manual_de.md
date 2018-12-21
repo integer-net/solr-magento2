@@ -517,6 +517,19 @@ Zur Anpassung des Moduls sind verschiedene Events integriert, die von einem exte
 
 Weitere Informationen zu den Events, ihren Parametern und Nutzungszwecken, ebenso wie ein Beispielmodul finden Sie in unserem [Blogpost](https://www.integer-net.de/nutzung-von-events-in-integernet_solr-ein-beispiel/).
 
+Kommandozeilen-Befehle
+---------------------
+Auf der Kommandozeile haben wir mehrere Befehle bereit gestellt, die Sie für die Indizierung nutzen können:
+
+- `bin/magento indexer:reindex integernet_solr`: Reindiziert alle Produkte für alle Stores.
+- `bin/magento indexer:reindex integernet_solr_categories`: Reindiziert alle Kategorien für alle Stores.
+- `bin/magento solr:reindex:full`: Reindiziert alle Produkte für einen oder mehrere Stores.
+- `bin/magento solr:reindex:slice`: Reindiziert einen Teil der Produkte für einen oder mehrere Stores. Die Anzahl der Teile („Slices“) und den zu indizierenden Teil können Sie über Parameter bestimmen. Diese Funktion kann für parallele Indizierung mit mehreren Prozessen genutzt werden.
+- `bin/magento solr:clear`: Löscht alle Produktdaten aus dem Solr-Core (oder dem Swap Core) für einen oder mehrere Stores.
+- `bin/magento solr:swap`: Tauscht den Live-Core mit dem Swap Core. Dies ist nur bei Verwendung der Slice-Funktionalität notwendig.
+
+Weitere Informationen finden Sie in den Hilfetexten zu den Befehlen, die Sie z.B. mit `bin/magento solr:swap –help` aufrufen können.
+
 Mögliche Probleme und Lösungsansätze
 -------------------------------------
 1. **Das Speichern von Produkten im Backend dauert lange**

@@ -2,6 +2,11 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Version 1.5.1 (Dec 21, 2018)
+----------------------------
+
+- Add section about command line tools to documentation
+
 Version 1.5.0 (Dec 19, 2018)
 ----------------------------
 

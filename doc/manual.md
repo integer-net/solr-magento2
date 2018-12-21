@@ -515,6 +515,19 @@ In order to further customize the module, we integrated several events which can
 
 For further information about these events, their parameters and usage, as well as a sample module, please see our [blog post](https://www.integer-net.com/utilizing-events-of-integernet_solr-an-example/).
 
+Command Line
+---------------------
+On the command line, you have several commands which you can use which are connected to indexing:
+
+- `bin/magento indexer:reindex integernet_solr`: Reindexes all products for all stores.
+- `bin/magento indexer:reindex integernet_solr_categories`: Reindexes all categories for all stores.
+- `bin/magento solr:reindex:full`: Reindexes all products for one or more stores.
+- `bin/magento solr:reindex:slice`: Reindexes a part of the products for one or more stores. You can define how many slices there will be and which one you want to use. This can be used for parallel indexing.
+- `bin/magento solr:clear`: Deletes all products for one or more stores from the Solr core (or the swap core).
+- `bin/magento solr:swap`: Swaps the main Solr core with the swap Solr core. This should usually be done after indexing. It is meant to be used with the slice index functionality, otherwise it will be done automatically and you won’t need to call it.
+
+For further information about the commands please view their help text, i.e. with `bin/magento solr:swap –help`.
+
 Possible Problems and Their Solutions
 -------------------------------------
 1. **It takes a long time to save products in the backend**
