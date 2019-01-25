@@ -82,6 +82,16 @@
 
   <!-- Plugins -->
 
+  <type name="IntegerNet\Solr\Model\Plugin\AdapterFactoryPlugin">
+    <arguments>
+      <argument name="searchResultModuleNames" xsi:type="array">
+        <item name="catalogsearch" xsi:type="string">catalogsearch</item>
+      </argument>
+      <argument name="categoryModuleNames" xsi:type="array">
+        <item name="catalog" xsi:type="string">catalog</item>
+      </argument>
+    </arguments>
+  </type>
   <type name="Magento\Search\Model\AdapterFactory">
     <plugin name="integernet_solr_choose_adapter" type="IntegerNet\Solr\Model\Plugin\AdapterFactoryPlugin" />
   </type>

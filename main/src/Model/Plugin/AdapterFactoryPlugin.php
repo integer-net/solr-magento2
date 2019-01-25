@@ -56,6 +56,14 @@ class AdapterFactoryPlugin
      * @var LoggerInterface
      */
     private $logger;
+    /**
+     * @var string[]
+     */
+    private $searchResultModuleNames;
+    /**
+     * @var string[]
+     */
+    private $categoryModuleNames;
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -73,7 +81,9 @@ class AdapterFactoryPlugin
         RequestInterface $request,
         AllStoresConfig $solrConfig,
         StoreManagerInterface $storeManager,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        array $searchResultModuleNames,
+        array $categoryModuleNames
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->registry = $registry;
@@ -82,6 +92,8 @@ class AdapterFactoryPlugin
         $this->solrResource = new ResourceFacade($solrConfig->getArrayCopy());
         $this->storeManager = $storeManager;
         $this->logger = $logger;
+        $this->searchResultModuleNames = $searchResultModuleNames;
+        $this->categoryModuleNames = $categoryModuleNames;
     }
 
     /**
@@ -95,7 +107,10 @@ class AdapterFactoryPlugin
         if (!$this->scopeConfig->isSetFlag('integernet_solr/general/is_active')) {
             return $proceed($data);
         }
-        if ($this->request->getModuleName() == 'catalog'
+        if (!$this->isCategoryRequest() && !$this->isSearchResultRequest()) {
+            return $proceed($data);
+        }
+        if ($this->isCategoryRequest()
             && !$this->scopeConfig->isSetFlag('integernet_solr/category/is_active')) {
             return $proceed($data);
         }
@@ -116,5 +131,21 @@ class AdapterFactoryPlugin
         $solr = $this->solrResource->getSolrService($storeId);
 
         return boolval($solr->ping());
+    }
+
+    /**
+     * @return bool
+     */
+    private function isSearchResultRequest()
+    {
+        return in_array($this->request->getModuleName(), $this->searchResultModuleNames);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isCategoryRequest()
+    {
+        return in_array($this->request->getModuleName(), $this->categoryModuleNames);
     }
 }
