@@ -2,6 +2,11 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Version 1.6.0 (Feb 4, 2019)
+---------------------------
+
+- Improve search results by boosting full word matches
+
 Version 1.5.1 (Dec 21, 2018)
 ----------------------------
 
