@@ -9,6 +9,7 @@
 namespace IntegerNet\Solr\Plugin;
 
 use Magento\Eav\Model\Config as EavConfig;
+use Magento\Ui\Component\Form\Fieldset;
 
 class CategoryDataProviderPlugin
 {
@@ -42,6 +43,7 @@ class CategoryDataProviderPlugin
                     $result[$fieldSet]['children'][$field]['arguments']['data']['config'] = $fieldsMeta[$field];
                 }
             }
+            $result[$fieldSet]['arguments']['data']['config']['componentType'] = Fieldset::NAME;
         }
         return $result;
     }
