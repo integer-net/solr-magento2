@@ -2,6 +2,11 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Version 1.6.1 (Feb 11, 2019)
+----------------------------
+
+- Fix a bug with the Magento 2 Commerce staging feature on category pages
+
 Version 1.6.0 (Feb 4, 2019)
 ---------------------------
 
