@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="solr" sortOrder="99">
+        <settings>
+            <collapsible>true</collapsible>
+            <label translate="true">Solr</label>
+        </settings>
+        <field name="solr_exclude" sortOrder="10" formElement="checkbox">
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Exclude this Category from Solr Index</label>
+                <notice translate="true">Exclude only Categories, not included Products</notice>
+            </settings>
+        </field>
+        <field name="solr_exclude_children" sortOrder="15" formElement="checkbox">
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Exclude Child Categories from Solr Index</label>
+                <notice translate="true">Exclude only Categories, not included Products</notice>
+            </settings>
+        </field>
+        <field name="solr_remove_filters" sortOrder="20" formElement="multiselect">
+            <settings>
+                <dataType>string</dataType>
+                <label translate="true">Remove Filters</label>
+                <notice translate="true">Hold the CTRL key to select multiple filters</notice>
+            </settings>
+        </field>
+        <field name="solr_boost" sortOrder="30" formElement="input">
+            <settings>
+                <dataType>string</dataType>
+                <label translate="true">Solr Priority</label>
+                <notice translate="true">1 is default, use higher numbers for higher priority.</notice>
+            </settings>
+        </field>
+    </fieldset>
+</form>
