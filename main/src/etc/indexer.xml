@@ -3,5 +3,8 @@
     <indexer id="integernet_solr" view_id="integernet_solr" class="\IntegerNet\Solr\Model\Indexer\Fulltext">
         <title translate="true">IntegerNet_Solr</title>
         <description translate="true">Solr Search Index</description>
+        <dependencies>
+            <indexer id="catalog_product_price" />
+        </dependencies>
     </indexer>
 </config>
