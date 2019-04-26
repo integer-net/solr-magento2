@@ -38,6 +38,7 @@ define([
                 indexList: null,
                 selected: null
             };
+            this.autosuggestRequest = null;
             this.autoComplete = $(this.options.destinationSelector);
             this.searchForm = $(this.options.formSelector);
             this.submitBtn = this.searchForm.find(this.options.submitBtn)[0];
@@ -255,7 +256,11 @@ define([
             this.submitBtn.disabled = isEmpty(value);
 
             if (value.length >= parseInt(this.options.minSearchLength, 10)) {
-                $.get(this.options.url, {q: value}, $.proxy(function (data) {
+                if (this.autosuggestRequest != null) {
+                    this.autosuggestRequest.abort();
+                }
+
+                this.autosuggestRequest = $.get(this.options.url, {q: value}, $.proxy(function (data) {
                     if (value != searchField.val()) {
                         // Looked up keyword doesn't match current keyword any more - don't overwrite.
                         return;
