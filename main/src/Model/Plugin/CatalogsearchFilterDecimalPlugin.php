@@ -11,13 +11,13 @@
 namespace IntegerNet\Solr\Model\Plugin;
 
 use Magento\Catalog\Model\Layer\Filter\ItemFactory as FilterItemFactory;
-use Magento\CatalogSearch\Model\Layer\Filter\Price as Subject;
+use Magento\CatalogSearch\Model\Layer\Filter\Decimal as Subject;
 use Magento\Framework\App\RequestInterface;
 
 /**
  * Plugin to display multiple filters for same attribute in state block
  */
-class CatalogsearchFilterPricePlugin
+class CatalogsearchFilterDecimalPlugin
 {
     /**
      * @var FilterItemFactory
@@ -70,7 +70,7 @@ class CatalogsearchFilterPricePlugin
             list($from, $to) = $filter;
 
             $fromParts[] = $from;
-            $toParts[] = empty($to) || $from == $to ? $to : $to - Subject::PRICE_DELTA;
+            $toParts[] = $to;
 
             $subject->getLayer()->getState()->addFilter(
                 $this->_createItem($subject, $this->_renderRangeLabel($subject, empty($from) ? 0 : $from, $to), $filter)
@@ -111,23 +111,18 @@ class CatalogsearchFilterPricePlugin
      * Prepare text of range label
      *
      * @param Subject $subject
-     * @param float|string $fromPrice
-     * @param float|string $toPrice
+     * @param float|string $fromValue
+     * @param float|string $toValue
      * @return float|\Magento\Framework\Phrase
      */
-    protected function _renderRangeLabel(Subject $subject, $fromPrice, $toPrice)
+    protected function _renderRangeLabel(Subject $subject, $fromValue, $toValue)
     {
-        $formattedFromPrice = $this->priceCurrency->format($fromPrice);
-        if ($toPrice === '') {
-            return __('%1 and above', $formattedFromPrice);
-        } elseif ($fromPrice == $toPrice && $this->getDataProvider($subject)->getOnePriceIntervalValue()) {
-            return $formattedFromPrice;
+        if ($toValue === '') {
+            return __('%1 and above', $fromValue);
+        } elseif ($fromValue == $toValue && $this->getDataProvider($subject)->getOnePriceIntervalValue()) {
+            return $fromValue;
         } else {
-            if ($fromPrice != $toPrice) {
-                $toPrice -= .01;
-            }
-
-            return __('%1 - %2', $formattedFromPrice, $this->priceCurrency->format($toPrice));
+            return __('%1 - %2', $fromValue, $toValue);
         }
     }
 
@@ -138,14 +133,5 @@ class CatalogsearchFilterPricePlugin
     private function getDataProvider(Subject $subject)
     {
         return $this->dataProviderFactory->create(['layer' => $subject->getLayer()]);
-    }
-
-    /**
-     * @param Subject $subject
-     * @param string $attributeValue
-     */
-    private function addFilterToState(Subject $subject, $attributeValue)
-    {
-
     }
 }

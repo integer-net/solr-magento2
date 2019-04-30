@@ -8,6 +8,7 @@ use IntegerNet\Solr\Model\SearchCriteria\AttributeSearchCriteriaBuilder;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\StoreManagerInterface;
 
 class AttributeRepository implements AttributeRepositoryInterface
 {
@@ -28,18 +29,20 @@ class AttributeRepository implements AttributeRepositoryInterface
      * @var AttributeSearchCriteriaBuilder
      */
     protected $searchCriteriaBuilder;
-
     /**
-     * AttributeRepository constructor.
-     * @param ProductAttributeRepositoryInterface $attributeRepository
-     * @param AttributeSearchCriteriaBuilder $searchCriteriaBuilder
+     * @var StoreManagerInterface
      */
-    public function __construct(ProductAttributeRepositoryInterface $attributeRepository,
-                                AttributeSearchCriteriaBuilder $searchCriteriaBuilder)
-    {
+    private $storeManager;
+
+    public function __construct(
+        ProductAttributeRepositoryInterface $attributeRepository,
+        AttributeSearchCriteriaBuilder $searchCriteriaBuilder,
+        StoreManagerInterface $storeManager
+    ) {
         $this->attributeRepository = $attributeRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder->except(['status']);
         $this->attributeStorage = new \SplObjectStorage;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -124,6 +127,9 @@ class AttributeRepository implements AttributeRepositoryInterface
      */
     public function getAttributeByCode($attributeCode, $storeId)
     {
+        if ($storeId === null) {
+            $storeId = $this->storeManager->getStore()->getId();
+        }
         try {
             $magentoAttribute = $this->attributeRepository->get($attributeCode);
         } catch (NoSuchEntityException $e) {

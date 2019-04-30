@@ -11,6 +11,8 @@
 namespace IntegerNet\Solr\Model\Search\Adapter;
 
 use IntegerNet\Solr\Implementor\AttributeRepository;
+use IntegerNet\Solr\Indexer\IndexField;
+use IntegerNet\Solr\Model\Bridge\EventDispatcher;
 use IntegerNet\Solr\Query\Params\FilterQueryBuilder;
 use Magento\Framework\Search\Request as MagentoRequest;
 use Psr\Log\LoggerInterface;
@@ -30,11 +32,19 @@ class FilterConverter
      * @var LoggerInterface
      */
     private $logger;
+    /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
 
-    public function __construct(AttributeRepository $attributeRepository, LoggerInterface $logger)
-    {
+    public function __construct(
+        AttributeRepository $attributeRepository,
+        LoggerInterface $logger,
+        EventDispatcher $eventDispatcher
+    ) {
         $this->attributeRepository = $attributeRepository;
         $this->logger = $logger;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -49,7 +59,7 @@ class FilterConverter
         if ($reference instanceof MagentoRequest\Filter\Term) {
             $this->configureTermFilter($fqBuilder, $reference, $storeId);
         } elseif ($reference instanceof MagentoRequest\Filter\Range) {
-            $this->configureRangeFilter($fqBuilder, $reference);
+            $this->configureRangeFilter($fqBuilder, $reference, $storeId);
         } else {
             $this->log(sprintf('Unknown filter reference %s (type: %s)', get_class($reference), $filter->getReferenceType()));
         }
@@ -71,7 +81,7 @@ class FilterConverter
             );
         }
     }
-    private function configureRangeFilter(FilterQueryBuilder $fqBuilder, MagentoRequest\Filter\Range $range)
+    private function configureRangeFilter(FilterQueryBuilder $fqBuilder, MagentoRequest\Filter\Range $range, $storeId)
     {
         if ($range->getField() === 'price') {
             $fqBuilder->addPriceRangeFilterByMinMax(
@@ -79,7 +89,15 @@ class FilterConverter
                 $range->getTo()
             );
         } else {
-            $this->log(sprintf('Unknown range field %s', $range->getField()));
+            $indexField = new IndexField(
+                $this->attributeRepository->getAttributeByCode($range->getField(), $storeId),
+                $this->eventDispatcher
+            );
+            $fqBuilder->addRangeFilterByMinMax(
+                $indexField->getFieldName(),
+                $range->getFrom(),
+                $range->getTo()
+            );
         }
     }
 

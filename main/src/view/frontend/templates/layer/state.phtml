@@ -27,8 +27,7 @@
                 <?php
                 $clearLinkUrl = $_filter->getClearLinkUrl();
                 $currentFilterName = $block->escapeHtml(__($_filter->getName())) . " " . $block->stripTags($_filter->getLabel());
-                if ($clearLinkUrl):
-                    ?>
+                if ($clearLinkUrl): ?>
                     <a class="action previous" href="<?php /* @escapeNotVerified */ echo $_filter->getRemoveUrl() ?>"
                        title="<?php /* @escapeNotVerified */ echo __('Previous') ?>">
                         <span><?php /* @escapeNotVerified */ echo __('Previous') ?></span>
@@ -55,3 +54,5 @@
     </ol>
 </div>
 <?php endif; ?>
+
+
