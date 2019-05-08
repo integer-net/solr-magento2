@@ -11,7 +11,7 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^5.7",
-    "tddwizard/magento2-fixtures": "0.3.1"
+    "tddwizard/magento2-fixtures": "0.8.0"
   },
   "type": "magento2-module",
   "license": [
