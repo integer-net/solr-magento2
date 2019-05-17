@@ -11,7 +11,7 @@ for information on how to install it or ask your administrator or hosting provid
 same network or on the same server as your Magento installation in order to improve performance.
 1. Create at least one new Solr core. If you don't know how, please refer to your administrator or hosting partner.
 2. You can download the configuration files which should be installed in the "conf" directory of your core(s) from
-[https://github.com/integer-net/solr-magento1/tree/master/solr_conf](https://github.com/integer-net/solr-magento1/tree/master/solr_conf).
+[https://github.com/integer-net/solr-base/tree/master/conf](https://github.com/integer-net/solr-base/tree/master/conf).
 Please don't use any other configuration files unless you know exactly what you are doing.
 
 From there, you have two options:
