@@ -24,7 +24,7 @@ build-2.2:
           while ! nc -q 1 $MYSQL_CI_PORT_3306_TCP_ADDR $MYSQL_CI_PORT_3306_TCP_PORT </dev/null; do echo -n . && sleep 3; done
     - script:
         name: set up test system
-        code: build/install-magento.sh 2.2.8
+        code: build/install-magento.sh 2.2.7 # Don't use 2.2.8 because of the bug described in https://github.com/magento/magento2/issues/22370
     - script:
         name: run unit tests
         cwd: /var/www/magento/vendor/integer-net/solr-magento2
