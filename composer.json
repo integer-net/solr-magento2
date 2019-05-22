@@ -7,7 +7,8 @@
     "integer-net/solr-magento2-autosuggest" : "^1.0.0",
     "symfony/console": "^2.3|^3.0|^4.0",
     "magento/module-catalog": "^101.0.0|^102.0.0|^103.0.0",
-    "magento/module-search": "^100.1.0|^101.0.0"
+    "magento/module-search": "^100.1.0|^101.0.0",
+    "magento/module-indexer": "^100.2.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^5.7",
