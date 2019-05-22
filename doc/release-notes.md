@@ -2,6 +2,13 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Version 1.7.0 (May 22, 2019)
+----------------------------
+
+- Compatibility to Magento 2.3.1
+- Define correct indexer dependencies so they always run in the right order (Thanks Dominik Meglič!)
+- Abandoned compatibility to Magento 2.1.x and Php < 7.1 Use the branch "2.1-lts" if you need to use any of those.
+
 Version 1.6.2 (Feb 13, 2019)
 ----------------------------
 
