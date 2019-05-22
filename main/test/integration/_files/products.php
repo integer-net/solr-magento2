@@ -41,6 +41,7 @@ use Magento\Catalog\Model\Product\Visibility;
         ->setName('Product name in store')
         ->setStatus(Status::STATUS_ENABLED)
         ->setUrlKey('product-1-store-1')
+        ->setUrlPath('product-1-store-1')
         ->save();
 
 
