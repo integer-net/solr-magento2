@@ -45,12 +45,14 @@ Features
 
 Systemvoraussetzungen
 ------------
-- **Magento Community Edition** 2.1.x und 2.2.x
+- **Magento OpenSource Edition** 2.1.x, 2.2.x und 2.3.x (2.1.x wird seit Modulversion 1.7.0 nicht mehr unterstützt)
+- **Magento Commerce Edition** 2.2.x und 2.3.x
 - **Solr** 4.x bis 6.x
-- **PHP** 5.6 bis 7.0
+- **PHP** 5.6, 7.0 bis 7.2 (5.6 and 7.0 werden seit Modulversion 1.7.0 nicht mehr unterstützt)
 
 Installation
 ------------
+Beachten Sie unsere separaten [Installationsanweisungen](installation.md) (Englisch).
 <!-- @TODO Copy and translate from OR link to installation.md -->
 
 <a name="technischer-ablauf">Technischer Ablauf</a>

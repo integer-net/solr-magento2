@@ -45,12 +45,15 @@ Features
 
 Requirements
 ------------
-- **Magento Community Edition** 2.1.x and 2.2.x
+- **Magento OpenSource Edition** 2.1.x, 2.2.x and 2.3.x (2.1.x is not supported any more starting from Module Version 1.7.0)
+- **Magento Commerce Edition** 2.2.x and 2.3.x
 - **Solr** 4.x to 6.x
-- **PHP** 5.6 to 7.0
+- **PHP** 5.6, 7.0 to 7.2 (5.6 and 7.0 are not supported any more starting from Module Version 1.7.0)
 
 Installation
 ------------
+
+See our seperate [installation instructions](installation.md).
 <!-- @TODO Copy and translate from OR link to installation.md -->
 
 <a name="technical-workflow">Technical workflow</a>
