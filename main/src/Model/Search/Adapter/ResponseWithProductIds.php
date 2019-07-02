@@ -50,6 +50,7 @@ class ResponseWithProductIds
         $response = [
             'aggregations' => $this->aggregationsFromSolrResponse(),
             'documents' => $this->documentsFromSolrResponse(),
+            'total' => $this->solrResponse->documents()->count(),
         ];
         return $response;
     }
