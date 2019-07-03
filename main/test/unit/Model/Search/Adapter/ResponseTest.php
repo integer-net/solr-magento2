@@ -122,6 +122,7 @@ class ResponseTest extends TestCase
                             ],
                         ],
                     ],
+                    'total' => 3,
                 ]
             ]
         ];
