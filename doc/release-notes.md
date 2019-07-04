@@ -2,6 +2,11 @@ IntegerNet_Solr for Magento 2
 ===============
 Release Notes
 
+Version 1.7.1 (Jul 4, 2019)
+----------------------------
+
+- Compatibility to Magento 2.3.2 (thanks Gerrit Pechmann!)
+
 Version 1.7.0 (May 22, 2019)
 ----------------------------
 
